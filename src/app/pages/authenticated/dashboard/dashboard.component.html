@@ -1,0 +1,20 @@
+<div>
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+    @if (name()) {
+      <p class="text-lg text-gray-600">Welcome, <span class="font-semibold text-gray-900">{{ name() }}</span>!</p>
+    }
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <app-card title="Total Projects" padding="md">
+      <p class="text-3xl font-bold text-blue-600">0</p>
+    </app-card>
+    <app-card title="Active Tasks" padding="md">
+      <p class="text-3xl font-bold text-green-600">0</p>
+    </app-card>
+    <app-card title="Completed" padding="md">
+      <p class="text-3xl font-bold text-purple-600">0</p>
+    </app-card>
+  </div>
+</div>
+

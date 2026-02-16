@@ -1,0 +1,36 @@
+<div [class]="wrapperClass">
+  @if (label) {
+    <label [for]="id" [class]="labelClass">
+      {{ label }}
+      @if (required) {
+        <span class="text-red-500">*</span>
+      }
+    </label>
+  }
+  <textarea
+    [id]="id"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [readonly]="readonly"
+    [required]="required"
+    [rows]="rows"
+    [cols]="cols"
+    [class]="getTextareaClasses()"
+    [value]="value"
+    (input)="onInput($event)"
+    (blur)="onBlur()"
+    (focus)="onFocus()"
+  ></textarea>
+  @if (showCharCount && maxLength) {
+    <p class="mt-1 text-sm text-gray-500 text-right">
+      {{ value.length }} / {{ maxLength }}
+    </p>
+  }
+  @if (hint && !error) {
+    <p class="mt-1 text-sm text-gray-500">{{ hint }}</p>
+  }
+  @if (error) {
+    <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+  }
+</div>
+

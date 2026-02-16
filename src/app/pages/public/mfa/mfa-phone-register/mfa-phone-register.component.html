@@ -1,0 +1,53 @@
+<div class="min-h-[calc(100vh-8rem)] flex items-center justify-center">
+  <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
+    <div>
+      <h2 class="text-3xl font-bold text-center text-gray-900">Register Phone for MFA</h2>
+      <p class="mt-2 text-center text-sm text-gray-600">
+        For added security, we use Multi-Factor Authentication (MFA)
+      </p>
+    </div>
+
+    <form [formGroup]="phoneForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
+      <div class="space-y-4">
+        <app-input
+          id="phone"
+          type="tel"
+          label="Phone Number"
+          placeholder="Enter 10-digit phone number"
+          formControlName="phone"
+          [error]="getPhoneError()"
+          [required]="true"
+          maxlength="10"
+          class="m-2"
+        />
+        <p class="text-sm text-gray-500">Enter your 10-digit phone number (no dashes or spaces)</p>
+      </div>
+
+      @if (errorMessage()) {
+        <app-alert type="error" [title]="errorMessage()" [dismissible]="true" (onDismiss)="errorMessage.set('')" />
+      }
+
+      <div class="flex space-x-4">
+        <app-button
+          type="button"
+          variant="outline"
+          (onClick)="onCancel()"
+          [disabled]="isLoading()"
+          [fullWidth]="true"
+        >
+          Cancel
+        </app-button>
+        <app-button
+          type="submit"
+          variant="primary"
+          [disabled]="phoneForm.invalid || isLoading()"
+          [loading]="isLoading()"
+          [fullWidth]="true"
+        >
+          Send Verification Code
+        </app-button>
+      </div>
+    </form>
+  </div>
+</div>
+

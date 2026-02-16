@@ -1,0 +1,84 @@
+<div class="min-h-[calc(100vh-8rem)] flex items-center justify-center">
+  <div class="max-w-[470px] w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
+    <div>
+      <h2 class="text-3xl font-bold text-center text-gray-900">Multi-Factor Authentication</h2>
+      <p class="mt-2 text-center text-sm text-gray-600">
+        For added security, we use Multi-Factor Authentication (MFA). A verification code has been
+        sent via text to <b>{{ formatPhone(phone) }}</b>
+        Please enter it below.
+      </p>
+    </div>
+
+    <form [formGroup]="otpForm" (ngSubmit)="onSubmit()" class="!mt-0 space-y-6">
+      <div class="mb-3">
+        <app-input
+          id="otp"
+          type="text"
+          label="Verification Code:"
+          placeholder="123456"
+          formControlName="otp"
+          [error]="getOtpError()"
+          [required]="true"
+          maxlength="6"
+          class="m-2"
+        />
+
+        <app-checkbox
+          id="rememberMe"
+          label="Remember this MFA verification on this device for 30 days"
+          formControlName="rememberMe"
+        />
+      </div>
+
+      @if (errorMessage()) {
+      <app-alert
+        type="error"
+        [title]="errorMessage()"
+        [dismissible]="true"
+        (onDismiss)="errorMessage.set('')"
+      />
+      } @if (successMessage()) {
+      <app-alert
+        type="success"
+        [title]="successMessage()"
+        [dismissible]="true"
+        (onDismiss)="successMessage.set('')"
+      />
+      }
+
+      <div class="space-y-4">
+        <app-button
+          type="submit"
+          variant="primary"
+          [disabled]="otpForm.invalid || isLoading()"
+          [loading]="isLoading()"
+          [fullWidth]="true"
+        >
+          Continue
+        </app-button>
+
+        <div class="text-center">
+          <button
+            type="button"
+            (click)="requestNewOtp()"
+            [disabled]="resendDisabled() || resendCooldown() > 0"
+            class="text-sm text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:cursor-not-allowed"
+          >
+            @if (resendCooldown() > 0) { Request Verification Code in {{ resendCooldown() }}s }
+            @else { Request Verification Code }
+          </button>
+        </div>
+
+        <!-- <app-button
+          type="button"
+          variant="outline"
+          (onClick)="onCancel()"
+          [disabled]="isLoading()"
+          [fullWidth]="true"
+        >
+          Cancel
+        </app-button> -->
+      </div>
+    </form>
+  </div>
+</div>

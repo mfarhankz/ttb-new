@@ -1,0 +1,83 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Authenticated Header -->
+  <header class="bg-white shadow-sm">
+    <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Left Section: Logo and Navigation -->
+        <div class="flex items-center space-x-8">
+          <h1 class="text-xl font-semibold text-gray-900">Title Toolbox</h1>
+          <nav class="flex space-x-4">
+            <a
+              routerLink="/property-search"
+              routerLinkActive="text-blue-600 font-medium"
+              class="text-gray-600 hover:text-gray-900"
+            >
+              Property Search
+            </a>
+            <a
+              routerLink="/farming"
+              routerLinkActive="text-blue-600 font-medium"
+              class="text-gray-600 hover:text-gray-900"
+            >
+              Farming
+            </a>
+            <a
+              routerLink="/statistics"
+              routerLinkActive="text-blue-600 font-medium"
+              class="text-gray-600 hover:text-gray-900"
+            >
+              Statistics
+            </a>
+            <a
+              routerLink="/buyer-cost-estimate"
+              routerLinkActive="text-blue-600 font-medium"
+              class="text-gray-600 hover:text-gray-900"
+            >
+              Buyer Cost Estimate
+            </a>
+            <a
+              routerLink="/daily-lead-alerts"
+              routerLinkActive="text-blue-600 font-medium"
+              class="text-gray-600 hover:text-gray-900 relative"
+            >
+              Daily Lead Alerts
+              <span class="absolute -top-1 -right-1 bg-green-500 text-white text-xs px-1 rounded">NEW</span>
+            </a>
+          </nav>
+        </div>
+
+        <!-- Right Section: Actions and User -->
+        <div class="flex items-center space-x-4">
+          
+          <!-- User Section -->
+          <div class="flex items-center space-x-2">
+            @if (userPicture()) {
+              <img
+                [src]="userPicture()"
+                [alt]="name()"
+                class="w-8 h-8 rounded-full object-cover"
+                onerror="this.style.display='none'"
+              />
+            }
+            <span class="text-sm text-gray-600">
+              <span class="font-medium text-gray-900">{{ name() }}</span>
+            </span>
+          </div>
+
+          <button
+            (click)="logout()"
+            class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+

@@ -1,0 +1,17 @@
+<div [class]="wrapperClass">
+  @if (label) {
+    <app-label [for]="controlId" [required]="required" [size]="labelSize">
+      {{ label }}
+    </app-label>
+  }
+  <div class="mt-1">
+    <ng-content></ng-content>
+  </div>
+  @if (hint && !error) {
+    <p class="mt-1 text-sm text-gray-500">{{ hint }}</p>
+  }
+  @if (error) {
+    <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+  }
+</div>
+

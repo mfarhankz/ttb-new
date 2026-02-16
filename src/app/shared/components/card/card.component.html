@@ -1,0 +1,28 @@
+<div [class]="getCardClasses()">
+  @if (title || headerActions) {
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div class="flex items-center justify-between">
+        @if (title) {
+          <h3 [class]="getTitleClasses()">{{ title }}</h3>
+        }
+        @if (headerActions) {
+          <div class="flex items-center space-x-2">
+            <ng-content select="[headerActions]"></ng-content>
+          </div>
+        }
+      </div>
+      @if (subtitle) {
+        <p class="mt-1 text-sm text-gray-500">{{ subtitle }}</p>
+      }
+    </div>
+  }
+  <div [class]="getBodyClasses()">
+    <ng-content></ng-content>
+  </div>
+  @if (footer) {
+    <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+      <ng-content select="[footer]"></ng-content>
+    </div>
+  }
+</div>
+

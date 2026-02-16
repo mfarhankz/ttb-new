@@ -1,0 +1,31 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Public Header (optional) -->
+  <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center">
+          <h1 class="text-xl font-semibold text-gray-900">Title Toolbox</h1>
+        </div>
+        <nav class="flex space-x-4">
+          <a routerLink="/" class="text-gray-600 hover:text-gray-900">Home</a>
+          <a routerLink="/login" class="text-gray-600 hover:text-gray-900">Login</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Public Footer (optional) -->
+  <footer class="bg-white border-t mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <p class="text-center text-gray-500 text-sm">
+        &copy; {{ currentYear }} Title Toolbox. All rights reserved.
+      </p>
+    </div>
+  </footer>
+</div>
+

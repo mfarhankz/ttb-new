@@ -1,0 +1,18 @@
+<button
+  [type]="type"
+  [disabled]="disabled || loading"
+  [class]="getButtonClasses()"
+  (click)="onClick.emit($event)"
+>
+  @if (loading) {
+    <span class="inline-block animate-spin mr-2">⟳</span>
+  }
+  @if (icon && iconPosition === 'left') {
+    <i [class]="icon" class="mr-2"></i>
+  }
+  <ng-content></ng-content>
+  @if (icon && iconPosition === 'right') {
+    <i [class]="icon" class="ml-2"></i>
+  }
+</button>
+

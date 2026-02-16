@@ -1,0 +1,7 @@
+<label [for]="for" [class]="getLabelClasses()">
+  <ng-content></ng-content>
+  @if (required) {
+    <span class="text-red-500 ml-1">*</span>
+  }
+</label>
+

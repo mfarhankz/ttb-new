@@ -1,0 +1,32 @@
+<div [class]="wrapperClass">
+  <label [for]="id" class="flex items-center cursor-pointer" [class.cursor-not-allowed]="disabled">
+    <input
+      [id]="id"
+      type="radio"
+      [name]="name"
+      [value]="value"
+      [checked]="isChecked"
+      [disabled]="disabled"
+      [required]="required"
+      [class]="getRadioClasses()"
+      (change)="onChange($event)"
+      (blur)="onBlur()"
+    />
+    @if (label) {
+      <span [class]="getLabelClasses()" class="ml-2">
+        {{ label }}
+        @if (required) {
+          <span class="text-red-500">*</span>
+        }
+      </span>
+    }
+    <ng-content></ng-content>
+  </label>
+  @if (hint && !error) {
+    <p class="mt-1 text-sm text-gray-500 ml-6">{{ hint }}</p>
+  }
+  @if (error) {
+    <p class="mt-1 text-sm text-red-600 ml-6">{{ error }}</p>
+  }
+</div>
+
