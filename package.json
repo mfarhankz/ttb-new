@@ -6,7 +6,11 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "generate-login-defaults": "node scripts/generate-login-defaults.js",
+    "postinstall": "node scripts/generate-login-defaults.js",
+    "prestart": "node scripts/generate-login-defaults.js",
+    "prebuild": "node scripts/generate-login-defaults.js"
   },
   "prettier": {
     "printWidth": 100,

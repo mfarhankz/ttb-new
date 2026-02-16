@@ -4,6 +4,7 @@ import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { SKIP_LOGIN_IN_DEV } from '../../../core/config/api.config';
+import { LOGIN_DEFAULTS } from '../../../../environments/login-defaults.generated';
 import { InputComponent, ButtonComponent, AlertComponent } from '../../../shared/components';
 import { MfaPhoneRegisterComponent } from '../mfa/mfa-phone-register/mfa-phone-register.component';
 import { MfaOtpVerifyComponent } from '../mfa/mfa-otp-verify/mfa-otp-verify.component';
@@ -45,8 +46,8 @@ export class LoginComponent implements OnInit {
     private route: ActivatedRoute
   ) {
     this.loginForm = this.fb.group({
-      email: ['ttbhelp@benutech.com', [Validators.required, Validators.email]],
-      password: ['TTBHelp123', [Validators.required, Validators.minLength(6)]]
+      email: [LOGIN_DEFAULTS.email, [Validators.required, Validators.email]],
+      password: [LOGIN_DEFAULTS.password, [Validators.required, Validators.minLength(6)]]
     });
   }
 

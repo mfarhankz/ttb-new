@@ -90,6 +90,7 @@ ng version        # Should be 21.1.4
    ```
 
 3. **Configure environment** (if needed)
+   - Copy `.env.example` to `.env` and set `TTB_DEV_EMAIL` and `TTB_DEV_PASSWORD` for local login form defaults (optional; never commit `.env`).
    - Update API endpoints in `src/app/core/config/api.config.ts`
    - Adjust development flags as needed
 
@@ -252,6 +253,16 @@ titletoolbox-new/
 - **Nested Routes**: Hierarchical routing structure
 
 ## ⚙️ Configuration
+
+### Login form defaults (.env)
+
+To prefill the login form in development without putting credentials in code:
+
+1. Copy `.env.example` to `.env`.
+2. Set `TTB_DEV_EMAIL` and `TTB_DEV_PASSWORD` in `.env` (optional).
+3. Run `npm run generate-login-defaults` or start the app with `npm start` (script runs automatically).
+
+The file `src/environments/login-defaults.generated.ts` is generated from `.env`. Never commit `.env`; if you run the script with real credentials in `.env`, do not commit the generated file (revert it to the empty default before committing).
 
 ### API Configuration
 
