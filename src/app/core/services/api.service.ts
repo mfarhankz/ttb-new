@@ -1,17 +1,23 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { API_CONFIG } from '../config/api.config';
 import { ApiError } from '../interfaces/api.interface';
+import { VerticalService } from './vertical.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = API_CONFIG.baseUrl;
+  private readonly http = inject(HttpClient);
+  private readonly verticalService = inject(VerticalService);
 
-  constructor(private http: HttpClient) {}
+  private get baseUrl(): string {
+    return this.verticalService.initialized()
+      ? this.verticalService.apiBaseUrl()
+      : API_CONFIG.baseUrl;
+  }
 
   /**
    * Get default headers for API requests

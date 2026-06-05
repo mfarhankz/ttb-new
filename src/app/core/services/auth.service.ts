@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, catchError, map, throwError } from 'rxjs';
 import { ApiService } from './api.service';
+import { VerticalService } from './vertical.service';
 import { API_CONFIG, DISABLE_MFA_IN_DEV } from '../config/api.config';
 import { LoginRequest, LoginResponse, ApiError, LoginCredentials, RegisterPhoneMFARequest, VerifyOTPRequest, MFAResponse } from '../interfaces/api.interface';
 
@@ -49,7 +50,8 @@ export class AuthService {
 
   constructor(
     private router: Router,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private verticalService: VerticalService
   ) {
     this.checkAuthStatus();
   }
@@ -399,8 +401,16 @@ export class AuthService {
     if (!userPic || usersId == null) {
       return null;
     }
-    const base = API_CONFIG.storageBaseUrl.replace(/\/$/, '');
-    const location = API_CONFIG.userPicLocation.replace(/^\//, '');
+    const base = (
+      this.verticalService.initialized()
+        ? this.verticalService.storageBaseUrl()
+        : API_CONFIG.storageBaseUrl
+    ).replace(/\/$/, '');
+    const location = (
+      this.verticalService.initialized()
+        ? this.verticalService.userPicLocation()
+        : API_CONFIG.userPicLocation
+    ).replace(/^\//, '');
     return `${base}/${location}/${usersId}/${userPic}?t=${Date.now()}`;
   }
 

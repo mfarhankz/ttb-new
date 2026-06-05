@@ -1,6 +1,18 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+  @if (vertical.bannerUrl()) {
+    <div class="mb-12 flex justify-center">
+      <img
+        [src]="vertical.bannerUrl()"
+        [alt]="vertical.companyName()"
+        class="max-w-full h-auto rounded-lg shadow-md"
+      />
+    </div>
+  }
+
   <div class="text-center">
-    <h1 class="text-display font-bold text-foreground mb-4">Welcome to Title Toolbox</h1>
+    <h1 class="text-display font-bold text-foreground mb-4">
+      Welcome to {{ vertical.companyName() }}
+    </h1>
     <p class="text-h4 text-muted mb-8">
       Your comprehensive title management solution.
     </p>

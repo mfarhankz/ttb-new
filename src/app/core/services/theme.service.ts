@@ -62,6 +62,15 @@ export class ThemeService {
     this.applyCssVars(vars);
   }
 
+  /** Apply arbitrary design-token CSS variables (used by VerticalService presets). */
+  applyCssVars(vars: Record<string, string>): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const root = document.documentElement;
+    for (const [key, value] of Object.entries(vars)) {
+      root.style.setProperty(key, value);
+    }
+  }
+
   resetToDefault(): void {
     if (!isPlatformBrowser(this.platformId)) return;
     this.runtimeOverrides = {};
@@ -103,13 +112,5 @@ export class ThemeService {
 
   private applyTokens(tokens: ThemeTokens): void {
     this.applyCssVars(tokensToCssVars(tokens));
-  }
-
-  private applyCssVars(vars: Record<string, string>): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-    const root = document.documentElement;
-    for (const [key, value] of Object.entries(vars)) {
-      root.style.setProperty(key, value);
-    }
   }
 }

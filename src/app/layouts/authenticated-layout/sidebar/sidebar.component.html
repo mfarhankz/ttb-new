@@ -1,29 +1,187 @@
 <nav
-  class="fixed top-0 left-0 bottom-0 z-sidebar flex flex-col bg-sidebar border-r border-sidebar-border transition-[width] duration-200 overflow-visible"
+  class="fixed top-0 left-0 bottom-0 z-sidebar flex flex-col mr-0 bg-sidebar border border-sidebar-border shadow-sm transition-[width] duration-200 overflow-visible"
   [class.w-sidebar]="!isCollapsed"
   [class.w-sidebar-collapsed]="isCollapsed"
 >
-  <button
-    type="button"
-    class="absolute top-6 -right-3 w-6 h-6 rounded-full bg-sidebar border border-sidebar-border flex items-center justify-center cursor-pointer z-[41] text-sidebar-muted shadow-sm transition-colors hover:text-sidebar-foreground"
-    (click)="toggleCollapsed()"
-    [attr.aria-label]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
-  >
-    <i class="pi pi-chevron-left text-xs transition-transform duration-200" [class.rotate-180]="isCollapsed"></i>
-  </button>
-
+  <!-- Brand header -->
   <div
-    class="text-center font-bold text-caption text-sidebar-foreground py-2 tracking-tight"
-    [class.hidden]="!isCollapsed"
-    [class.block]="isCollapsed"
+    class="relative flex items-center gap-3 px-4 py-3 border-b border-sidebar-border min-h-[4.5rem]"
+    [class.justify-center]="isCollapsed"
+    [class.px-3]="isCollapsed"
   >
-    TTB
+    <img
+      [src]="isCollapsed ? vertical.dashboardShortLogoUrl() : vertical.dashboardLogoUrl()"
+      [alt]="vertical.companyName()"
+      class="object-contain"
+      [class.w-full]="!isCollapsed"
+      [class.h-auto]="!isCollapsed"
+      [class.h-10]="isCollapsed"
+      [class.w-10]="isCollapsed"
+    />
+
+    <button
+      type="button"
+      class="absolute -right-3 top-[4.5em] -translate-y-1/2 w-5 h-5 rounded-md bg-surface border border-border flex items-center justify-center cursor-pointer z-[41] text-muted shadow-sm transition-colors hover:text-foreground"
+      (click)="toggleCollapsed()"
+      [attr.aria-label]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+    >
+      <i
+        class="pi text-xs"
+        [class.pi-angle-right]="isCollapsed"
+        [class.pi-angle-left]="!isCollapsed"
+      ></i>
+    </button>
   </div>
 
+  <!-- Navigation: overflow visible when collapsed so flyout panels are not clipped -->
   <div
-    class="flex items-center gap-3 px-4 py-5 border-b border-sidebar-border min-h-20"
+    class="flex-1 px-3 py-4 min-h-0"
+    [class.overflow-y-auto]="!isCollapsed"
+    [class.overflow-visible]="isCollapsed"
+  >
+    <div class="text-overline uppercase text-sidebar-muted px-2 pt-2 pb-2" [class.hidden]="isCollapsed">
+      Main
+    </div>
+
+    @for (item of mainNav; track item.label) {
+      <div
+        class="relative mb-1"
+        (mouseenter)="onParentMouseEnter(item)"
+        (mouseleave)="onParentMouseLeave(item)"
+      >
+        @if (hasChildren(item)) {
+          <button
+            type="button"
+            class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-body-sm text-sidebar-foreground border-0 bg-transparent cursor-pointer text-left transition-colors hover:bg-sidebar-hover"
+            [class.justify-center]="isCollapsed"
+            [class.px-2]="isCollapsed"
+            [class.bg-sidebar-active]="isParentActive(item) || (!isCollapsed && isMenuExpanded(item.label))"
+            [class.font-medium]="isParentActive(item)"
+            (click)="toggleMenu(item, $event)"
+          >
+            <i [class]="item.icon" class="text-lg flex-shrink-0"></i>
+            <span class="truncate flex-1" [class.hidden]="isCollapsed">{{ item.label }}</span>
+            @if (!isCollapsed) {
+              <i
+                class="pi text-caption flex-shrink-0 transition-transform duration-200"
+                [class.pi-chevron-up]="isMenuExpanded(item.label)"
+                [class.pi-chevron-down]="!isMenuExpanded(item.label)"
+              ></i>
+            }
+          </button>
+
+          <!-- Expanded: inline accordion -->
+          @if (isMenuExpanded(item.label) && !isCollapsed) {
+            <div class="ml-4 pl-3 border-l border-sidebar-border mt-1 mb-2">
+              @for (child of item.children; track child.label) {
+                <a
+                  class="flex items-center w-full px-3 py-2 mb-0.5 rounded-lg text-caption text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium"
+                  [routerLink]="child.route"
+                  routerLinkActive="active"
+                >
+                  <span class="truncate">{{ child.label }}</span>
+                </a>
+              }
+            </div>
+          }
+
+          <!-- Collapsed: hover flyout submenu (pl-2 bridges gap to parent icon) -->
+          @if (isCollapsed && isFlyoutOpen(item.label)) {
+            <div
+              class="absolute left-full top-0 pl-2 z-[60]"
+              (mouseenter)="showFlyout(item.label)"
+              (mouseleave)="hideFlyout(item.label)"
+            >
+              <div class="min-w-[11rem] bg-surface border border-border rounded-xl shadow-lg py-2">
+                <div class="px-3 py-1.5 text-overline uppercase text-muted border-b border-border mb-1">
+                  {{ item.label }}
+                </div>
+                @for (child of item.children; track child.label) {
+                  <a
+                    class="block px-3 py-2 mx-1 rounded-lg text-body-sm text-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium"
+                    [routerLink]="child.route"
+                    routerLinkActive="active"
+                    (click)="clearFlyout()"
+                  >
+                    {{ child.label }}
+                  </a>
+                }
+              </div>
+            </div>
+          }
+        } @else {
+          <div class="relative group">
+            <a
+              class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-body-sm text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium"
+              [class.justify-center]="isCollapsed"
+              [class.px-2]="isCollapsed"
+              [routerLink]="item.route"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+            >
+              <i [class]="item.icon" class="text-lg flex-shrink-0"></i>
+              <span class="truncate flex-1" [class.hidden]="isCollapsed">{{ item.label }}</span>
+              @if (item.badge && !isCollapsed) {
+                <span class="text-caption bg-success text-success-foreground px-1.5 py-0.5 rounded">{{ item.badge }}</span>
+              }
+            </a>
+            @if (isCollapsed) {
+              <span
+                class="hidden group-hover:block absolute left-[calc(100%+0.5rem)] top-1/2 -translate-y-1/2 bg-surface text-foreground border border-border px-3 py-1.5 rounded-lg text-caption whitespace-nowrap z-tooltip pointer-events-none shadow-md"
+              >
+                {{ item.label }}
+              </span>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <div class="text-overline uppercase text-sidebar-muted px-2 pt-4 pb-2" [class.hidden]="isCollapsed">
+      Settings
+    </div>
+
+    @for (item of settingsNav; track item.label) {
+      <div class="relative mb-1 group">
+        @if (item.route) {
+          <a
+            class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-body-sm text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium"
+            [class.justify-center]="isCollapsed"
+            [class.px-2]="isCollapsed"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+          >
+            <i [class]="item.icon" class="text-lg flex-shrink-0"></i>
+            <span class="truncate" [class.hidden]="isCollapsed">{{ item.label }}</span>
+          </a>
+        } @else if (item.action === 'logout') {
+          <button
+            type="button"
+            class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-body-sm text-sidebar-foreground border-0 bg-transparent cursor-pointer text-left transition-colors hover:bg-sidebar-hover"
+            [class.justify-center]="isCollapsed"
+            [class.px-2]="isCollapsed"
+            (click)="onNavAction(item)"
+          >
+            <i [class]="item.icon" class="text-lg flex-shrink-0"></i>
+            <span class="truncate" [class.hidden]="isCollapsed">{{ item.label }}</span>
+          </button>
+        }
+        @if (isCollapsed) {
+          <span
+            class="hidden group-hover:block absolute left-[calc(100%+0.5rem)] top-1/2 -translate-y-1/2 bg-surface text-foreground border border-border px-3 py-1.5 rounded-lg text-caption whitespace-nowrap z-tooltip pointer-events-none shadow-md"
+          >
+            {{ item.label }}
+          </span>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- User block -->
+  <div
+    class="flex items-center gap-3 px-4 py-3 border-t border-sidebar-border mt-auto flex-shrink-0"
     [class.justify-center]="isCollapsed"
-    [class.px-2]="isCollapsed"
+    [class.px-3]="isCollapsed"
   >
     @if (userPicture()) {
       <img
@@ -42,120 +200,8 @@
     <div class="min-w-0 overflow-hidden" [class.hidden]="isCollapsed">
       <div class="font-semibold text-body-sm text-sidebar-foreground truncate">{{ name() }}</div>
       @if (userSubtitle()) {
-        <div class="text-overline uppercase text-sidebar-muted mt-0.5">{{ userSubtitle() }}</div>
+        <div class="text-overline uppercase text-sidebar-muted mt-0.5 truncate">{{ userSubtitle() }}</div>
       }
     </div>
-  </div>
-
-  <div class="flex-1 overflow-y-auto px-3">
-    <div class="text-overline uppercase text-sidebar-muted px-1 pt-4 pb-2" [class.hidden]="isCollapsed">
-      Main
-    </div>
-    @for (item of mainNav; track item.label) {
-      <div class="relative group">
-        @if (hasChildren(item)) {
-          <button
-            type="button"
-            class="flex items-center gap-3 w-full px-3 py-2.5 mb-1 rounded-lg text-body-sm text-sidebar-foreground no-underline border-0 bg-transparent cursor-pointer text-left transition-colors hover:bg-sidebar-hover"
-            [class.justify-center]="isCollapsed"
-            [class.px-2.5]="isCollapsed"
-            [class.bg-sidebar-active]="isParentActive(item)"
-            [class.font-medium]="isParentActive(item)"
-            (click)="toggleMenu(item, $event)"
-          >
-            <i [class]="item.icon" class="text-lg flex-shrink-0"></i>
-            <span class="truncate" [class.hidden]="isCollapsed">{{ item.label }}</span>
-            <i
-              class="pi pi-chevron-right text-caption ml-auto transition-transform duration-200"
-              [class.hidden]="isCollapsed"
-              [class.rotate-90]="isMenuExpanded(item.label)"
-            ></i>
-          </button>
-          @if (isMenuExpanded(item.label) && !isCollapsed) {
-            <div class="ml-3 pl-3 border-l border-sidebar-border mb-1">
-              @for (child of item.children; track child.label) {
-                <div class="relative group">
-                  <a
-                    class="flex items-center gap-3 w-full pl-2 pr-3 py-2 mb-1 rounded-lg text-caption text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium"
-                    [routerLink]="child.route"
-                    routerLinkActive="active"
-                  >
-                    <i [class]="child.icon" class="text-lg flex-shrink-0"></i>
-                    <span class="truncate">{{ child.label }}</span>
-                  </a>
-                  @if (isCollapsed) {
-                    <span
-                      class="hidden group-hover:block absolute left-[calc(100%+8px)] top-1/2 -translate-y-1/2 bg-sidebar-tooltip text-sidebar-tooltip-foreground px-3 py-1.5 rounded-md text-caption whitespace-nowrap z-tooltip pointer-events-none shadow-md"
-                    >
-                      {{ child.label }}
-                    </span>
-                  }
-                </div>
-              }
-            </div>
-          }
-        } @else {
-          <a
-            class="flex items-center gap-3 w-full px-3 py-2.5 mb-1 rounded-lg text-body-sm text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium"
-            [class.justify-center]="isCollapsed"
-            [class.px-2.5]="isCollapsed"
-            [routerLink]="item.route"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
-          >
-            <i [class]="item.icon" class="text-lg flex-shrink-0"></i>
-            <span class="truncate" [class.hidden]="isCollapsed">{{ item.label }}</span>
-            @if (item.badge && !isCollapsed) {
-              <span class="ml-auto text-caption bg-success text-success-foreground px-1 rounded">{{ item.badge }}</span>
-            }
-          </a>
-        }
-        @if (isCollapsed) {
-          <span
-            class="hidden group-hover:block absolute left-[calc(100%+8px)] top-1/2 -translate-y-1/2 bg-sidebar-tooltip text-sidebar-tooltip-foreground px-3 py-1.5 rounded-md text-caption whitespace-nowrap z-tooltip pointer-events-none shadow-md"
-          >
-            {{ item.label }}
-          </span>
-        }
-      </div>
-    }
-
-    <div class="text-overline uppercase text-sidebar-muted px-1 pt-4 pb-2" [class.hidden]="isCollapsed">
-      Settings
-    </div>
-    @for (item of settingsNav; track item.label) {
-      <div class="relative group">
-        @if (item.route) {
-          <a
-            class="flex items-center gap-3 w-full px-3 py-2.5 mb-1 rounded-lg text-body-sm text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium"
-            [class.justify-center]="isCollapsed"
-            [class.px-2.5]="isCollapsed"
-            [routerLink]="item.route"
-            routerLinkActive="active"
-          >
-            <i [class]="item.icon" class="text-lg flex-shrink-0"></i>
-            <span class="truncate" [class.hidden]="isCollapsed">{{ item.label }}</span>
-          </a>
-        } @else if (item.action === 'logout') {
-          <button
-            type="button"
-            class="flex items-center gap-3 w-full px-3 py-2.5 mb-1 rounded-lg text-body-sm text-sidebar-foreground border-0 bg-transparent cursor-pointer text-left transition-colors hover:bg-sidebar-hover"
-            [class.justify-center]="isCollapsed"
-            [class.px-2.5]="isCollapsed"
-            (click)="onNavAction(item)"
-          >
-            <i [class]="item.icon" class="text-lg flex-shrink-0"></i>
-            <span class="truncate" [class.hidden]="isCollapsed">{{ item.label }}</span>
-          </button>
-        }
-        @if (isCollapsed) {
-          <span
-            class="hidden group-hover:block absolute left-[calc(100%+8px)] top-1/2 -translate-y-1/2 bg-sidebar-tooltip text-sidebar-tooltip-foreground px-3 py-1.5 rounded-md text-caption whitespace-nowrap z-tooltip pointer-events-none shadow-md"
-          >
-            {{ item.label }}
-          </span>
-        }
-      </div>
-    }
   </div>
 </nav>

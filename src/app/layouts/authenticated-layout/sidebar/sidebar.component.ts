@@ -1,9 +1,10 @@
-import { Component, computed, inject, OnDestroy, OnInit, output } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, output, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { LayoutService } from '../../../core/services/layout.service';
+import { VerticalService } from '../../../core/services/vertical.service';
 import {
   MAIN_NAV,
   SETTINGS_NAV,
@@ -24,9 +25,12 @@ import {
 export class SidebarComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private layoutService = inject(LayoutService);
+  private verticalService = inject(VerticalService);
   private router = inject(Router);
   private routerSub?: Subscription;
+  private flyoutHideTimer?: ReturnType<typeof setTimeout>;
 
+  readonly vertical = this.verticalService;
   collapsedChange = output<boolean>();
 
   mainNav = MAIN_NAV;
@@ -42,6 +46,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   isCollapsed = false;
   expandedMenus = new Set<string>();
+  hoveredFlyout = signal<string | null>(null);
 
   ngOnInit(): void {
     const stored = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
@@ -53,11 +58,15 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.syncExpandedMenusFromRoute();
     this.routerSub = this.router.events
       .pipe(filter((e) => e instanceof NavigationEnd))
-      .subscribe(() => this.syncExpandedMenusFromRoute());
+      .subscribe(() => {
+        this.syncExpandedMenusFromRoute();
+        this.clearFlyout();
+      });
   }
 
   ngOnDestroy(): void {
     this.routerSub?.unsubscribe();
+    if (this.flyoutHideTimer) clearTimeout(this.flyoutHideTimer);
   }
 
   hasChildren(item: NavItem): boolean {
@@ -66,6 +75,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   isMenuExpanded(label: string): boolean {
     return this.expandedMenus.has(label);
+  }
+
+  isFlyoutOpen(label: string): boolean {
+    return this.isCollapsed && this.hoveredFlyout() === label;
   }
 
   isParentActive(item: NavItem): boolean {
@@ -77,11 +90,50 @@ export class SidebarComponent implements OnInit, OnDestroy {
   toggleMenu(item: NavItem, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
+    if (this.isCollapsed) return;
     if (this.expandedMenus.has(item.label)) {
       this.expandedMenus.delete(item.label);
     } else {
       this.expandedMenus.add(item.label);
     }
+  }
+
+  onParentMouseEnter(item: NavItem): void {
+    if (this.isCollapsed && this.hasChildren(item)) {
+      this.showFlyout(item.label);
+    }
+  }
+
+  onParentMouseLeave(item: NavItem): void {
+    if (this.isCollapsed && this.hasChildren(item)) {
+      this.hideFlyout(item.label);
+    }
+  }
+
+  showFlyout(label: string): void {
+    if (!this.isCollapsed) return;
+    if (this.flyoutHideTimer) {
+      clearTimeout(this.flyoutHideTimer);
+      this.flyoutHideTimer = undefined;
+    }
+    this.hoveredFlyout.set(label);
+  }
+
+  hideFlyout(label: string): void {
+    if (this.hoveredFlyout() !== label) return;
+    this.flyoutHideTimer = setTimeout(() => {
+      if (this.hoveredFlyout() === label) {
+        this.hoveredFlyout.set(null);
+      }
+    }, 200);
+  }
+
+  clearFlyout(): void {
+    if (this.flyoutHideTimer) {
+      clearTimeout(this.flyoutHideTimer);
+      this.flyoutHideTimer = undefined;
+    }
+    this.hoveredFlyout.set(null);
   }
 
   private syncExpandedMenusFromRoute(): void {
@@ -93,6 +145,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   toggleCollapsed(): void {
+    this.clearFlyout();
     this.setCollapsed(!this.isCollapsed);
   }
 
