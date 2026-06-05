@@ -32,9 +32,41 @@ export const routes: Routes = [
         title: 'Dashboard'
       },
       {
-        path: 'profile',
-        loadComponent: () => import('./pages/authenticated/profile/profile.component').then(m => m.ProfileComponent),
-        title: 'Profile'
+        path: 'property-search',
+        loadComponent: () => import('./pages/authenticated/placeholder/placeholder.component').then(m => m.PlaceholderComponent),
+        title: 'Property Search'
+      },
+      {
+        path: 'farming',
+        redirectTo: 'farming/radius-search',
+        pathMatch: 'full'
+      },
+      {
+        path: 'farming/radius-search',
+        loadComponent: () => import('./pages/authenticated/farming/farming.component').then(m => m.FarmingComponent),
+        title: 'Radius search',
+        data: { mapMode: 'radius' }
+      },
+      {
+        path: 'farming/boundary-search',
+        loadComponent: () => import('./pages/authenticated/farming/farming.component').then(m => m.FarmingComponent),
+        title: 'Boundary search',
+        data: { mapMode: 'boundary' }
+      },
+      {
+        path: 'statistics',
+        loadComponent: () => import('./pages/authenticated/placeholder/placeholder.component').then(m => m.PlaceholderComponent),
+        title: 'Statistics'
+      },
+      {
+        path: 'buyer-cost-estimate',
+        loadComponent: () => import('./pages/authenticated/placeholder/placeholder.component').then(m => m.PlaceholderComponent),
+        title: 'Buyer Cost Estimate'
+      },
+      {
+        path: 'daily-lead-alerts',
+        loadComponent: () => import('./pages/authenticated/placeholder/placeholder.component').then(m => m.PlaceholderComponent),
+        title: 'Daily Lead Alerts'
       }
     ]
   },

@@ -1,0 +1,13 @@
+<div class="farming-map-wrap">
+  <div class="farming-map-container">
+    <div
+      appOlMap
+      [mapObject]="mapObject"
+      [options]="mapOptions"
+      class="farming-map-inner"
+    ></div>
+    <div class="farming-map-toolbar">
+      <app-button variant="outline" (onClick)="onClearSearch()">Clear search</app-button>
+    </div>
+  </div>
+</div>

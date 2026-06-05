@@ -389,6 +389,22 @@ export class AuthService {
   }
 
   /**
+   * User profile image URL from TTB storage (same pattern as legacy app).
+   * e.g. https://demo.api.titletoolbox.com/ttb-storage/demo/user_pic/604/604.png?t=...
+   */
+  getUserPictureUrl(): string | null {
+    const tbUser = this._tbUser();
+    const userPic = tbUser?.user_pic;
+    const usersId = tbUser?.users_id;
+    if (!userPic || usersId == null) {
+      return null;
+    }
+    const base = API_CONFIG.storageBaseUrl.replace(/\/$/, '');
+    const location = API_CONFIG.userPicLocation.replace(/^\//, '');
+    return `${base}/${location}/${usersId}/${userPic}?t=${Date.now()}`;
+  }
+
+  /**
    * Register phone for MFA
    * Sends OTP to the provided phone number
    */

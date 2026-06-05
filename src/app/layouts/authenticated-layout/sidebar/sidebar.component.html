@@ -1,0 +1,112 @@
+<nav class="sidebar">
+  <button
+    type="button"
+    class="sidebar-toggle"
+    (click)="toggleCollapsed()"
+    [attr.aria-label]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+  >
+    <i class="pi pi-chevron-left"></i>
+  </button>
+
+  <div class="sidebar-brand-collapsed">TTB</div>
+
+  <div class="sidebar-user">
+    @if (userPicture()) {
+      <img
+        [src]="userPicture()"
+        [alt]="name()"
+        class="w-10 h-10 rounded-full object-cover flex-shrink-0"
+        onerror="this.style.display='none'"
+      />
+    } @else {
+      <div
+        class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-semibold"
+        style="background: var(--sidebar-active-bg); color: var(--sidebar-text)"
+      >
+        {{ name().charAt(0) }}
+      </div>
+    }
+    <div class="sidebar-user-info">
+      <div class="sidebar-user-name">{{ name() }}</div>
+      @if (userSubtitle()) {
+        <div class="sidebar-user-role">{{ userSubtitle() }}</div>
+      }
+    </div>
+  </div>
+
+  <div class="sidebar-nav">
+    <div class="sidebar-section-label">Main</div>
+    @for (item of mainNav; track item.label) {
+      <div class="sidebar-item-wrap">
+        @if (hasChildren(item)) {
+          <button
+            type="button"
+            class="sidebar-item w-full"
+            [class.active]="isParentActive(item)"
+            (click)="toggleMenu(item, $event)"
+          >
+            <i [class]="item.icon"></i>
+            <span class="sidebar-item-label">{{ item.label }}</span>
+            <i
+              class="pi pi-chevron-right sidebar-item-chevron"
+              [class.expanded]="isMenuExpanded(item.label)"
+            ></i>
+          </button>
+          @if (isMenuExpanded(item.label)) {
+            <div class="sidebar-children">
+              @for (child of item.children; track child.label) {
+                <div class="sidebar-item-wrap">
+                  <a
+                    class="sidebar-item sidebar-child-item"
+                    [routerLink]="child.route"
+                    routerLinkActive="active"
+                  >
+                    <i [class]="child.icon"></i>
+                    <span class="sidebar-item-label">{{ child.label }}</span>
+                  </a>
+                  <span class="sidebar-tooltip">{{ child.label }}</span>
+                </div>
+              }
+            </div>
+          }
+        } @else {
+          <a
+            class="sidebar-item"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+          >
+            <i [class]="item.icon"></i>
+            <span class="sidebar-item-label">{{ item.label }}</span>
+            @if (item.badge && !isCollapsed) {
+              <span class="ml-auto text-xs bg-green-500 text-white px-1 rounded">{{ item.badge }}</span>
+            }
+          </a>
+        }
+        <span class="sidebar-tooltip">{{ item.label }}</span>
+      </div>
+    }
+
+    <div class="sidebar-section-label">Settings</div>
+    @for (item of settingsNav; track item.label) {
+      <div class="sidebar-item-wrap">
+        @if (item.route) {
+          <a
+            class="sidebar-item"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+          >
+            <i [class]="item.icon"></i>
+            <span class="sidebar-item-label">{{ item.label }}</span>
+          </a>
+        } @else if (item.action === 'logout') {
+          <button type="button" class="sidebar-item w-full" (click)="onNavAction(item)">
+            <i [class]="item.icon"></i>
+            <span class="sidebar-item-label">{{ item.label }}</span>
+          </button>
+        }
+        <span class="sidebar-tooltip">{{ item.label }}</span>
+      </div>
+    }
+  </div>
+</nav>

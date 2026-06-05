@@ -1,44 +1,35 @@
-import { Component, computed, inject } from '@angular/core';
-import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { AuthService } from '../../core/services/auth.service';
+import { Component, inject, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { SidebarComponent } from './sidebar/sidebar.component';
+import { LayoutService } from '../../core/services/layout.service';
 
 @Component({
   selector: 'app-authenticated-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
+  imports: [RouterOutlet, SidebarComponent],
   templateUrl: './authenticated-layout.component.html',
-  styles: []
+  styles: [`
+    .authenticated-shell {
+      min-height: 100vh;
+      background: #f9fafb;
+    }
+    .authenticated-main {
+      margin-left: var(--sidebar-width, 260px);
+      min-height: 100vh;
+      transition: margin-left 0.2s ease;
+    }
+    .authenticated-shell.sidebar-collapsed .authenticated-main {
+      margin-left: var(--sidebar-width-collapsed, 72px);
+    }
+  `]
 })
 export class AuthenticatedLayoutComponent {
-  // Inject services using inject() function
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  private layoutService = inject(LayoutService);
 
-  // Access response data reactively
-  responseData = this.authService.responseData;
+  collapsed = signal(false);
 
-  // Get user data reactively
-  tbUser = this.authService.tbUser;
-
-  // Get user name from TbUser.name in response data
-  // Uses the helper method from AuthService
-  name = computed(() => {
-    return this.authService.getUserName() || 'User';
-  });
-
-  // Get user picture
-  userPicture = computed(() => {
-    const userPic = this.tbUser()?.user_pic;
-    if (userPic) {
-      // Assuming the image is stored at a specific path, adjust as needed
-      return `assets/images/users/${userPic}`;
-    }
-    return null;
-  });
-
-  logout(): void {
-    this.authService.logout();
+  onSidebarCollapsed(collapsed: boolean): void {
+    this.collapsed.set(collapsed);
+    this.layoutService.setSidebarCollapsed(collapsed);
   }
 }
-

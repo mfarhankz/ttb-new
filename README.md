@@ -289,6 +289,14 @@ export const SKIP_LOGIN_IN_DEV = false;   // Auto-login in development
 export const SKIP_PHONE_REGISTER_IN_DEV = false; // Auto-register phone
 ```
 
+### Map (OpenLayers + Google Maps)
+
+The map is implemented like the existing Title Toolbox app:
+
+- **Libraries**: OpenLayers (ol) v7.4.0 from CDN for the main map; Google Maps JavaScript API v3 with Places for geocoding and address autocomplete.
+- **Load order**: Google Maps is loaded first (async); when its callback runs, OpenLayers is loaded. The app does not initialize the main map until both are loaded (`mapScriptsLoaded` / `MapScriptsLoaderService.whenReady()`).
+- **Config**: Map defaults (center Irvine CA, zoom 12, etc.) are in `src/app/core/config/map.config.ts`. To enable Google Maps geocoding/Places, set a Google API key: in `map.config.ts` set `MAP_CONFIG.googleMapsApiKey` or set `window.__GOOGLE_MAPS_API_KEY__` before the app loads.
+
 ### TailwindCSS Configuration
 
 TailwindCSS is configured in `tailwind.config.js`:
