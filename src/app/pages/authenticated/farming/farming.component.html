@@ -1,12 +1,12 @@
-<div class="farming-map-wrap">
-  <div class="farming-map-container">
+<div class="fixed top-0 right-0 bottom-0 z-0 bg-background transition-[left] duration-200 left-[var(--sidebar-width)]">
+  <div class="relative w-full h-full">
     <div
       appOlMap
       [mapObject]="mapObject"
       [options]="mapOptions"
-      class="farming-map-inner"
+      class="absolute inset-0 w-full h-full"
     ></div>
-    <div class="farming-map-toolbar">
+    <div class="absolute top-0 left-0 right-0 z-toolbar flex flex-wrap gap-2 items-center px-4 py-2 bg-surface/55 border-b border-border">
       <app-button variant="outline" (onClick)="onClearSearch()">Clear search</app-button>
     </div>
   </div>

@@ -16,17 +16,17 @@
       <span [class]="getLabelClasses()" class="ml-2">
         {{ label }}
         @if (required) {
-          <span class="text-red-500">*</span>
+          <span class="text-danger">*</span>
         }
       </span>
     }
     <ng-content></ng-content>
   </label>
   @if (hint && !error) {
-    <p class="mt-1 text-sm text-gray-500 ml-6">{{ hint }}</p>
+    <p class="mt-1 text-body-sm text-muted ml-6">{{ hint }}</p>
   }
   @if (error) {
-    <p class="mt-1 text-sm text-red-600 ml-6">{{ error }}</p>
+    <p class="mt-1 text-body-sm text-danger ml-6">{{ error }}</p>
   }
 </div>
 

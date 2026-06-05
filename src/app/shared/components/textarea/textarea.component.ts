@@ -38,7 +38,7 @@ export class TextareaComponent implements ControlValueAccessor {
   private onTouched = () => {};
 
   get labelClass(): string {
-    return 'block text-sm font-medium text-gray-700 mb-1';
+    return 'block text-body-sm font-medium text-foreground mb-1';
   }
 
   getTextareaClasses(): string {
@@ -50,8 +50,8 @@ export class TextareaComponent implements ControlValueAccessor {
       lg: 'px-4 py-3 text-base'
     };
 
-    const errorClass = this.error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500';
-    const disabledClass = this.disabled ? 'bg-gray-50 cursor-not-allowed' : 'bg-white';
+    const errorClass = this.error ? 'border-danger focus:ring-danger' : 'border-border focus:ring-focus focus:border-primary';
+    const disabledClass = this.disabled ? 'bg-background cursor-not-allowed' : 'bg-surface';
     const widthClass = this.fullWidth ? 'w-full' : '';
 
     return `${baseClasses} ${sizeClasses[this.size]} ${errorClass} ${disabledClass} ${widthClass}`;

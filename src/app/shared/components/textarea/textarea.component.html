@@ -3,7 +3,7 @@
     <label [for]="id" [class]="labelClass">
       {{ label }}
       @if (required) {
-        <span class="text-red-500">*</span>
+        <span class="text-danger">*</span>
       }
     </label>
   }
@@ -22,15 +22,15 @@
     (focus)="onFocus()"
   ></textarea>
   @if (showCharCount && maxLength) {
-    <p class="mt-1 text-sm text-gray-500 text-right">
+    <p class="mt-1 text-body-sm text-muted text-right">
       {{ value.length }} / {{ maxLength }}
     </p>
   }
   @if (hint && !error) {
-    <p class="mt-1 text-sm text-gray-500">{{ hint }}</p>
+    <p class="mt-1 text-body-sm text-muted">{{ hint }}</p>
   }
   @if (error) {
-    <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+    <p class="mt-1 text-body-sm text-danger">{{ error }}</p>
   }
 </div>
 

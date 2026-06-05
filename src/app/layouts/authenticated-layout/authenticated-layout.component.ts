@@ -8,20 +8,7 @@ import { LayoutService } from '../../core/services/layout.service';
   standalone: true,
   imports: [RouterOutlet, SidebarComponent],
   templateUrl: './authenticated-layout.component.html',
-  styles: [`
-    .authenticated-shell {
-      min-height: 100vh;
-      background: #f9fafb;
-    }
-    .authenticated-main {
-      margin-left: var(--sidebar-width, 260px);
-      min-height: 100vh;
-      transition: margin-left 0.2s ease;
-    }
-    .authenticated-shell.sidebar-collapsed .authenticated-main {
-      margin-left: var(--sidebar-width-collapsed, 72px);
-    }
-  `]
+  styles: []
 })
 export class AuthenticatedLayoutComponent {
   private layoutService = inject(LayoutService);

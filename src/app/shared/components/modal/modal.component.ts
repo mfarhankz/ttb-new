@@ -41,7 +41,7 @@ export class ModalComponent {
   }
 
   getModalClasses(): string {
-    const baseClasses = 'relative bg-white rounded-lg shadow-xl transform transition-all pointer-events-auto';
+    const baseClasses = 'relative bg-surface rounded-lg shadow-lg transform transition-all pointer-events-auto';
     
     const sizeClasses = {
       sm: 'w-full max-w-sm',

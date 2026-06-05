@@ -37,7 +37,7 @@ export class RadioComponent implements ControlValueAccessor {
   }
 
   getRadioClasses(): string {
-    const baseClasses = 'border-gray-300 text-blue-600 focus:ring-blue-500 transition-colors';
+    const baseClasses = 'border-border text-primary focus:ring-focus transition-colors';
     
     const sizeClasses = {
       sm: 'h-4 w-4',
@@ -45,7 +45,7 @@ export class RadioComponent implements ControlValueAccessor {
       lg: 'h-6 w-6'
     };
 
-    const errorClass = this.error ? 'border-red-500' : '';
+    const errorClass = this.error ? 'border-danger' : '';
     const disabledClass = this.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';
 
     return `${baseClasses} ${sizeClasses[this.size]} ${errorClass} ${disabledClass}`;
@@ -53,7 +53,7 @@ export class RadioComponent implements ControlValueAccessor {
 
   getLabelClasses(): string {
     const baseClasses = 'text-sm';
-    const disabledClass = this.disabled ? 'text-gray-400' : 'text-gray-700';
+    const disabledClass = this.disabled ? 'text-subtle' : 'text-foreground';
     return `${baseClasses} ${disabledClass}`;
   }
 

@@ -21,10 +21,10 @@ export class AlertComponent {
     const baseClasses = 'rounded-md p-4';
     
     const typeClasses = {
-      success: 'bg-green-50 border border-green-200',
-      error: 'bg-red-50 border border-red-200',
-      warning: 'bg-yellow-50 border border-yellow-200',
-      info: 'bg-blue-50 border border-blue-200'
+      success: 'bg-success/10 border border-success/25',
+      error: 'bg-danger/10 border border-danger/25',
+      warning: 'bg-warning/10 border border-warning/25',
+      info: 'bg-info/10 border border-info/25'
     };
 
     return `${baseClasses} ${typeClasses[this.type]}`;
@@ -32,40 +32,40 @@ export class AlertComponent {
 
   getIconClasses(): string {
     const iconMap = {
-      success: 'pi pi-check-circle text-green-400',
-      error: 'pi pi-times-circle text-red-400',
-      warning: 'pi pi-exclamation-triangle text-yellow-400',
-      info: 'pi pi-info-circle text-blue-400'
+      success: 'pi pi-check-circle text-success',
+      error: 'pi pi-times-circle text-danger',
+      warning: 'pi pi-exclamation-triangle text-warning',
+      info: 'pi pi-info-circle text-info'
     };
     return iconMap[this.type];
   }
 
   getTitleClasses(): string {
     const typeClasses = {
-      success: 'text-green-800',
-      error: 'text-red-800',
-      warning: 'text-yellow-800',
-      info: 'text-blue-800'
+      success: 'text-success',
+      error: 'text-danger',
+      warning: 'text-warning',
+      info: 'text-info'
     };
-    return `text-sm font-medium ${typeClasses[this.type]}`;
+    return `text-body-sm font-medium ${typeClasses[this.type]}`;
   }
 
   getMessageClasses(): string {
     const typeClasses = {
-      success: 'text-green-700',
-      error: 'text-red-700',
-      warning: 'text-yellow-700',
-      info: 'text-blue-700'
+      success: 'text-success',
+      error: 'text-danger',
+      warning: 'text-warning',
+      info: 'text-info'
     };
-    return `text-sm ${typeClasses[this.type]}`;
+    return `text-body-sm ${typeClasses[this.type]}`;
   }
 
   getDismissButtonClasses(): string {
     const typeClasses = {
-      success: 'text-green-500 hover:bg-green-100 focus:ring-green-600',
-      error: 'text-red-500 hover:bg-red-100 focus:ring-red-600',
-      warning: 'text-yellow-500 hover:bg-yellow-100 focus:ring-yellow-600',
-      info: 'text-blue-500 hover:bg-blue-100 focus:ring-blue-600'
+      success: 'text-success hover:bg-success/10 focus:ring-success',
+      error: 'text-danger hover:bg-danger/10 focus:ring-danger',
+      warning: 'text-warning hover:bg-warning/10 focus:ring-warning',
+      info: 'text-info hover:bg-info/10 focus:ring-info'
     };
     return `inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 ${typeClasses[this.type]}`;
   }

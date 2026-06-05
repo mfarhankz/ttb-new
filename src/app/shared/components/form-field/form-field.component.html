@@ -8,10 +8,10 @@
     <ng-content></ng-content>
   </div>
   @if (hint && !error) {
-    <p class="mt-1 text-sm text-gray-500">{{ hint }}</p>
+    <p class="mt-1 text-body-sm text-muted">{{ hint }}</p>
   }
   @if (error) {
-    <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+    <p class="mt-1 text-body-sm text-danger">{{ error }}</p>
   }
 </div>
 

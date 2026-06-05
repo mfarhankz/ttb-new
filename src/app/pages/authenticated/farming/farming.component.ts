@@ -14,46 +14,7 @@ export type FarmingMapMode = 'radius' | 'boundary';
   standalone: true,
   imports: [ButtonComponent, OlMapComponent],
   templateUrl: './farming.component.html',
-  styles: [`
-    .farming-map-wrap {
-      position: fixed;
-      top: 0;
-      left: var(--sidebar-width, 260px);
-      right: 0;
-      bottom: 0;
-      z-index: 0;
-      background: #f3f4f6;
-      transition: left 0.2s ease;
-    }
-    .farming-map-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-    .farming-map-inner {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      width: 100%;
-      height: 100%;
-    }
-    .farming-map-toolbar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      align-items: center;
-      padding: 0.5rem 1rem;
-      background: rgb(255 255 255 / 54%);
-      border-bottom: 1px solid #e5e7eb;
-    }
-  `]
+  styles: []
 })
 export class FarmingComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);

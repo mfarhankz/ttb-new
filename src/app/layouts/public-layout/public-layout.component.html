@@ -1,31 +1,27 @@
-<div class="min-h-screen bg-gray-50">
-  <!-- Public Header (optional) -->
-  <header class="bg-white shadow-sm">
+<div class="min-h-screen bg-background flex flex-col">
+  <header class="bg-surface shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <div class="flex items-center">
-          <h1 class="text-xl font-semibold text-gray-900">Title Toolbox</h1>
+          <h1 class="text-h4 font-semibold text-foreground">Title Toolbox</h1>
         </div>
         <nav class="flex space-x-4">
-          <a routerLink="/" class="text-gray-600 hover:text-gray-900">Home</a>
-          <a routerLink="/login" class="text-gray-600 hover:text-gray-900">Login</a>
+          <a routerLink="/" class="text-muted hover:text-foreground">Home</a>
+          <a routerLink="/login" class="text-muted hover:text-foreground">Login</a>
         </nav>
       </div>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main>
+  <main class="flex-1">
     <router-outlet></router-outlet>
   </main>
 
-  <!-- Public Footer (optional) -->
-  <footer class="bg-white border-t mt-auto">
+  <footer class="bg-surface border-t border-border mt-auto">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-      <p class="text-center text-gray-500 text-sm">
+      <p class="text-center text-muted text-body-sm">
         &copy; {{ currentYear }} Title Toolbox. All rights reserved.
       </p>
     </div>
   </footer>
 </div>
-

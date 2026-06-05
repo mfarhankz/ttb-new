@@ -41,11 +41,11 @@ export class SelectComponent implements ControlValueAccessor {
   private onTouchedFn = () => {};
 
   get labelClass(): string {
-    return 'block text-sm font-medium text-gray-700 mb-1';
+    return 'block text-body-sm font-medium text-foreground mb-1';
   }
 
   getSelectClasses(): string {
-    const baseClasses = 'block w-full rounded-md border shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 appearance-none bg-white';
+    const baseClasses = 'block w-full rounded-md border shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 appearance-none bg-surface text-foreground';
     
     const sizeClasses = {
       sm: 'px-3 py-1.5 text-sm',
@@ -54,8 +54,8 @@ export class SelectComponent implements ControlValueAccessor {
     };
 
     const paddingClass = this.icon ? 'pl-10' : '';
-    const errorClass = this.error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500';
-    const disabledClass = this.disabled ? 'bg-gray-50 cursor-not-allowed' : '';
+    const errorClass = this.error ? 'border-danger focus:ring-danger' : 'border-border focus:ring-focus focus:border-primary';
+    const disabledClass = this.disabled ? 'bg-background cursor-not-allowed' : '';
     const widthClass = this.fullWidth ? 'w-full' : '';
 
     return `${baseClasses} ${sizeClasses[this.size]} ${paddingClass} ${errorClass} ${disabledClass} ${widthClass}`;

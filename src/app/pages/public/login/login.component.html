@@ -1,10 +1,10 @@
 @if (currentView() === 'login') {
   <div class="min-h-[calc(100vh-8rem)] flex items-center justify-center">
-    <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
+    <div class="max-w-md w-full space-y-8 p-8 bg-surface rounded-lg shadow-md">
       <div>
-        <h2 class="text-3xl font-bold text-center text-gray-900">Login to your account
+        <h2 class="text-h1 font-bold text-center text-foreground">Login to your account
         </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
+        <p class="mt-2 text-center text-body-sm text-muted">
           Please enter your credentials below.
         </p>
       </div>
@@ -34,7 +34,7 @@
         </div>
 
         <div class="text-right mb-4">
-          <a routerLink="/forgot-password" class="text-sm text-blue-600 hover:text-blue-800">
+          <a routerLink="/forgot-password" class="text-body-sm text-primary hover:text-primary/80">
             Forgot Password?
           </a>
         </div>
@@ -56,9 +56,9 @@
         </div>
 
         <div class="text-center mt-4">
-          <p class="text-sm text-gray-600">
+          <p class="text-body-sm text-muted">
             Don't have an account?
-            <a routerLink="/signup" class="text-blue-600 hover:text-blue-800 font-medium">
+            <a routerLink="/signup" class="text-primary hover:text-primary/80 font-medium">
               Sign up
             </a>
           </p>
@@ -80,4 +80,3 @@
     (otpVerified)="onOtpVerified()"
   />
 }
-

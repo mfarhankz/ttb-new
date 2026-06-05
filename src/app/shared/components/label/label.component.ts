@@ -14,7 +14,7 @@ export class LabelComponent {
   @Input() size: 'sm' | 'md' | 'lg' = 'md';
 
   getLabelClasses(): string {
-    const baseClasses = 'block font-medium text-gray-700';
+    const baseClasses = 'block font-medium text-foreground';
     
     const sizeClasses = {
       sm: 'text-xs',

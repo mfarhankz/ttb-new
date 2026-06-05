@@ -18,19 +18,12 @@ declare const ol: any;
 @Component({
   selector: '[appOlMap]',
   standalone: true,
-  template: `<div #mapEl class="ol-map-container"></div>`,
+  host: {
+    class: 'block w-full h-full'
+  },
+  template: `<div #mapEl class="w-full h-full min-h-[320px]"></div>`,
   styles: [
     `
-      :host {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
-      .ol-map-container {
-        width: 100%;
-        height: 100%;
-        min-height: 320px;
-      }
       :host ::ng-deep .ol-viewport {
         width: 100% !important;
         height: 100% !important;

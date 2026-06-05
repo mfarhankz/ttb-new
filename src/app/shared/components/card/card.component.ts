@@ -19,21 +19,21 @@ export class CardComponent {
   @Input() hover = false;
 
   getCardClasses(): string {
-    const baseClasses = 'bg-white rounded-lg';
+    const baseClasses = 'bg-surface rounded-lg';
     const shadowClasses = {
       none: '',
       sm: 'shadow-sm',
       md: 'shadow-md',
       lg: 'shadow-lg'
     };
-    const borderClass = this.bordered ? 'border border-gray-200' : '';
+    const borderClass = this.bordered ? 'border border-border' : '';
     const hoverClass = this.hover ? 'transition-shadow hover:shadow-lg' : '';
 
     return `${baseClasses} ${shadowClasses[this.shadow]} ${borderClass} ${hoverClass}`;
   }
 
   getTitleClasses(): string {
-    return 'text-lg font-semibold text-gray-900';
+    return 'text-h3 font-semibold text-foreground';
   }
 
   getBodyClasses(): string {

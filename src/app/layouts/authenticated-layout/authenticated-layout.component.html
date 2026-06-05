@@ -1,6 +1,9 @@
-<div class="authenticated-shell" [class.sidebar-collapsed]="collapsed()">
+<div class="min-h-screen bg-background">
   <app-sidebar (collapsedChange)="onSidebarCollapsed($event)" />
-  <main class="authenticated-main">
+  <main
+    class="min-h-screen transition-[margin-left] duration-200 ml-sidebar"
+    [class.ml-sidebar-collapsed]="collapsed()"
+  >
     <router-outlet />
   </main>
 </div>

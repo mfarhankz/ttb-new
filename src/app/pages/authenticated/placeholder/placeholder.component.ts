@@ -6,8 +6,8 @@ import { ActivatedRoute } from '@angular/router';
   standalone: true,
   template: `
     <div class="p-8">
-      <h1 class="text-2xl font-bold text-gray-900">{{ title }}</h1>
-      <p class="mt-2 text-gray-600">This page is coming soon.</p>
+      <h1 class="text-h2 font-bold text-foreground">{{ title }}</h1>
+      <p class="mt-2 text-muted">This page is coming soon.</p>
     </div>
   `
 })
