@@ -23,6 +23,12 @@ export const MAIN_NAV: NavItem[] = [
   { label: 'Daily Lead Alerts', icon: 'pi pi-bell', route: '/daily-lead-alerts', badge: 'NEW' }
 ];
 
+export const ADMIN_NAV: NavItem[] = [
+  { label: 'Admin', icon: 'pi pi-shield', route: '/admin' },
+  { label: 'Manage Reports', icon: 'pi pi-file', route: '/manage-reports' },
+  { label: 'Manage Account', icon: 'pi pi-user', route: '/manage-account' }
+];
+
 export const SETTINGS_NAV: NavItem[] = [
   { label: 'Logout', icon: 'pi pi-sign-out', action: 'logout' }
 ];

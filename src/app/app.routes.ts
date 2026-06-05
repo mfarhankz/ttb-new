@@ -67,6 +67,21 @@ export const routes: Routes = [
         path: 'daily-lead-alerts',
         loadComponent: () => import('./pages/authenticated/placeholder/placeholder.component').then(m => m.PlaceholderComponent),
         title: 'Daily Lead Alerts'
+      },
+      {
+        path: 'admin',
+        loadComponent: () => import('./pages/authenticated/admin/admin.component').then(m => m.AdminComponent),
+        title: 'Admin'
+      },
+      {
+        path: 'manage-reports',
+        loadComponent: () => import('./pages/authenticated/admin/manage-reports.component').then(m => m.ManageReportsComponent),
+        title: 'Manage Reports'
+      },
+      {
+        path: 'manage-account',
+        loadComponent: () => import('./pages/authenticated/admin/manage-account.component').then(m => m.ManageAccountComponent),
+        title: 'Manage Account'
       }
     ]
   },

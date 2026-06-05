@@ -35,6 +35,9 @@ export const VERTICAL_CONFIG = {
     'farming',
     'statistics',
     'buyer-cost-estimate',
-    'daily-lead-alerts'
+    'daily-lead-alerts',
+    'admin',
+    'manage-reports',
+    'manage-account'
   ])
 } as const;

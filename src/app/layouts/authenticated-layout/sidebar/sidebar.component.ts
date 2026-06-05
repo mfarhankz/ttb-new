@@ -6,6 +6,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { LayoutService } from '../../../core/services/layout.service';
 import { VerticalService } from '../../../core/services/vertical.service';
 import {
+  ADMIN_NAV,
   MAIN_NAV,
   SETTINGS_NAV,
   SIDEBAR_COLLAPSED_KEY,
@@ -34,6 +35,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   collapsedChange = output<boolean>();
 
   mainNav = MAIN_NAV;
+  adminNav = ADMIN_NAV;
   settingsNav = SETTINGS_NAV;
 
   tbUser = this.authService.tbUser;
