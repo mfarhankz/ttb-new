@@ -390,6 +390,28 @@ export class AuthService {
     return tbUser?.name || tbUser?.username || null;
   }
 
+  getUserId(): number | string | null {
+    const fromSignal = this._tbUser()?.users_id;
+    if (fromSignal != null && fromSignal !== '') {
+      return fromSignal;
+    }
+
+    for (const key of [this.STORAGE_KEYS.TB_USER, this.STORAGE_KEYS.USER]) {
+      try {
+        const stored = localStorage.getItem(key);
+        if (!stored) continue;
+        const usersId = JSON.parse(stored)?.users_id;
+        if (usersId != null && usersId !== '') {
+          return usersId;
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    return null;
+  }
+
   /**
    * User profile image URL from TTB storage (same pattern as legacy app).
    * e.g. https://demo.api.titletoolbox.com/ttb-storage/demo/user_pic/604/604.png?t=...

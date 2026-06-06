@@ -17,9 +17,11 @@ export class CardComponent {
   @Input() shadow: 'none' | 'sm' | 'md' | 'lg' = 'md';
   @Input() bordered = true;
   @Input() hover = false;
+  @Input() fillHeight = false;
 
   getCardClasses(): string {
     const baseClasses = 'bg-surface rounded-lg';
+    const fillClass = this.fillHeight ? 'h-full flex flex-col min-h-0' : '';
     const shadowClasses = {
       none: '',
       sm: 'shadow-sm',
@@ -29,7 +31,7 @@ export class CardComponent {
     const borderClass = this.bordered ? 'border border-border' : '';
     const hoverClass = this.hover ? 'transition-shadow hover:shadow-lg' : '';
 
-    return `${baseClasses} ${shadowClasses[this.shadow]} ${borderClass} ${hoverClass}`;
+    return `${baseClasses} ${fillClass} ${shadowClasses[this.shadow]} ${borderClass} ${hoverClass}`;
   }
 
   getTitleClasses(): string {
@@ -44,7 +46,9 @@ export class CardComponent {
       lg: 'p-8'
     };
 
-    return paddingClasses[this.padding];
+    const fillClass = this.fillHeight ? 'flex-1 min-h-0 flex flex-col overflow-hidden' : '';
+
+    return `${paddingClasses[this.padding]} ${fillClass}`.trim();
   }
 }
 

@@ -1,0 +1,205 @@
+@if (subscriptionEnabled()) {
+  <app-card
+    title="Subscription"
+    subtitle="Update your plan and billing information"
+    [headerActions]="hasActiveSubscription()"
+    [fillHeight]="heightLocked()"
+  >
+    <div headerActions>
+      @if (hasActiveSubscription()) {
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-success/15 px-3 py-1 text-caption font-semibold text-success">
+          <span class="h-1.5 w-1.5 rounded-full bg-success"></span>
+          {{ activeSubscriptions().length }} active
+        </span>
+      }
+    </div>
+
+    <div
+      class="flex flex-col"
+      [class.flex-1]="heightLocked()"
+      [class.min-h-0]="heightLocked()"
+      [class.h-full]="heightLocked()"
+    >
+      @if (loading()) {
+        <div class="flex flex-col items-center justify-center gap-3 py-10 text-body-sm text-muted">
+          <i class="pi pi-spin pi-spinner text-2xl text-primary"></i>
+          Loading subscriptions…
+        </div>
+      } @else if (error()) {
+        <div class="flex items-start gap-3 rounded-xl border border-danger/20 bg-danger/5 px-4 py-3 text-body-sm text-danger">
+          <i class="pi pi-exclamation-circle mt-0.5 shrink-0 text-base"></i>
+          <span>{{ error() }}</span>
+        </div>
+      } @else if (!hasActiveSubscription()) {
+        <div class="flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-background px-6 py-10 text-center">
+          <i class="pi pi-credit-card text-3xl text-muted/60"></i>
+          <p class="text-body font-medium text-foreground">No active subscription</p>
+          <p class="text-body-sm text-muted max-w-xs">Subscribe to a plan to unlock recurring features.</p>
+        </div>
+      } @else {
+        <div
+          class="flex flex-col rounded-xl border border-border bg-background p-4"
+          [class.flex-1]="heightLocked()"
+          [class.min-h-0]="heightLocked()"
+        >
+          <div
+            class="subscription-scroll space-y-2.5 pr-0.5"
+            [class.flex-1]="heightLocked()"
+            [class.min-h-0]="heightLocked()"
+            [class.overflow-y-auto]="heightLocked()"
+          >
+            @for (subscription of activeSubscriptions(); track subscription.profile_id) {
+              <article
+                class="group rounded-xl border overflow-hidden transition-all duration-200"
+                [class.border-border]="!isExpanded(subscription.profile_id)"
+                [class.border-primary/25]="isExpanded(subscription.profile_id)"
+                [class.shadow-sm]="isExpanded(subscription.profile_id)"
+                [class.ring-1]="isExpanded(subscription.profile_id)"
+                [class.ring-primary/10]="isExpanded(subscription.profile_id)"
+              >
+                <div
+                  class="flex items-center gap-2 px-3 py-2.5 transition-colors"
+                  [class.bg-sidebar-active/40]="isExpanded(subscription.profile_id)"
+                  [class.bg-sidebar-active/20]="!isExpanded(subscription.profile_id)"
+                  [class.group-hover:bg-sidebar-active/35]="!isExpanded(subscription.profile_id)"
+                >
+                  <button
+                    type="button"
+                    class="flex items-center gap-3 flex-1 min-w-0 text-left"
+                    [attr.aria-expanded]="isExpanded(subscription.profile_id)"
+                    (click)="toggleSubscription(subscription.profile_id)"
+                  >
+                    <span
+                      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-muted transition-colors group-hover:border-primary/30 group-hover:text-primary"
+                    >
+                      <i
+                        class="pi text-xs transition-transform duration-200"
+                        [class.pi-chevron-down]="isExpanded(subscription.profile_id)"
+                        [class.pi-chevron-right]="!isExpanded(subscription.profile_id)"
+                      ></i>
+                    </span>
+
+                    <span class="min-w-0 flex-1">
+                      <span class="flex flex-wrap items-center gap-2 mb-0.5">
+                        <span class="inline-flex items-center gap-1 rounded-full bg-success/12 py-0.5 text-[14px] font-semibold text-success">
+                          <i class="pi pi-check-circle text-[14px]"></i>
+                          Active Subscription
+                        </span>
+                      </span>
+                      <span class="block text-body font-semibold text-foreground leading-snug truncate">
+                        {{ planTitle(subscription) }}
+                      </span>
+                      @if (!isExpanded(subscription.profile_id)) {
+                        <span class="block text-caption text-muted mt-0.5 truncate">
+                          Next billing · {{ displayField(subscription.next_bill_date) }}
+                        </span>
+                      }
+                    </span>
+                  </button>
+
+                  @if (isExpanded(subscription.profile_id)) {
+                    <app-button variant="success" size="sm" [disabled]="true" class="shrink-0 hidden sm:inline-flex">
+                      Update Payment Method
+                    </app-button>
+                  }
+                </div>
+
+                @if (isExpanded(subscription.profile_id)) {
+                  <div class="border-t border-border/60 bg-surface/50">
+                    <div class="sm:hidden px-3 py-2 border-b border-border/60">
+                      <app-button variant="success" size="sm" [disabled]="true" [fullWidth]="true">
+                        Update Payment Method
+                      </app-button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4">
+                      <div class="rounded-lg border border-border/60 bg-background px-3 py-2.5">
+                        <dt class="text-caption font-medium uppercase tracking-wide text-muted">Profile ID</dt>
+                        <dd class="text-body-sm font-medium text-foreground mt-1 break-all">
+                          {{ displayField(subscription.profile_id) }}
+                        </dd>
+                      </div>
+                      <div class="rounded-lg border border-border/60 bg-background px-3 py-2.5">
+                        <dt class="text-caption font-medium uppercase tracking-wide text-muted">Start Date</dt>
+                        <dd class="text-body-sm font-medium text-foreground mt-1">
+                          {{ displayField(subscription.profile_start_date) }}
+                        </dd>
+                      </div>
+                      <div class="rounded-lg border border-border/60 bg-background px-3 py-2.5">
+                        <dt class="text-caption font-medium uppercase tracking-wide text-muted">Next Billing</dt>
+                        <dd class="text-body-sm font-medium text-foreground mt-1">
+                          {{ displayField(subscription.next_bill_date) }}
+                        </dd>
+                      </div>
+                    </div>
+
+                    <div class="px-4 pb-4">
+                      <div class="overflow-hidden rounded-lg border border-border/60">
+                        <table class="w-full text-body-sm">
+                          <thead>
+                            <tr class="bg-sidebar-active/30 text-left text-muted">
+                              <th class="px-3 py-2 font-medium">Billing History</th>
+                              <th class="px-3 py-2 font-medium">Amount</th>
+                              <th class="px-3 py-2 font-medium">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody class="divide-y divide-border/60 bg-background">
+                            @for (
+                              item of historyForProfile(subscription);
+                              track item.profile_id + '-' + item.last_payment_date + '-' + $index
+                            ) {
+                              <tr class="hover:bg-sidebar-active/20 transition-colors">
+                                <td class="px-3 py-2.5 text-foreground">
+                                  {{ displayField(item.last_payment_date) }}
+                                </td>
+                                <td class="px-3 py-2.5 font-medium text-foreground">
+                                  @if (item.last_payment_amount != null && item.last_payment_amount !== '') {
+                                    {{ item.last_payment_amount | currency:'USD':'symbol':'1.2-2' }}
+                                  } @else {
+                                    —
+                                  }
+                                </td>
+                                <td class="px-3 py-2.5">
+                                  <span [class]="statusBadgeClass(item.status)">
+                                    {{ paymentStatusLabel(item.status) }}
+                                  </span>
+                                </td>
+                              </tr>
+                            } @empty {
+                              <tr>
+                                <td colspan="3" class="px-3 py-4 text-center text-muted">No billing history available.</td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-3 border-t border-border/60 px-4 py-2.5 bg-sidebar-active/15">
+                      <button
+                        type="button"
+                        class="inline-flex items-center gap-1.5 text-body-sm text-muted hover:text-danger disabled:opacity-50 transition-colors"
+                        [disabled]="cancelling()"
+                        (click)="cancelSubscription(subscription)"
+                      >
+                        <i class="pi pi-times-circle text-xs"></i>
+                        Cancel anytime
+                      </button>
+                    </div>
+                  </div>
+                }
+              </article>
+            }
+          </div>
+
+          <p
+            class="shrink-0 text-caption text-muted leading-relaxed pt-2 border-t border-border/60"
+            [class.mt-auto]="heightLocked()"
+          >
+            Recurring subscription. Cancel anytime. No refunds — service continues until the end of the billing cycle.
+          </p>
+        </div>
+      }
+    </div>
+  </app-card>
+}

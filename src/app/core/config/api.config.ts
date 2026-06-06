@@ -16,7 +16,11 @@ export const API_CONFIG = {
   endpoints: {
     login: '/login.json',
     sendMfaOtp: '/send_mfa_otp.json',
-    verifyMfaOtp: '/verify_mfa_otp.json'
+    verifyMfaOtp: '/verify_mfa_otp.json',
+    getUserWallet: '/get_user_wallet.json',
+    showBillingProfile: '/show_billing_profile.json',
+    cancelSubscription: '/cancel_subscription.json',
+    listSubscriptionOptions: '/list_subscription_options.json'
   }
 } as const;
 

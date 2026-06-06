@@ -1,0 +1,47 @@
+@if (walletEnabled()) {
+  <app-card
+    title="Wallet Balance"
+    subtitle="Your prepaid credit balance for purchases on Title Toolbox"
+    [fillHeight]="true"
+  >
+    <p class="text-body-sm text-muted">
+      Prepaid credits let you buy items without entering card details each time. Wallet balance
+      represents the dollar amount you can spend.
+    </p>
+
+    <div class="mt-6 p-5 rounded-xl bg-background border border-border">
+      <div class="flex items-center justify-between gap-3 mb-2">
+        <p class="text-overline uppercase text-muted">Current Balance</p>
+        <button
+          type="button"
+          class="inline-flex items-center gap-1.5 text-caption font-medium text-primary hover:text-primary/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          [disabled]="walletLoading()"
+          (click)="refreshBalance()"
+        >
+          <i class="pi pi-refresh text-xs" [class.animate-spin]="walletLoading()"></i>
+          Refresh
+        </button>
+      </div>
+
+      @if (walletLoading()) {
+        <p class="text-body text-muted py-2">Fetching, please wait...</p>
+      } @else if (walletError()) {
+        <p class="text-body text-danger py-2">{{ walletError() }}</p>
+      } @else {
+        <p class="text-h2 font-bold text-success">
+          {{ (balance() ?? 0) | currency:'USD':'symbol':'1.2-2' }}
+        </p>
+      }
+
+      <div class="mt-5">
+        <app-button variant="success" [fullWidth]="true" (onClick)="goToWallet()">
+          Buy Credit Now
+        </app-button>
+      </div>
+
+      <p class="mt-4 text-caption text-muted">
+        All wallet credit purchases are final and cannot be refunded.
+      </p>
+    </div>
+  </app-card>
+}

@@ -23,8 +23,9 @@ export class ButtonComponent {
   @Output() onClick = new EventEmitter<MouseEvent>();
 
   getButtonClasses(): string {
-    const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-    
+    const baseClasses =
+      'inline-flex items-center justify-center whitespace-nowrap font-medium rounded-md border-2 border-transparent box-border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+
     const sizeClasses = {
       sm: 'px-3 py-1.5 text-sm',
       md: 'px-4 py-2 text-sm',
@@ -37,7 +38,7 @@ export class ButtonComponent {
       danger: 'bg-danger text-danger-foreground hover:bg-danger/90 focus:ring-focus',
       success: 'bg-success text-success-foreground hover:bg-success/90 focus:ring-focus',
       warning: 'bg-warning text-warning-foreground hover:bg-warning/90 focus:ring-focus',
-      outline: 'border-2 border-primary text-primary hover:bg-primary/10 focus:ring-focus',
+      outline: 'border-primary bg-transparent text-primary hover:bg-primary/10 focus:ring-focus',
       ghost: 'text-foreground hover:bg-sidebar-active focus:ring-focus'
     };
 

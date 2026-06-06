@@ -41,6 +41,58 @@ export interface LoginResponse {
   [key: string]: any;
 }
 
+export interface WalletInfo {
+  wallet_balance?: number | string;
+  modified?: string;
+}
+
+export interface TtbWalletResponse {
+  response: {
+    status: string;
+    message?: string;
+    count?: number;
+    data: WalletInfo | WalletInfo[] | string[];
+  };
+}
+
+export interface SubscribedService {
+  service_name?: string;
+  [key: string]: unknown;
+}
+
+export interface BillingProfile {
+  profile_id?: string;
+  profile_start_date?: string;
+  next_bill_date?: string;
+  last_payment_date?: string;
+  last_payment_amount?: number | string;
+  status?: string;
+  plan?: string;
+  card_type?: string;
+  exp_date?: string;
+  deny_access_date?: string;
+  access_allowed_until?: string;
+  subscribed_service?: SubscribedService;
+  subscribed_services?: SubscribedService[];
+}
+
+export interface TtbBillingProfileResponse {
+  response: {
+    status: string;
+    message?: string;
+    count?: number;
+    data: BillingProfile[] | Record<string, BillingProfile>;
+  };
+}
+
+export interface TtbSubscriptionOptionsResponse {
+  response: {
+    status: string;
+    message?: string;
+    data?: Record<string, string> | string[];
+  };
+}
+
 export interface ApiError {
   message: string;
   status?: number;

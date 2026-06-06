@@ -8,13 +8,14 @@ import { MapScriptsLoaderService } from './core/services/map-scripts-loader.serv
 import { ThemeService } from './core/services/theme.service';
 import { VerticalService } from './core/services/vertical.service';
 import { partnerKeyInterceptor } from './core/interceptors/partner-key.interceptor';
+import { ttbSessionInterceptor } from './core/interceptors/ttb-session.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideAnimations(),
-    provideHttpClient(withInterceptors([partnerKeyInterceptor])),
+    provideHttpClient(withInterceptors([ttbSessionInterceptor, partnerKeyInterceptor])),
     MapScriptsLoaderService,
     {
       provide: APP_INITIALIZER,

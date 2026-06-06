@@ -23,16 +23,9 @@ export class ApiService {
    * Get default headers for API requests
    */
   private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('authToken');
-    let headers = new HttpHeaders({
+    return new HttpHeaders({
       'Content-Type': 'application/json'
     });
-
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
-
-    return headers;
   }
 
   /**
