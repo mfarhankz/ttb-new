@@ -13,8 +13,6 @@ export class PurchaseHistoryPanelComponent {
   private readonly authService = inject(AuthService);
   private readonly purchaseHistoryService = inject(PurchaseHistoryService);
 
-  private lastFetchedUserId: number | string | null = null;
-
   readonly columns = this.purchaseHistoryService.columns;
   readonly rows = this.purchaseHistoryService.rows;
   readonly loading = this.purchaseHistoryService.loading;
@@ -22,9 +20,7 @@ export class PurchaseHistoryPanelComponent {
 
   constructor() {
     effect(() => {
-      const userId = this.authService.getUserId();
-      if (userId != null && userId !== this.lastFetchedUserId) {
-        this.lastFetchedUserId = userId;
+      if (this.authService.getUserId() != null) {
         this.purchaseHistoryService.fetchPurchaseHistory();
       }
     });

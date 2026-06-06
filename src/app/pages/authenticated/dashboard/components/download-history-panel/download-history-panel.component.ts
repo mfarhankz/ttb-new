@@ -13,17 +13,13 @@ export class DownloadHistoryPanelComponent {
   private readonly authService = inject(AuthService);
   private readonly userUsageService = inject(UserUsageService);
 
-  private lastFetchedUserId: number | string | null = null;
-
   readonly details = this.userUsageService.details;
   readonly loading = this.userUsageService.loading;
   readonly error = this.userUsageService.error;
 
   constructor() {
     effect(() => {
-      const userId = this.authService.getUserId();
-      if (userId != null && userId !== this.lastFetchedUserId) {
-        this.lastFetchedUserId = userId;
+      if (this.authService.getUserId() != null) {
         this.userUsageService.fetchUserUsage();
       }
     });

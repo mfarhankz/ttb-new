@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { Observable, map, of } from 'rxjs';
 import { API_CONFIG } from '../config/api.config';
 import {
@@ -16,6 +16,75 @@ import { AuthService } from './auth.service';
 export class AccountInformationService {
   private readonly apiService = inject(ApiService);
   private readonly authService = inject(AuthService);
+
+  private readonly _profile = signal<UserProfileModel | null>(null);
+  private readonly _repSummary = signal<RepProfileSummary | null>(null);
+  private readonly _loading = signal(false);
+  private readonly _error = signal<string | null>(null);
+
+  private loadedUserId: number | string | null = null;
+  private loadSucceeded = false;
+
+  readonly profile = this._profile.asReadonly();
+  readonly repSummary = this._repSummary.asReadonly();
+  readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
+
+  fetchAccountInformation(force = false): void {
+    const userId = this.authService.getUserId();
+    if (userId == null) {
+      this._error.set('Unable to determine current user.');
+      return;
+    }
+
+    if (!force && this.loadSucceeded && this.loadedUserId === userId) {
+      return;
+    }
+
+    this.loadedUserId = userId;
+    this._loading.set(true);
+    this._error.set(null);
+
+    this.loadUserProfile(userId).subscribe({
+      next: (profile) => {
+        this._profile.set(profile);
+        const repId = profile.TbAssociation?.parent_user_id;
+        if (repId == null || repId === '' || repId === '0' || repId === 0) {
+          this._repSummary.set(null);
+          this.loadSucceeded = true;
+          this._loading.set(false);
+          return;
+        }
+
+        this.loadRepSummary(repId).subscribe({
+          next: (summary) => {
+            this._repSummary.set(summary);
+            this.loadSucceeded = true;
+            this._loading.set(false);
+          },
+          error: () => {
+            this._repSummary.set(null);
+            this.loadSucceeded = true;
+            this._loading.set(false);
+          }
+        });
+      },
+      error: (err) => {
+        this.loadSucceeded = false;
+        this._error.set(err.message ?? 'Failed to load account information.');
+        this._loading.set(false);
+      }
+    });
+  }
+
+  clearCache(): void {
+    this.loadedUserId = null;
+    this.loadSucceeded = false;
+    this._profile.set(null);
+    this._repSummary.set(null);
+    this._error.set(null);
+    this._loading.set(false);
+  }
 
   loadUserProfile(userId: number | string): Observable<UserProfileModel> {
     return this.apiService
@@ -70,6 +139,7 @@ export class AccountInformationService {
 
         const updated = this.normalizeProfile(profile);
         this.authService.updateCachedUserProfile(updated as unknown as Record<string, unknown>);
+        this._profile.set(updated);
         return updated;
       })
     );

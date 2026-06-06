@@ -10,7 +10,7 @@ import { AccountInformationService } from '../../../../../core/services/account-
 import { AuthService } from '../../../../../core/services/auth.service';
 import { VerticalService } from '../../../../../core/services/vertical.service';
 import { US_STATE_OPTIONS } from '../../../../../core/config/us-states.config';
-import { RepProfileSummary, UserProfileModel } from '../../../../../core/interfaces/user-profile.interface';
+import { UserProfileModel } from '../../../../../core/interfaces/user-profile.interface';
 import {
   AlertComponent,
   ButtonComponent,
@@ -49,18 +49,14 @@ export class AccountInformationPanelComponent {
 
   @ViewChild('profilePicInput') profilePicInput?: ElementRef<HTMLInputElement>;
 
-  private lastFetchedUserId: number | string | null = null;
-  private savedUsername = '';
-  private savedProfile: UserProfileModel | null = null;
-
   readonly stateOptions = US_STATE_OPTIONS;
-  readonly loading = signal(false);
+  readonly loading = this.accountInformationService.loading;
+  readonly loadError = this.accountInformationService.error;
+  readonly repSummary = this.accountInformationService.repSummary;
   readonly savingProfile = signal(false);
   readonly savingPassword = signal(false);
   readonly removingPicture = signal(false);
   readonly uploadingPicture = signal(false);
-  readonly loadError = signal<string | null>(null);
-  readonly repSummary = signal<RepProfileSummary | null>(null);
 
   readonly profileStatusType = signal<'success' | 'error' | ''>('');
   readonly profileStatusMessage = signal('');
@@ -104,10 +100,15 @@ export class AccountInformationPanelComponent {
 
   constructor() {
     effect(() => {
-      const userId = this.authService.getUserId();
-      if (userId != null && userId !== this.lastFetchedUserId) {
-        this.lastFetchedUserId = userId;
-        this.fetchProfile(userId);
+      if (this.authService.getUserId() != null) {
+        this.accountInformationService.fetchAccountInformation();
+      }
+    });
+
+    effect(() => {
+      const profile = this.accountInformationService.profile();
+      if (profile && !this.accountInformationService.loading()) {
+        this.applyProfile(profile);
       }
     });
   }
@@ -124,15 +125,17 @@ export class AccountInformationPanelComponent {
       return;
     }
 
-    if (!this.savedProfile) {
+    if (!this.accountInformationService.profile()) {
       return;
     }
 
-    const updated = this.buildProfileFromForm(this.savedProfile);
+    const savedProfile = this.accountInformationService.profile()!;
+    const savedUsername = savedProfile.TbUser.username ?? '';
+    const updated = this.buildProfileFromForm(savedProfile);
     this.savingProfile.set(true);
     this.clearProfileStatus();
 
-    this.accountInformationService.updateUserProfile(updated, this.savedUsername).subscribe({
+    this.accountInformationService.updateUserProfile(updated, savedUsername).subscribe({
       next: (profile) => {
         this.applyProfile(profile);
         this.savingProfile.set(false);
@@ -147,8 +150,9 @@ export class AccountInformationPanelComponent {
   }
 
   onProfileReset(): void {
-    if (this.savedProfile) {
-      this.patchProfileForm(this.savedProfile);
+    const profile = this.accountInformationService.profile();
+    if (profile) {
+      this.patchProfileForm(profile);
     }
     this.clearProfileStatus();
   }
@@ -281,30 +285,8 @@ export class AccountInformationPanelComponent {
     return '';
   }
 
-  private fetchProfile(userId: number | string): void {
-    this.loading.set(true);
-    this.loadError.set(null);
-    this.clearProfileStatus();
-    this.clearPasswordStatus();
-    this.clearPictureStatus();
-
-    this.accountInformationService.loadUserProfile(userId).subscribe({
-      next: (profile) => {
-        this.applyProfile(profile);
-        this.loadRepSummary(profile);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.loadError.set(err.message ?? 'Failed to load account information.');
-        this.loading.set(false);
-      }
-    });
-  }
-
   private applyProfile(profile: UserProfileModel): void {
-    this.savedProfile = this.accountInformationService.normalizeProfile(profile);
-    this.savedUsername = this.savedProfile.TbUser.username ?? '';
-    this.patchProfileForm(this.savedProfile);
+    this.patchProfileForm(this.accountInformationService.normalizeProfile(profile));
     this.refreshProfileImage();
   }
 
@@ -347,19 +329,6 @@ export class AccountInformationPanelComponent {
     profile.TbEmail[0].email = form.username.trim();
 
     return profile;
-  }
-
-  private loadRepSummary(profile: UserProfileModel): void {
-    const repId = profile.TbAssociation?.parent_user_id;
-    if (repId == null || repId === '' || repId === '0' || repId === 0) {
-      this.repSummary.set(null);
-      return;
-    }
-
-    this.accountInformationService.loadRepSummary(repId).subscribe({
-      next: (summary) => this.repSummary.set(summary),
-      error: () => this.repSummary.set(null)
-    });
   }
 
   private refreshProfileImage(): void {

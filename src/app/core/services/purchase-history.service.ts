@@ -28,16 +28,28 @@ export class PurchaseHistoryService {
   readonly error = this._error.asReadonly();
   readonly columns = PURCHASE_HISTORY_COLUMNS;
 
-  fetchPurchaseHistory(): void {
+  private loadedUserId: number | string | null = null;
+  private loadSucceeded = false;
+
+  fetchPurchaseHistory(force = false): void {
     const userId = this.authService.getUserId();
     if (userId == null) {
       this._error.set('Unable to determine current user.');
       return;
     }
 
+    if (!force && this.loadSucceeded && this.loadedUserId === userId) {
+      return;
+    }
+
+    const isNewUser = this.loadedUserId !== userId;
+    this.loadedUserId = userId;
     this._loading.set(true);
     this._error.set(null);
-    this._rows.set([]);
+
+    if (isNewUser || force) {
+      this._rows.set([]);
+    }
 
     this.apiService
       .post<TtbPurchaseHistoryResponse>(API_CONFIG.endpoints.showPurchaseHistory, { user_id: userId })
@@ -46,6 +58,7 @@ export class PurchaseHistoryService {
           const payload = response.response;
 
           if (payload.status !== 'OK') {
+            this.loadSucceeded = false;
             this._error.set(payload.message ?? 'Failed to load purchase history.');
             this._loading.set(false);
             return;
@@ -54,13 +67,23 @@ export class PurchaseHistoryService {
           const rawData = payload.data;
           const records = Array.isArray(rawData) ? rawData : [];
           this._rows.set(records.map(record => this.mapRecord(record)));
+          this.loadSucceeded = true;
           this._loading.set(false);
         },
         error: (err) => {
+          this.loadSucceeded = false;
           this._error.set(err.message ?? 'Failed to load purchase history.');
           this._loading.set(false);
         }
       });
+  }
+
+  clearCache(): void {
+    this.loadedUserId = null;
+    this.loadSucceeded = false;
+    this._rows.set([]);
+    this._error.set(null);
+    this._loading.set(false);
   }
 
   private mapRecord(record: PurchaseHistoryRecord): Record<string, unknown> {

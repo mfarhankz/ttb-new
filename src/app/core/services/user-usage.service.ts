@@ -18,34 +18,57 @@ export class UserUsageService {
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
 
-  fetchUserUsage(): void {
+  private loadedUserId: number | string | null = null;
+  private loadSucceeded = false;
+
+  fetchUserUsage(force = false): void {
     const userId = this.authService.getUserId();
     if (userId == null) {
       this._error.set('Unable to determine current user.');
       return;
     }
 
+    if (!force && this.loadSucceeded && this.loadedUserId === userId) {
+      return;
+    }
+
+    const isNewUser = this.loadedUserId !== userId;
+    this.loadedUserId = userId;
     this._loading.set(true);
     this._error.set(null);
-    this._details.set(null);
+
+    if (isNewUser || force) {
+      this._details.set(null);
+    }
 
     this.apiService.get<TtbUserUsageResponse>(`${API_CONFIG.endpoints.userUsageReport}/${userId}.json`).subscribe({
       next: (response) => {
         const payload = response.response;
 
         if (payload.status !== 'OK') {
+          this.loadSucceeded = false;
           this._error.set(payload.message ?? 'Failed to load download history.');
           this._loading.set(false);
           return;
         }
 
         this._details.set(payload.data ?? null);
+        this.loadSucceeded = true;
         this._loading.set(false);
       },
       error: (err) => {
+        this.loadSucceeded = false;
         this._error.set(err.message ?? 'Failed to load download history.');
         this._loading.set(false);
       }
     });
+  }
+
+  clearCache(): void {
+    this.loadedUserId = null;
+    this.loadSucceeded = false;
+    this._details.set(null);
+    this._error.set(null);
+    this._loading.set(false);
   }
 }
