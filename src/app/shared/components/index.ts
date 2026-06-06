@@ -26,3 +26,8 @@ export { AlertComponent, type AlertType } from './alert/alert.component';
 export { LabelComponent } from './label/label.component';
 export { FormFieldComponent } from './form-field/form-field.component';
 
+// Data Display Components
+export { DataTableComponent } from './data-table/data-table.component';
+export { type DataTableColumn } from './data-table/data-table.types';
+export { UsageReportTableComponent } from './usage-report-table/usage-report-table.component';
+

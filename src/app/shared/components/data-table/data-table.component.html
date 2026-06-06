@@ -1,0 +1,111 @@
+<div class="overflow-hidden border border-border bg-surface rounded-lg shadow-sm">
+  @if (loading) {
+    <div class="flex flex-col items-center justify-center gap-3 px-6 py-16 text-body-sm text-muted">
+      <i class="pi pi-spin pi-spinner text-2xl text-primary" aria-hidden="true"></i>
+      <span>Loading records…</span>
+    </div>
+  } @else if (error) {
+    <div class="flex items-start gap-3 px-6 py-8 text-body-sm text-danger">
+      <i class="pi pi-exclamation-circle mt-0.5 shrink-0" aria-hidden="true"></i>
+      <span>{{ error }}</span>
+    </div>
+  } @else if (!rows.length) {
+    <div class="flex flex-col items-center justify-center gap-2 px-6 py-16 text-center">
+      <i class="pi pi-inbox text-3xl text-subtle" aria-hidden="true"></i>
+      <p class="text-body-sm text-muted">{{ emptyMessage }}</p>
+    </div>
+  } @else {
+    <div class="overflow-x-auto">
+      <table class="data-table w-full min-w-[760px] border-collapse">
+        <thead class="sticky top-0 z-10">
+          <tr class="border-b-2 border-border">
+            @for (column of columns; track column.key; let colIndex = $index; let last = $last) {
+              <th [class]="headerClasses(column, colIndex, last)" scope="col">
+                @if (isSortable(column)) {
+                  <button
+                    type="button"
+                    [class]="'border-0 bg-transparent p-0 font-inherit text-inherit uppercase tracking-wide ' + headerButtonClasses(column, colIndex)"
+                    [attr.aria-label]="sortAriaLabel(column)"
+                    (click)="toggleSort(column)"
+                  >
+                    <span>{{ column.label }}</span>
+                    <i [class]="sortIconClass(column)" aria-hidden="true"></i>
+                  </button>
+                } @else {
+                  <span [class]="headerButtonClasses(column, colIndex)">{{ column.label }}</span>
+                }
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of visibleRows(); track trackRow($index, row); let even = $even) {
+            <tr
+              class="border-b border-border/70 transition-colors last:border-b-0 hover:bg-sidebar-hover"
+              [class.bg-sidebar-active/25]="even"
+            >
+              @for (column of columns; track column.key; let colIndex = $index; let last = $last) {
+                <td [class]="cellClasses(column, colIndex, last)">
+                  @if (column.variant === 'badge') {
+                    <span [class]="badgeClasses(formatCell(row[column.key]))">
+                      {{ formatCell(row[column.key]) }}
+                    </span>
+                  } @else if (column.truncate) {
+                    <span
+                      class="block truncate"
+                      [title]="formatCell(row[column.key])"
+                    >
+                      {{ formatCell(row[column.key]) }}
+                    </span>
+                  } @else {
+                    {{ formatCell(row[column.key]) }}
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (paginated) {
+      <div
+        class="flex flex-col gap-3 border-t border-border bg-sidebar-active/20 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <p class="text-caption text-muted">
+          Showing <span class="font-medium text-foreground">{{ pageStart() }}–{{ pageEnd() }}</span>
+          of <span class="font-medium text-foreground">{{ sortedRows().length }}</span>
+        </p>
+
+        @if (totalPages() > 1) {
+          <div class="flex items-center gap-1.5">
+            <button
+              type="button"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface text-muted transition-colors hover:border-primary/30 hover:bg-sidebar-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+              [disabled]="currentPage() <= 1"
+              aria-label="Previous page"
+              (click)="goToPage(currentPage() - 1)"
+            >
+              <i class="pi pi-chevron-left text-xs" aria-hidden="true"></i>
+            </button>
+
+            <span class="min-w-[7rem] px-2 text-center text-caption text-muted">
+              Page <span class="font-medium text-foreground">{{ currentPage() }}</span>
+              of {{ totalPages() }}
+            </span>
+
+            <button
+              type="button"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface text-muted transition-colors hover:border-primary/30 hover:bg-sidebar-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+              [disabled]="currentPage() >= totalPages()"
+              aria-label="Next page"
+              (click)="goToPage(currentPage() + 1)"
+            >
+              <i class="pi pi-chevron-right text-xs" aria-hidden="true"></i>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

@@ -39,7 +39,6 @@ export const VERTICAL_CONFIG = {
     'buyer-cost-estimate',
     'daily-lead-alerts',
     'admin',
-    'manage-reports',
-    'manage-account'
+    'manage-reports'
   ])
 } as const;

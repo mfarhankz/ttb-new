@@ -1,7 +1,7 @@
 @if (walletEnabled()) {
   <app-card
     title="Wallet Balance"
-    subtitle="Your prepaid credit balance for purchases on Title Toolbox"
+    subtitle="Your balance for purchases on Title Toolbox"
     [fillHeight]="true"
   >
     <p class="text-body-sm text-muted">
@@ -34,7 +34,7 @@
       }
 
       <div class="mt-5">
-        <app-button variant="success" [fullWidth]="true" (onClick)="goToWallet()">
+        <app-button variant="success" [fullWidth]="true" [disabled]="true">
           Buy Credit Now
         </app-button>
       </div>

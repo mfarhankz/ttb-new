@@ -22,7 +22,9 @@ export const API_CONFIG = {
     cancelSubscription: '/cancel_subscription.json',
     listSubscriptionOptions: '/list_subscription_options.json',
     getUserSettings: '/get_user_settings.json',
-    saveUserSettings: '/save_user_settings.json'
+    saveUserSettings: '/save_user_settings.json',
+    showPurchaseHistory: '/show_purchase_history.json',
+    userUsageReport: '/usage_report'
   }
 } as const;
 

@@ -1,3 +1,9 @@
 export { WalletBalanceCardComponent } from './wallet-balance-card/wallet-balance-card.component';
 export { SubscriptionCardComponent } from './subscription-card/subscription-card.component';
 export { AccountSettingsCardComponent } from './account-settings-card/account-settings-card.component';
+export { AccountInformationPanelComponent } from './account-information-panel/account-information-panel.component';
+export { DownloadHistoryPanelComponent } from './download-history-panel/download-history-panel.component';
+export { PurchaseHistoryPanelComponent } from './purchase-history-panel/purchase-history-panel.component';
+export { AdminUsersPanelComponent } from './admin-users-panel/admin-users-panel.component';
+export { AdminOfficesPanelComponent } from './admin-offices-panel/admin-offices-panel.component';
+export { OrderHistoryPanelComponent } from './order-history-panel/order-history-panel.component';

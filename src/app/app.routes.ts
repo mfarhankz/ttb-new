@@ -95,57 +95,6 @@ export const routes: Routes = [
             m => m.ManageReportsOrderHistoryComponent
           ),
         title: 'Order History'
-      },
-      {
-        path: 'manage-account',
-        redirectTo: 'manage-account/account-information',
-        pathMatch: 'full'
-      },
-      {
-        path: 'manage-account/account-information',
-        loadComponent: () =>
-          import('./pages/authenticated/manage-account/account-information.component').then(
-            m => m.AccountInformationComponent
-          ),
-        title: 'Account Information'
-      },
-      {
-        path: 'manage-account/account-settings',
-        loadComponent: () =>
-          import('./pages/authenticated/manage-account/account-settings.component').then(
-            m => m.AccountSettingsComponent
-          ),
-        title: 'Account Settings'
-      },
-      {
-        path: 'manage-account/download-history',
-        loadComponent: () =>
-          import('./pages/authenticated/manage-account/download-history.component').then(
-            m => m.DownloadHistoryComponent
-          ),
-        title: 'Download History'
-      },
-      {
-        path: 'manage-account/purchase-history',
-        loadComponent: () =>
-          import('./pages/authenticated/manage-account/purchase-history.component').then(
-            m => m.PurchaseHistoryComponent
-          ),
-        title: 'Purchase History'
-      },
-      {
-        path: 'manage-account/wallet',
-        loadComponent: () =>
-          import('./pages/authenticated/manage-account/wallet.component').then(m => m.WalletComponent),
-        title: 'Wallet'
-      },
-      {
-        path: 'manage-account/subscription',
-        loadComponent: () =>
-          import('./pages/authenticated/manage-account/subscription.component').then(
-            m => m.SubscriptionComponent
-          ),
-        title: 'Subscription'
       }
     ]
   },

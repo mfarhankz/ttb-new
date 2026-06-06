@@ -115,6 +115,33 @@ export interface TtbSaveUserSettingsResponse {
   };
 }
 
+export interface PurchaseHistoryRecord {
+  tx_id?: string | number;
+  product?: string;
+  purchase_date?: string;
+  amount?: number | string;
+  status?: string;
+  payment_method?: string;
+  currency?: string;
+}
+
+export interface TtbPurchaseHistoryResponse {
+  response: {
+    status: string;
+    message?: string;
+    count?: number;
+    data: PurchaseHistoryRecord[] | { msg?: string };
+  };
+}
+
+export interface TtbUserUsageResponse {
+  response: {
+    status: string;
+    message?: string;
+    data: import('./user-usage.interface').UserUsageDetails;
+  };
+}
+
 export interface ApiError {
   message: string;
   status?: number;
