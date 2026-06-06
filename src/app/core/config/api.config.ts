@@ -24,7 +24,12 @@ export const API_CONFIG = {
     getUserSettings: '/get_user_settings.json',
     saveUserSettings: '/save_user_settings.json',
     showPurchaseHistory: '/show_purchase_history.json',
-    userUsageReport: '/usage_report'
+    userUsageReport: '/usage_report',
+    loadEditUser: '/load_edit_user.json',
+    editUser: '/edit_user.json',
+    changePassword: '/change_password.json',
+    removeUserPic: '/remove_user_pic.json',
+    uploadUserPic: '/upload_user_pic.json'
   }
 } as const;
 

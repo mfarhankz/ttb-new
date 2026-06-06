@@ -1,4 +1,4 @@
-import { Component, Input, forwardRef } from '@angular/core';
+import { Component, Input, forwardRef, ChangeDetectorRef, inject } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -17,13 +17,18 @@ import { CommonModule } from '@angular/common';
   styles: []
 })
 export class InputComponent implements ControlValueAccessor {
+  private readonly cdr = inject(ChangeDetectorRef);
+
   @Input() id = '';
   @Input() type: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' = 'text';
   @Input() label = '';
   @Input() placeholder = '';
   @Input() hint = '';
   @Input() error = '';
-  @Input() disabled = false;
+  @Input() set disabled(value: boolean | string) {
+    this.inputDisabled = value === '' || value === true || value === 'true';
+    this.cdr.detectChanges();
+  }
   @Input() readonly = false;
   @Input() required = false;
   @Input() icon?: string;
@@ -33,8 +38,14 @@ export class InputComponent implements ControlValueAccessor {
   @Input() wrapperClass = '';
 
   value = '';
+  private inputDisabled = false;
+  private cvaDisabled = false;
   private onChange = (value: string) => {};
   private onTouched = () => {};
+
+  get isDisabled(): boolean {
+    return this.inputDisabled || this.cvaDisabled;
+  }
 
   get labelClass(): string {
     return 'block text-body-sm font-medium text-foreground mb-1';
@@ -42,7 +53,7 @@ export class InputComponent implements ControlValueAccessor {
 
   getInputClasses(): string {
     const baseClasses = 'block w-full rounded-md border shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0';
-    
+
     const sizeClasses = {
       sm: 'px-3 py-1.5 text-sm',
       md: 'px-3 py-2 text-sm',
@@ -51,7 +62,9 @@ export class InputComponent implements ControlValueAccessor {
 
     const paddingClass = this.icon ? 'pl-10' : this.suffixIcon ? 'pr-10' : '';
     const errorClass = this.error ? 'border-danger focus:ring-danger' : 'border-border focus:ring-focus focus:border-primary';
-    const disabledClass = this.disabled ? 'bg-background cursor-not-allowed' : 'bg-surface';
+    const disabledClass = this.isDisabled
+      ? 'bg-background text-muted cursor-not-allowed opacity-80'
+      : 'bg-surface';
     const widthClass = this.fullWidth ? 'w-full' : '';
 
     return `${baseClasses} ${sizeClasses[this.size]} ${paddingClass} ${errorClass} ${disabledClass} ${widthClass}`;
@@ -85,7 +98,8 @@ export class InputComponent implements ControlValueAccessor {
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    this.cvaDisabled = isDisabled;
+    this.cdr.detectChanges();
   }
 }
 

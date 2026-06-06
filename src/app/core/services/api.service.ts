@@ -45,7 +45,7 @@ export class ApiService {
    * @param body - Request body
    * @param params - Optional query parameters
    */
-  post<T>(endpoint: string, body: any, params?: { [key: string]: string }): Observable<T> {
+  post<T>(endpoint: string, body: unknown, params?: { [key: string]: string }): Observable<T> {
     // For JSON endpoints, ensure proper content type
     const headers = this.getHeaders();
     
@@ -72,9 +72,16 @@ export class ApiService {
   }
 
   /**
+   * Multipart form upload (Content-Type set automatically by the browser).
+   */
+  postFormData<T>(endpoint: string, formData: FormData): Observable<T> {
+    return this.http.post<T>(`${this.baseUrl}${endpoint}`, formData).pipe(catchError(this.handleError));
+  }
+
+  /**
    * Generic PUT request
    */
-  put<T>(endpoint: string, body: any): Observable<T> {
+  put<T>(endpoint: string, body: unknown): Observable<T> {
     return this.http
       .put<T>(`${this.baseUrl}${endpoint}`, body, {
         headers: this.getHeaders()

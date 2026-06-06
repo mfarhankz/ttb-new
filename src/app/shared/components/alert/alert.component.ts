@@ -15,10 +15,11 @@ export class AlertComponent {
   @Input() title = '';
   @Input() icon = true;
   @Input() dismissible = false;
+  @Input() compact = false;
   @Output() onDismiss = new EventEmitter<void>();
 
   getAlertClasses(): string {
-    const baseClasses = 'rounded-md p-4';
+    const padding = this.compact ? 'rounded-md py-2 px-3' : 'rounded-md p-4';
     
     const typeClasses = {
       success: 'bg-success/10 border border-success/25',
@@ -27,7 +28,7 @@ export class AlertComponent {
       info: 'bg-info/10 border border-info/25'
     };
 
-    return `${baseClasses} ${typeClasses[this.type]}`;
+    return `${padding} ${typeClasses[this.type]}`;
   }
 
   getIconClasses(): string {
@@ -58,6 +59,10 @@ export class AlertComponent {
       info: 'text-info'
     };
     return `text-body-sm ${typeClasses[this.type]}`;
+  }
+
+  getContentClasses(): string {
+    return [this.title ? 'mt-2' : '', this.getMessageClasses()].filter(Boolean).join(' ');
   }
 
   getDismissButtonClasses(): string {

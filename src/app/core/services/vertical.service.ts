@@ -66,6 +66,16 @@ export class VerticalService {
   /** user_pic path segment: ttb-storage/{vertical}/user_pic */
   readonly userPicLocation = computed(() => `ttb-storage/${this.verticalName()}/user_pic`);
 
+  /** Legacy app_config.grayout_primary_fields — disables email/password on profile pages. */
+  readonly grayoutPrimaryFields = computed(() => {
+    const value = this._content()?.app_config?.['grayout_primary_fields'];
+    if (value !== undefined && value !== null) {
+      return !!value && value !== '0' && value !== 'false' && value !== 0;
+    }
+
+    return this.verticalName() === VERTICAL_CONFIG.defaultVerticalName;
+  });
+
   async init(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) {
       this._initialized.set(true);
@@ -165,16 +175,22 @@ export class VerticalService {
     const url = `${this.buildApiOrigin(meta)}/${VERTICAL_CONFIG.confEndpoint}`;
 
     const res = await firstValueFrom(
-      this.http.get<TtbApiResponse<VerticalContentData>>(url, {
+      this.http.get<VerticalContentData | TtbApiResponse<VerticalContentData>>(url, {
         headers: { 'Partner-Key': meta.partner_key }
       })
     );
 
-    if (res.response?.status !== 'OK' || !res.response.data) {
-      throw new Error(res.response?.message ?? 'vertical_conf.json failed');
+    // Legacy vertical_conf.json is returned directly (not wrapped in the TTB envelope).
+    if ('app_config' in res && res.app_config) {
+      return res;
     }
 
-    return res.response.data;
+    const wrapped = res as TtbApiResponse<VerticalContentData>;
+    if (wrapped.response?.status === 'OK' && wrapped.response.data) {
+      return wrapped.response.data;
+    }
+
+    throw new Error(wrapped.response?.message ?? 'vertical_conf.json failed');
   }
 
   private async fetchAgencyConf(

@@ -310,6 +310,26 @@ export class AuthService {
    * Save user data from the login API response
    * Extracts and stores TbUser, TbAddress, TbEmail, TbOffice, TbAssociation, TbLicense, and TbPhone
    */
+  updateCachedUserProfile(userData: Record<string, unknown>): void {
+    this.saveUserData(userData);
+  }
+
+  updateUserPicture(userPic: string | null): void {
+    const current = this._tbUser();
+    if (!current) {
+      return;
+    }
+
+    const updated = { ...current, user_pic: userPic };
+    this.saveToStorage(this.STORAGE_KEYS.TB_USER, updated);
+    this.saveToStorage(this.STORAGE_KEYS.USER, updated);
+    this._tbUser.set(updated);
+  }
+
+  /**
+   * Save user data from the login API response
+   * Extracts and stores TbUser, TbAddress, TbEmail, TbOffice, TbAssociation, TbLicense, and TbPhone
+   */
   private saveUserData(userData: any): void {
     // Save TbUser object
     if (userData.TbUser) {

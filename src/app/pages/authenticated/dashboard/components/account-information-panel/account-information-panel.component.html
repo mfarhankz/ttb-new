@@ -1,0 +1,280 @@
+@if (loading()) {
+  <div class="flex items-center justify-center gap-2 py-16 text-body-sm text-muted">
+    <i class="pi pi-spin pi-spinner text-primary" aria-hidden="true"></i>
+    Loading account information…
+  </div>
+} @else if (loadError()) {
+  <app-alert type="error">{{ loadError() }}</app-alert>
+} @else {
+  <div class="grid grid-cols-1 gap-8 xl:grid-cols-12">
+    <div class="xl:col-span-7">
+      <h3 class="text-body font-semibold text-foreground mb-4">Profile Information</h3>
+
+      <form class="space-y-4" [formGroup]="profileForm" (ngSubmit)="onProfileSubmit()">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <app-input
+            id="account-username"
+            type="email"
+            label="Email Address (Username)"
+            placeholder="E.g. name@company.com"
+            formControlName="username"
+            [required]="true"
+            [error]="profileFieldError('username')"
+          />
+
+          <div class="flex flex-col justify-end">
+            <span class="block text-body-sm font-medium text-foreground mb-1">Assigned Rep</span>
+            <p class="min-h-[2.5rem] flex items-center rounded-md border border-border bg-background px-3 py-2 text-body-sm text-foreground">
+              @if (repSummary()) {
+                <span>{{ repSummary()?.fullName }} <span class="text-muted">— Assigned to Rep</span></span>
+              } @else {
+                <span class="text-muted">Unassigned</span>
+              }
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <app-input
+            id="account-first-name"
+            label="First Name"
+            formControlName="firstName"
+            [required]="true"
+            [error]="profileFieldError('firstName')"
+          />
+          <app-input
+            id="account-last-name"
+            label="Last Name"
+            formControlName="lastName"
+            [required]="true"
+            [error]="profileFieldError('lastName')"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <app-input
+            id="account-company"
+            [label]="companyLabel()"
+            formControlName="companyName"
+          />
+          <app-input
+            id="account-phone"
+            type="tel"
+            label="Phone"
+            placeholder="E.g. 8668123123"
+            formControlName="phone"
+            [required]="true"
+            [error]="profileFieldError('phone')"
+          />
+          <div class="md:col-span-2">
+            <app-input
+              id="account-address"
+              label="Address"
+              placeholder="E.g. 123 Baker St"
+              formControlName="address"
+              [required]="true"
+              [error]="profileFieldError('address')"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <app-input id="account-address-2" label="Address 2" formControlName="address2" />
+          <app-input
+            id="account-city"
+            label="City"
+            placeholder="E.g. Costa Mesa"
+            formControlName="city"
+            [required]="true"
+            [error]="profileFieldError('city')"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <app-select
+            id="account-state"
+            label="State"
+            placeholder="Select state"
+            formControlName="state"
+            [options]="stateOptions"
+            [required]="true"
+            [error]="profileFieldError('state')"
+          />
+          <app-input
+            id="account-zip"
+            label="Zip Code"
+            placeholder="E.g. 92612"
+            formControlName="zip"
+            [required]="true"
+            [error]="profileFieldError('zip')"
+          />
+        </div>
+
+        @if (profileStatusMessage()) {
+          <app-alert [type]="profileStatusType() === 'success' ? 'success' : 'error'">
+            {{ profileStatusMessage() }}
+          </app-alert>
+        }
+
+        <div class="flex flex-wrap gap-2 pt-1">
+          <app-button
+            type="button"
+            variant="danger"
+            size="sm"
+            [disabled]="savingProfile()"
+            (onClick)="onProfileReset()"
+          >
+            Reset
+          </app-button>
+          <app-button
+            type="submit"
+            variant="success"
+            size="sm"
+            [loading]="savingProfile()"
+            [disabled]="savingProfile()"
+          >
+            Update my profile
+          </app-button>
+        </div>
+      </form>
+    </div>
+
+    <div class="xl:col-span-5 space-y-8">
+      <section>
+        <h3 class="text-body font-semibold text-foreground mb-4">Profile Picture</h3>
+
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
+          <div class="flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-sidebar-active/30">
+            @if (profileImageUrl()) {
+              <img
+                [src]="profileImageUrl()"
+                alt="Profile picture"
+                class="h-full w-full object-cover"
+                (error)="profileImageUrl.set(null)"
+              />
+            } @else {
+              <i class="pi pi-user text-4xl text-subtle" aria-hidden="true"></i>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <input
+              #profilePicInput
+              type="file"
+              accept="image/*"
+              class="hidden"
+              (change)="onProfilePicSelected($event)"
+            />
+            <app-button
+              type="button"
+              variant="success"
+              size="sm"
+              [loading]="uploadingPicture()"
+              [disabled]="removingPicture() || uploadingPicture()"
+              (onClick)="triggerProfilePicUpload()"
+            >
+              {{ hasProfilePicture() ? 'Change' : 'Add' }}
+            </app-button>
+            @if (hasProfilePicture()) {
+              <app-button
+                type="button"
+                variant="danger"
+                size="sm"
+                [loading]="removingPicture()"
+                [disabled]="removingPicture() || uploadingPicture()"
+                (onClick)="removeProfilePicture()"
+              >
+                Remove
+              </app-button>
+            }
+          </div>
+        </div>
+
+        @if (pictureStatusMessage()) {
+          <div class="mt-3">
+            <app-alert [type]="pictureStatusType() === 'success' ? 'success' : 'error'">
+              {{ pictureStatusMessage() }}
+            </app-alert>
+          </div>
+        }
+      </section>
+
+      <section class="border-t border-border pt-8">
+        <h3 class="text-body font-semibold text-foreground mb-4">Change Password</h3>
+
+        @if (grayOutPrimaryFields()) {
+          <div class="space-y-4" aria-disabled="true">
+            <div class="grid grid-cols-1 gap-4">
+              <app-input
+                id="account-password-disabled"
+                type="password"
+                label="Password"
+                [disabled]="true"
+              />
+              <app-input
+                id="account-confirm-password-disabled"
+                type="password"
+                label="Confirm Password"
+                [disabled]="true"
+              />
+            </div>
+
+            <div class="flex flex-wrap gap-4">
+              <app-button type="button" variant="danger" size="sm" [disabled]="true">
+                Reset
+              </app-button>
+              <app-button type="button" variant="success" size="sm" [disabled]="true">
+                Update password
+              </app-button>
+            </div>
+          </div>
+        } @else {
+          <form class="space-y-4" [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
+            <div class="grid grid-cols-1 gap-2">
+              <app-input
+                id="account-password"
+                type="password"
+                label="Password"
+                formControlName="password"
+                [required]="true"
+                [error]="passwordFieldError('password')"
+              />
+              <app-input
+                id="account-confirm-password"
+                type="password"
+                label="Confirm Password"
+                formControlName="confirmPassword"
+                [required]="true"
+                [error]="passwordFieldError('confirmPassword')"
+              />
+            </div>
+
+            @if (passwordStatusMessage()) {
+              <app-alert
+                [type]="passwordStatusType() === 'success' ? 'success' : 'error'"
+                [compact]="true"
+              >
+                {{ passwordStatusMessage() }}
+              </app-alert>
+            }
+
+            <div class="flex flex-wrap gap-2">
+              <app-button type="button" variant="danger" size="sm" (onClick)="onPasswordReset()">
+                Reset
+              </app-button>
+              <app-button
+                type="submit"
+                variant="success"
+                size="sm"
+                [loading]="savingPassword()"
+                [disabled]="savingPassword()"
+              >
+                Update password
+              </app-button>
+            </div>
+          </form>
+        }
+      </section>
+    </div>
+  </div>
+}

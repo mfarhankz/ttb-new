@@ -17,7 +17,7 @@
       [id]="id"
       [type]="type"
       [placeholder]="placeholder"
-      [disabled]="disabled"
+      [disabled]="isDisabled"
       [readonly]="readonly"
       [required]="required"
       [class]="getInputClasses()"
@@ -36,7 +36,7 @@
     <p class="mt-1 text-body-sm text-muted">{{ hint }}</p>
   }
   @if (error) {
-    <p class="mt-1 text-body-sm text-danger">{{ error }}</p>
+    <p class="mt-0.5 text-body-sm leading-tight text-danger">{{ error }}</p>
   }
 </div>
 

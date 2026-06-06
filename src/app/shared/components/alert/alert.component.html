@@ -1,15 +1,15 @@
 <div [class]="getAlertClasses()" role="alert">
-  <div class="flex">
+  <div [class]="compact ? 'flex items-start gap-2' : 'flex'">
     @if (icon) {
       <div class="flex-shrink-0">
         <i [class]="getIconClasses()"></i>
       </div>
     }
-    <div [class]="icon ? 'ml-3' : ''" class="flex-1">
+    <div [class]="icon && !compact ? 'ml-3' : ''" class="flex-1 min-w-0">
       @if (title) {
         <h3 [class]="getTitleClasses()">{{ title }}</h3>
       }
-      <div [class]="title ? 'mt-2' : ''" [class]="getMessageClasses()">
+      <div [class]="getContentClasses()">
         <ng-content></ng-content>
       </div>
     </div>
