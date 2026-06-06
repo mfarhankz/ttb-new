@@ -1,0 +1,11 @@
+<div class="rounded-lg border border-border bg-surface">
+  <div class="border-b border-border px-6 py-5">
+    <h3 class="text-h3 font-semibold text-foreground">{{ title }}</h3>
+    <p class="mt-2 max-w-3xl text-body-sm text-muted">{{ description }}</p>
+  </div>
+
+  <div class="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
+    <i [class]="icon + ' text-3xl text-subtle'" aria-hidden="true"></i>
+    <p class="max-w-md text-body-sm text-muted">{{ note }}</p>
+  </div>
+</div>

@@ -37,14 +37,16 @@ export const DASHBOARD_SECTION_NAV: NavItem[] = [
   { label: 'Manage Account', icon: 'pi pi-user' }
 ];
 
+/** Base admin tabs; Agencies/Offices visibility is resolved in AdminPermissionsService. */
+export const ADMIN_USERS_TAB: NavItem = { label: 'Users', icon: 'pi pi-users', route: '/admin/users' };
+export const ADMIN_AGENCIES_TAB: NavItem = { label: 'Agencies', icon: 'pi pi-sitemap', route: '/admin/agencies' };
+export const ADMIN_OFFICES_TAB: NavItem = { label: 'Offices', icon: 'pi pi-building', route: '/admin/offices' };
+
 export const ADMIN_NAV: NavItem[] = [
   {
     label: 'Admin',
     icon: 'pi pi-shield',
-    children: [
-      { label: 'Users', icon: 'pi pi-users', route: '/admin/users' },
-      { label: 'Offices', icon: 'pi pi-building', route: '/admin/offices' }
-    ]
+    children: [ADMIN_USERS_TAB, ADMIN_OFFICES_TAB]
   },
   {
     label: 'Manage Reports',

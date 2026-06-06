@@ -1,6 +1,16 @@
 export type DataTableColumnAlign = 'left' | 'center' | 'right';
 
-export type DataTableColumnVariant = 'default' | 'numeric' | 'badge' | 'muted';
+export type DataTableColumnVariant = 'default' | 'numeric' | 'badge' | 'badges' | 'actions' | 'muted';
+
+export interface DataTableRowAction {
+  id: string;
+  label: string;
+}
+
+export interface DataTableBadgeCell {
+  label: string;
+  tone?: string;
+}
 
 export type DataTableSortType = 'text' | 'number' | 'date';
 

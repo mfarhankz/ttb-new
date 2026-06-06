@@ -10,9 +10,12 @@
       <span>{{ error }}</span>
     </div>
   } @else if (!details) {
-    <div class="flex flex-col items-center justify-center gap-2 px-6 py-16 text-center">
+    <div class="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
       <i class="pi pi-inbox text-3xl text-subtle" aria-hidden="true"></i>
-      <p class="text-body-sm text-muted">No usage data available.</p>
+      <div class="max-w-md space-y-1">
+        <p class="text-body font-medium text-foreground">No download activity yet</p>
+        <p class="text-body-sm text-muted">Your report downloads and usage summary will appear here once you start using reports.</p>
+      </div>
     </div>
   } @else {
     <div class="overflow-x-auto">

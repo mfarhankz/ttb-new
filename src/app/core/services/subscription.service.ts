@@ -28,11 +28,26 @@ export class SubscriptionService {
   readonly error = this._error.asReadonly();
   readonly hasActiveSubscription = computed(() => this._activeSubscriptions().length > 0);
 
-  fetchBillingProfile(userId: number | string): void {
+  private loadSucceeded = false;
+  private loadedUserId: number | string | null = null;
+
+  invalidateCache(): void {
+    this.loadSucceeded = false;
+  }
+
+  fetchBillingProfile(userId: number | string, force = false): void {
+    if (!force && this.loadSucceeded && this.loadedUserId === userId) {
+      return;
+    }
+
+    this.loadedUserId = userId;
     this._loading.set(true);
     this._error.set(null);
-    this._history.set([]);
-    this._activeSubscriptions.set([]);
+
+    if (force || !this.loadSucceeded) {
+      this._history.set([]);
+      this._activeSubscriptions.set([]);
+    }
 
     forkJoin({
       billing: this.apiService.post<TtbBillingProfileResponse>(API_CONFIG.endpoints.showBillingProfile, {
@@ -44,6 +59,7 @@ export class SubscriptionService {
         const response = billing.response;
 
         if (response.status !== 'OK') {
+          this.loadSucceeded = false;
           this._error.set(response.message ?? 'Failed to load subscription.');
           this._loading.set(false);
           return;
@@ -54,9 +70,11 @@ export class SubscriptionService {
 
         this._history.set(records);
         this._activeSubscriptions.set(this.extractActiveSubscriptions(records));
+        this.loadSucceeded = true;
         this._loading.set(false);
       },
       error: (err) => {
+        this.loadSucceeded = false;
         this._error.set(err.message ?? 'Failed to load subscription.');
         this._loading.set(false);
       }
@@ -80,7 +98,7 @@ export class SubscriptionService {
             throw new Error(res.response?.message ?? 'Failed to cancel subscription.');
           }
           this._cancelling.set(false);
-          this.fetchBillingProfile(userId);
+          this.fetchBillingProfile(userId, true);
         }),
         catchError((err) => {
           this._cancelling.set(false);

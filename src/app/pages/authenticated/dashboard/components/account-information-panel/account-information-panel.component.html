@@ -147,12 +147,12 @@
 
         <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
           <div class="flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-sidebar-active/30">
-            @if (profileImageUrl()) {
+            @if (profileImageUrl() && !profileImageBroken()) {
               <img
                 [src]="profileImageUrl()"
                 alt="Profile picture"
                 class="h-full w-full object-cover"
-                (error)="profileImageUrl.set(null)"
+                (error)="onProfileImageError()"
               />
             } @else {
               <i class="pi pi-user text-4xl text-subtle" aria-hidden="true"></i>

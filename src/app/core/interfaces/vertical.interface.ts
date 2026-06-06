@@ -53,6 +53,7 @@ export interface VerticalAppConfig {
   url?: string;
   GOOGLE_API_KEY?: string;
   agency_support?: boolean;
+  multi_office_support?: boolean;
   support_wallet?: boolean;
   [key: string]: unknown;
 }

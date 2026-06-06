@@ -10,9 +10,12 @@
       <span>{{ error }}</span>
     </div>
   } @else if (!rows.length) {
-    <div class="flex flex-col items-center justify-center gap-2 px-6 py-16 text-center">
+    <div class="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
       <i class="pi pi-inbox text-3xl text-subtle" aria-hidden="true"></i>
-      <p class="text-body-sm text-muted">{{ emptyMessage }}</p>
+      <div class="max-w-md space-y-1">
+        <p class="text-body font-medium text-foreground">{{ resolvedEmptyTitle() }}</p>
+        <p class="text-body-sm text-muted">{{ resolvedEmptyDescription() }}</p>
+      </div>
     </div>
   } @else {
     <div class="overflow-x-auto">
@@ -31,6 +34,8 @@
                     <span>{{ column.label }}</span>
                     <i [class]="sortIconClass(column)" aria-hidden="true"></i>
                   </button>
+                } @else if (column.variant === 'actions') {
+                  <span class="sr-only">Actions</span>
                 } @else {
                   <span [class]="headerButtonClasses(column, colIndex)">{{ column.label }}</span>
                 }
@@ -39,7 +44,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (row of visibleRows(); track trackRow($index, row); let even = $even) {
+          @for (row of visibleRows(); track trackRow($index, row); let rowIndex = $index; let even = $even) {
             <tr
               class="border-b border-border/70 transition-colors last:border-b-0 hover:bg-sidebar-hover"
               [class.bg-sidebar-active/25]="even"
@@ -50,6 +55,45 @@
                     <span [class]="badgeClasses(formatCell(row[column.key]))">
                       {{ formatCell(row[column.key]) }}
                     </span>
+                  } @else if (column.variant === 'badges') {
+                    <div class="flex flex-wrap gap-1.5">
+                      @for (badge of badgeList(row[column.key]); track badge.label) {
+                        <span [class]="badgeToneClasses(badge)">{{ badge.label }}</span>
+                      }
+                    </div>
+                  } @else if (column.variant === 'actions') {
+                    <div class="relative inline-flex">
+                      <button
+                        type="button"
+                        class="inline-flex items-center gap-0.5 rounded-md border-0 bg-transparent p-1 text-primary transition-colors hover:text-primary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+                        [attr.aria-expanded]="isActionsMenuOpen(row, rowIndex)"
+                        aria-haspopup="menu"
+                        [attr.aria-label]="'Actions for ' + formatCell(row['name'] ?? row['id'])"
+                        (click)="toggleActionsMenu($event, row, rowIndex)"
+                      >
+                        <i class="pi pi-cog text-base" aria-hidden="true"></i>
+                        <i class="pi pi-chevron-down text-[0.55rem]" aria-hidden="true"></i>
+                      </button>
+
+                      @if (isActionsMenuOpen(row, rowIndex)) {
+                        <div
+                          class="absolute left-0 top-full z-30 mt-1 min-w-[12.5rem] overflow-hidden rounded-md border border-border bg-surface py-1 shadow-lg"
+                          role="menu"
+                          (click)="$event.stopPropagation()"
+                        >
+                          @for (action of actionList(row[column.key]); track action.id) {
+                            <button
+                              type="button"
+                              class="block w-full border-0 bg-transparent px-3 py-2 text-left text-body-sm text-foreground transition-colors hover:bg-sidebar-hover focus:outline-none focus-visible:bg-sidebar-hover"
+                              role="menuitem"
+                              (click)="onRowActionClick($event, action, row)"
+                            >
+                              {{ action.label }}
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
                   } @else if (column.truncate) {
                     <span
                       class="block truncate"

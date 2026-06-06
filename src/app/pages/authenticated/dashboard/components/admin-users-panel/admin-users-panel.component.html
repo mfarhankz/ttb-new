@@ -1,0 +1,108 @@
+<div class="space-y-2">
+  <div class="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+    @if (showUserLimitHint()) {
+      <p class="max-w-md text-caption leading-snug text-warning">
+        Up to 100 of the most recently added users are shown below
+      </p>
+    }
+
+    <div class="flex flex-nowrap items-center justify-end gap-1.5 overflow-x-auto lg:ml-auto">
+      <button
+        type="button"
+        class="inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border-2 px-3 py-1.5 text-sm font-medium transition-colors hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-focus"
+        [class.border-primary]="filtersOpen() || hasActiveFilters()"
+        [class.bg-primary/10]="hasActiveFilters()"
+        [class.text-primary]="filtersOpen() || hasActiveFilters()"
+        [class.border-border]="!filtersOpen() && !hasActiveFilters()"
+        [class.bg-transparent]="!hasActiveFilters()"
+        [class.text-muted]="!filtersOpen() && !hasActiveFilters()"
+        (click)="toggleFilters()"
+      >
+        <i class="pi pi-filter text-xs" aria-hidden="true"></i>
+        Filters
+      </button>
+
+      @for (action of toolbarActions(); track action.id) {
+        <app-button
+          size="sm"
+          class="shrink-0"
+          [variant]="action.variant"
+          [disabled]="loading() || (action.id !== 'reset-default' && rows().length === 0)"
+          (onClick)="onToolbarAction(action.id)"
+        >
+          {{ action.label }}
+        </app-button>
+      }
+    </div>
+  </div>
+
+  @if (filtersOpen()) {
+    <div class="rounded-lg border border-border bg-surface px-2.5 py-1.5">
+      <div class="flex flex-wrap items-center gap-2">
+        <p-iconfield class="w-full min-w-0 sm:w-52">
+          <p-inputicon class="pi pi-search" />
+          <input
+            id="admin-users-search"
+            pInputText
+            type="search"
+            class="w-full"
+            pSize="small"
+            placeholder="Search name or email"
+            [value]="searchText()"
+            (input)="onSearchInput($event)"
+          />
+          @if (searchText()) {
+            <p-inputicon
+              class="pi pi-times cursor-pointer"
+              role="button"
+              tabindex="0"
+              aria-label="Clear search"
+              (click)="clearSearch()"
+              (keydown.enter)="clearSearch()"
+            />
+          }
+        </p-iconfield>
+
+        <p-select
+          inputId="admin-users-type"
+          class="w-full shrink-0 sm:min-w-[11rem] sm:w-auto"
+          [options]="userTypeOptions()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="User type"
+          [ngModel]="userTypeFilter()"
+          (ngModelChange)="onUserTypeChange($event)"
+        />
+
+        <div class="flex shrink-0 items-center gap-1.5">
+          <p-toggleswitch
+            inputId="include-inactive-users"
+            [ngModel]="includeInactive()"
+            (ngModelChange)="onIncludeInactiveChange($event)"
+          />
+          <label for="include-inactive-users" class="cursor-pointer select-none whitespace-nowrap text-caption text-muted">
+            Inactive
+          </label>
+        </div>
+
+        <div class="flex shrink-0 items-center gap-1.5 text-caption text-muted sm:ml-auto">
+          @if (searching()) {
+            <i class="pi pi-spin pi-spinner text-primary" aria-hidden="true"></i>
+          }
+          <span>{{ resultSummary() }}</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <app-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [error]="error()"
+    [pageSize]="100"
+    emptyTitle="No users found"
+    [emptyDescription]="emptyDescription()"
+    (rowAction)="onRowAction($event)"
+  />
+</div>

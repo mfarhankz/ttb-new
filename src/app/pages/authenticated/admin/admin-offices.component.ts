@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
+import { AdminOfficesPanelComponent } from '../dashboard/components/admin-offices-panel/admin-offices-panel.component';
 
 @Component({
   selector: 'app-admin-offices',
   standalone: true,
+  imports: [AdminOfficesPanelComponent],
   template: `
     <div class="p-8">
-      <h1 class="text-h2 font-bold text-foreground">Offices</h1>
-      <p class="mt-2 text-muted">Manage offices and agency settings.</p>
+      <app-admin-offices-panel />
     </div>
   `
 })

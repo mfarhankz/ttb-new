@@ -1,7 +1,18 @@
-import { Component, Input, computed, signal, OnChanges, SimpleChanges } from '@angular/core';
 import {
+  Component,
+  HostListener,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  computed,
+  output,
+  signal
+} from '@angular/core';
+import {
+  DataTableBadgeCell,
   DataTableColumn,
   DataTableColumnAlign,
+  DataTableRowAction,
   DataTableSortDirection,
   DataTableSortType
 } from './data-table.types';
@@ -16,9 +27,32 @@ export class DataTableComponent implements OnChanges {
   @Input({ required: true }) rows: Record<string, unknown>[] = [];
   @Input() loading = false;
   @Input() error: string | null = null;
-  @Input() emptyMessage = 'No records found.';
+  @Input() emptyTitle = 'No records found';
+  @Input() emptyDescription = 'There is nothing to show right now.';
+  /** @deprecated Use emptyTitle and emptyDescription instead. */
+  @Input() emptyMessage = '';
   @Input() paginated = true;
   @Input() pageSize = 10;
+
+  readonly rowAction = output<{ actionId: string; row: Record<string, unknown> }>();
+
+  readonly openActionsRowId = signal<string | null>(null);
+
+  resolvedEmptyTitle(): string {
+    if (this.emptyTitle !== 'No records found') {
+      return this.emptyTitle;
+    }
+
+    return this.emptyMessage || this.emptyTitle;
+  }
+
+  resolvedEmptyDescription(): string {
+    if (this.emptyDescription !== 'There is nothing to show right now.') {
+      return this.emptyDescription;
+    }
+
+    return this.emptyMessage ? '' : this.emptyDescription;
+  }
 
   readonly currentPage = signal(1);
   readonly sortKey = signal<string | null>(null);
@@ -230,6 +264,74 @@ export class DataTableComponent implements OnChanges {
     }
 
     return classes.join(' ');
+  }
+
+  @HostListener('document:click')
+  closeActionsMenu(): void {
+    this.openActionsRowId.set(null);
+  }
+
+  actionList(value: unknown): DataTableRowAction[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value.filter(
+      (item): item is DataTableRowAction =>
+        !!item && typeof item === 'object' && 'id' in item && 'label' in item
+    );
+  }
+
+  isActionsMenuOpen(row: Record<string, unknown>, index: number): boolean {
+    return this.openActionsRowId() === this.trackRow(index, row);
+  }
+
+  toggleActionsMenu(event: MouseEvent, row: Record<string, unknown>, index: number): void {
+    event.stopPropagation();
+    const rowId = this.trackRow(index, row);
+    this.openActionsRowId.update((current) => (current === rowId ? null : rowId));
+  }
+
+  onRowActionClick(event: MouseEvent, action: DataTableRowAction, row: Record<string, unknown>): void {
+    event.stopPropagation();
+    this.openActionsRowId.set(null);
+    this.rowAction.emit({ actionId: action.id, row });
+  }
+
+  badgeList(value: unknown): DataTableBadgeCell[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value.filter(
+      (item): item is DataTableBadgeCell =>
+        !!item && typeof item === 'object' && 'label' in item && typeof (item as DataTableBadgeCell).label === 'string'
+    );
+  }
+
+  badgeToneClasses(badge: DataTableBadgeCell): string {
+    const base = 'inline-flex items-center rounded-full px-2.5 py-1 text-caption font-medium whitespace-nowrap';
+
+    switch (badge.tone) {
+      case 'user':
+        return `${base} bg-emerald-100 text-emerald-800`;
+      case 'info':
+      case 'primary':
+        return `${base} bg-primary/10 text-primary`;
+      case 'warning':
+        return `${base} bg-warning/10 text-warning`;
+      case 'danger':
+        return `${base} bg-danger/10 text-danger`;
+      case 'success':
+        return `${base} bg-success/10 text-success`;
+      case 'assignment':
+        return `${base} bg-sidebar-active text-foreground`;
+      case 'status':
+      case 'muted':
+        return `${base} bg-muted/20 text-muted`;
+      default:
+        return this.badgeClasses(badge.label);
+    }
   }
 
   badgeClasses(value: string): string {

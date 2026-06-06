@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
+import { AdminPermissionsService } from '../../../core/services/admin-permissions.service';
 import { ADMIN_NAV, MANAGE_ACCOUNT_NAV, DASHBOARD_SECTION_NAV, NavItem } from '../../../core/config/navigation.config';
 import { CardComponent } from '../../../shared/components';
 import {
@@ -24,6 +25,7 @@ import {
   PurchaseHistoryPanelComponent,
   AdminUsersPanelComponent,
   AdminOfficesPanelComponent,
+  AdminAgenciesPanelComponent,
   OrderHistoryPanelComponent
 } from './components';
 
@@ -32,7 +34,7 @@ export type DashboardSectionId = 'admin' | 'manage-reports' | 'manage-account';
 const SECTION_IDS: DashboardSectionId[] = ['admin', 'manage-reports', 'manage-account'];
 
 const SECTION_META: Record<DashboardSectionId, { title: string; subtitle: string }> = {
-  admin: { title: 'Admin', subtitle: 'User and office administration' },
+  admin: { title: 'Admin', subtitle: 'Manage users, agencies, and offices' },
   'manage-reports': { title: 'Manage Reports', subtitle: 'Reports and order history' },
   'manage-account': {
     title: 'Manage Account',
@@ -59,6 +61,7 @@ const DEFAULT_TAB: Record<DashboardSectionId, string> = {
     PurchaseHistoryPanelComponent,
     AdminUsersPanelComponent,
     AdminOfficesPanelComponent,
+    AdminAgenciesPanelComponent,
     OrderHistoryPanelComponent
   ],
   templateUrl: './dashboard.component.html',
@@ -100,6 +103,7 @@ const DEFAULT_TAB: Record<DashboardSectionId, string> = {
 })
 export class DashboardComponent implements AfterViewInit, OnDestroy {
   private readonly authService = inject(AuthService);
+  private readonly adminPermissions = inject(AdminPermissionsService);
   private readonly platformId = inject(PLATFORM_ID);
 
   @ViewChild('tabNav') tabNav?: ElementRef<HTMLElement>;
@@ -162,7 +166,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   selectSection(section: NavItem): void {
     const id = this.sectionId(section);
     this.activeSection.set(id);
-    this.activeTabKey.set(DEFAULT_TAB[id]);
+    this.activeTabKey.set(this.resolveDefaultTab(id));
     this.scheduleTabIndicatorUpdate();
   }
 
@@ -171,7 +175,8 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   }
 
   selectTab(tab: NavItem): void {
-    this.activeTabKey.set(this.tabKey(tab));
+    const key = this.adminPermissions.normalizeAdminTabKey(this.tabKey(tab));
+    this.activeTabKey.set(key);
     this.scheduleTabIndicatorUpdate();
   }
 
@@ -191,12 +196,17 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   private tabsForSection(section: DashboardSectionId): NavItem[] {
     switch (section) {
       case 'admin':
-        return ADMIN_NAV[0]?.children ?? [];
+        return this.adminPermissions.adminTabs();
       case 'manage-reports':
         return ADMIN_NAV[1]?.children ?? [];
       case 'manage-account':
         return MANAGE_ACCOUNT_NAV;
     }
+  }
+
+  private resolveDefaultTab(section: DashboardSectionId): string {
+    const tabKey = DEFAULT_TAB[section];
+    return section === 'admin' ? this.adminPermissions.normalizeAdminTabKey(tabKey) : tabKey;
   }
 
   private scheduleTabIndicatorUpdate(): void {

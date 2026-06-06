@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
+import { AdminUsersPanelComponent } from '../dashboard/components/admin-users-panel/admin-users-panel.component';
 
 @Component({
   selector: 'app-admin-users',
   standalone: true,
+  imports: [AdminUsersPanelComponent],
   template: `
     <div class="p-8">
-      <h1 class="text-h2 font-bold text-foreground">Users</h1>
-      <p class="mt-2 text-muted">Manage user accounts and permissions.</p>
+      <app-admin-users-panel />
     </div>
   `
 })

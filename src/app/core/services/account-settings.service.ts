@@ -30,7 +30,17 @@ export class AccountSettingsService {
   readonly saving = this._saving.asReadonly();
   readonly error = this._error.asReadonly();
 
-  fetchSettings(): void {
+  private loadSucceeded = false;
+
+  invalidateCache(): void {
+    this.loadSucceeded = false;
+  }
+
+  fetchSettings(force = false): void {
+    if (!force && this.loadSucceeded) {
+      return;
+    }
+
     this._loading.set(true);
     this._error.set(null);
 
@@ -39,9 +49,11 @@ export class AccountSettingsService {
         const normalized = this.normalizeSettings(res.effective_user_settings?.notification);
         this._settings.set(normalized);
         this._savedSettings.set({ ...normalized });
+        this.loadSucceeded = true;
         this._loading.set(false);
       },
       error: (err) => {
+        this.loadSucceeded = false;
         this._error.set(err.message ?? 'Failed to load account settings.');
         this._loading.set(false);
       }

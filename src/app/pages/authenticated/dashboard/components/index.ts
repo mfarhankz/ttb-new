@@ -6,4 +6,5 @@ export { DownloadHistoryPanelComponent } from './download-history-panel/download
 export { PurchaseHistoryPanelComponent } from './purchase-history-panel/purchase-history-panel.component';
 export { AdminUsersPanelComponent } from './admin-users-panel/admin-users-panel.component';
 export { AdminOfficesPanelComponent } from './admin-offices-panel/admin-offices-panel.component';
+export { AdminAgenciesPanelComponent } from './admin-agencies-panel/admin-agencies-panel.component';
 export { OrderHistoryPanelComponent } from './order-history-panel/order-history-panel.component';

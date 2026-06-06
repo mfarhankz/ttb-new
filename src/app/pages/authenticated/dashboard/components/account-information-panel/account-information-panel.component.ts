@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { AccountInformationService } from '../../../../../core/services/account-information.service';
 import { AuthService } from '../../../../../core/services/auth.service';
+import { SessionExpiredService } from '../../../../../core/services/session-expired.service';
 import { VerticalService } from '../../../../../core/services/vertical.service';
 import { US_STATE_OPTIONS } from '../../../../../core/config/us-states.config';
 import { UserProfileModel } from '../../../../../core/interfaces/user-profile.interface';
@@ -46,6 +47,7 @@ export class AccountInformationPanelComponent {
   private readonly authService = inject(AuthService);
   private readonly verticalService = inject(VerticalService);
   private readonly accountInformationService = inject(AccountInformationService);
+  private readonly sessionExpiredService = inject(SessionExpiredService);
 
   @ViewChild('profilePicInput') profilePicInput?: ElementRef<HTMLInputElement>;
 
@@ -65,7 +67,8 @@ export class AccountInformationPanelComponent {
   readonly pictureStatusType = signal<'success' | 'error' | ''>('');
   readonly pictureStatusMessage = signal('');
 
-  readonly profileImageUrl = signal<string | null>(null);
+  readonly profileImageUrl = this.authService.userPictureUrl;
+  readonly profileImageBroken = signal(false);
   readonly hasProfilePicture = computed(() => !!this.authService.tbUser()?.user_pic);
 
   readonly grayOutPrimaryFields = this.verticalService.grayoutPrimaryFields;
@@ -100,9 +103,17 @@ export class AccountInformationPanelComponent {
 
   constructor() {
     effect(() => {
+      this.sessionExpiredService.sessionRenewed();
+      this.profileImageUrl();
+
       if (this.authService.getUserId() != null) {
         this.accountInformationService.fetchAccountInformation();
       }
+    });
+
+    effect(() => {
+      this.profileImageUrl();
+      this.profileImageBroken.set(false);
     });
 
     effect(() => {
@@ -111,6 +122,10 @@ export class AccountInformationPanelComponent {
         this.applyProfile(profile);
       }
     });
+  }
+
+  onProfileImageError(): void {
+    this.profileImageBroken.set(true);
   }
 
   onProfileSubmit(): void {
@@ -211,7 +226,7 @@ export class AccountInformationPanelComponent {
     this.accountInformationService.uploadProfilePicture(file).subscribe({
       next: () => {
         this.uploadingPicture.set(false);
-        this.refreshProfileImage();
+        this.profileImageBroken.set(false);
         this.setPictureStatus('success', 'Picture uploaded successfully.');
         setTimeout(() => this.clearPictureStatus(), 2500);
       },
@@ -229,7 +244,6 @@ export class AccountInformationPanelComponent {
     this.accountInformationService.removeProfilePicture().subscribe({
       next: () => {
         this.removingPicture.set(false);
-        this.profileImageUrl.set(null);
         this.setPictureStatus('success', 'Profile picture removed.');
         setTimeout(() => this.clearPictureStatus(), 2500);
       },
@@ -287,7 +301,6 @@ export class AccountInformationPanelComponent {
 
   private applyProfile(profile: UserProfileModel): void {
     this.patchProfileForm(this.accountInformationService.normalizeProfile(profile));
-    this.refreshProfileImage();
   }
 
   private patchProfileForm(profile: UserProfileModel): void {
@@ -329,10 +342,6 @@ export class AccountInformationPanelComponent {
     profile.TbEmail[0].email = form.username.trim();
 
     return profile;
-  }
-
-  private refreshProfileImage(): void {
-    this.profileImageUrl.set(this.authService.getUserPictureUrl());
   }
 
   private setProfileStatus(type: 'success' | 'error', message: string): void {

@@ -1,8 +1,27 @@
-import { Component } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
+import { OrderHistoryService } from '../../../../../core/services/order-history.service';
+import { SessionExpiredService } from '../../../../../core/services/session-expired.service';
+import { DataTableComponent } from '../../../../../shared/components/data-table/data-table.component';
 
 @Component({
   selector: 'app-order-history-panel',
   standalone: true,
+  imports: [DataTableComponent],
   templateUrl: './order-history-panel.component.html'
 })
-export class OrderHistoryPanelComponent {}
+export class OrderHistoryPanelComponent {
+  private readonly orderHistoryService = inject(OrderHistoryService);
+  private readonly sessionExpiredService = inject(SessionExpiredService);
+
+  readonly columns = this.orderHistoryService.columns;
+  readonly rows = this.orderHistoryService.rows;
+  readonly loading = this.orderHistoryService.loading;
+  readonly error = this.orderHistoryService.error;
+
+  constructor() {
+    effect(() => {
+      this.sessionExpiredService.sessionRenewed();
+      this.orderHistoryService.fetchOrderHistory();
+    });
+  }
+}

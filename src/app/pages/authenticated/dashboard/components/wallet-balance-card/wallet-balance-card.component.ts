@@ -37,6 +37,6 @@ export class WalletBalanceCardComponent {
   }
 
   refreshBalance(): void {
-    this.walletService.fetchBalance();
+    this.walletService.fetchBalance(true);
   }
 }

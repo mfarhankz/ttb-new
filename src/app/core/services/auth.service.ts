@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, catchError, map, throwError } from 'rxjs';
 import { ApiService } from './api.service';
@@ -22,7 +22,9 @@ export class AuthService {
   private _tbAssociation = signal<any>(null);
   private _tbLicense = signal<any>(null);
   private _tbPhone = signal<any[]>([]);
-  
+  /** Bumped only when profile picture changes so the URL stays stable across route changes. */
+  private readonly _pictureCacheBust = signal(0);
+
   // Public readonly signals
   public readonly isAuthenticated = this._isAuthenticated.asReadonly();
   public readonly responseData = this._responseData.asReadonly();
@@ -33,6 +35,7 @@ export class AuthService {
   public readonly tbAssociation = this._tbAssociation.asReadonly();
   public readonly tbLicense = this._tbLicense.asReadonly();
   public readonly tbPhone = this._tbPhone.asReadonly();
+  public readonly userPictureUrl = computed(() => this.buildUserPictureUrl());
 
   // LocalStorage keys
   private readonly STORAGE_KEYS = {
@@ -324,6 +327,7 @@ export class AuthService {
     this.saveToStorage(this.STORAGE_KEYS.TB_USER, updated);
     this.saveToStorage(this.STORAGE_KEYS.USER, updated);
     this._tbUser.set(updated);
+    this._pictureCacheBust.update((value) => value + 1);
   }
 
   /**
@@ -442,6 +446,10 @@ export class AuthService {
    * e.g. https://demo.api.titletoolbox.com/ttb-storage/demo/user_pic/604/604.png?t=...
    */
   getUserPictureUrl(): string | null {
+    return this.userPictureUrl();
+  }
+
+  private buildUserPictureUrl(): string | null {
     const tbUser = this._tbUser();
     const userPic = tbUser?.user_pic;
     const usersId = tbUser?.users_id;
@@ -458,7 +466,8 @@ export class AuthService {
         ? this.verticalService.userPicLocation()
         : API_CONFIG.userPicLocation
     ).replace(/^\//, '');
-    return `${base}/${location}/${usersId}/${userPic}?t=${Date.now()}`;
+    const cacheBust = this._pictureCacheBust();
+    return `${base}/${location}/${usersId}/${userPic}?t=${cacheBust}`;
   }
 
   /**
