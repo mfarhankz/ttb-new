@@ -1,16 +1,42 @@
 <div class="w-full">
-  <div
-    class="sticky top-0 z-20 w-full bg-white px-8 py-4 shadow-md"
-  >
+  <div class="sticky top-0 z-20 w-full bg-white px-8 py-4 shadow-md">
     <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
       <div>
         <h1 class="text-h1 font-bold text-foreground mb-2">Dashboard</h1>
         <p class="text-body text-muted">
-          Welcome, <span class="font-semibold text-foreground">{{ name() }}</span>!
+          Welcome, <span class="font-semibold text-foreground">{{ name() }}</span
+          >!
         </p>
       </div>
+    </div>
+  </div>
 
-      <div class="flex flex-wrap gap-2">
+  <div class="p-8 pt-6 w-full">
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 pb-6 items-stretch">
+      <div class="xl:col-span-3 min-w-0 flex flex-col">
+        <app-wallet-balance-card class="flex-1 min-h-0" />
+      </div>
+
+      <div class="xl:col-span-6 min-w-0 flex flex-col">
+        <app-subscription-card
+          class="flex-1 min-h-0"
+          [heightLocked]="!subscriptionExpanded()"
+          (expandedChange)="subscriptionExpanded.set($event)"
+        />
+      </div>
+
+      <div class="xl:col-span-3 min-w-0 flex flex-col">
+        <app-account-settings-card class="flex-1 min-h-0" />
+      </div>
+    </div>
+
+    <app-card
+      [title]="sectionTitle()"
+      [subtitle]="sectionSubtitle()"
+      [headerActions]="true"
+      class="block"
+    >
+      <div headerActions class="flex flex-wrap gap-2">
         @for (section of dashboardSections; track section.label) {
           <button
             type="button"
@@ -30,95 +56,73 @@
           </button>
         }
       </div>
-    </div>
-  </div>
 
-  <div class="p-8 pt-6 w-full">
-    <app-card [title]="sectionTitle()" [subtitle]="sectionSubtitle()" class="block">
-    <nav
-      #tabNav
-      class="relative flex justify-start items-stretch gap-6 mb-6 w-full overflow-x-auto border-b border-border"
-      role="tablist"
-      [attr.aria-label]="sectionTitle()"
-    >
-      <span
-        class="dashboard-tabs-slider absolute bottom-0 left-0 h-0.5 rounded-t-sm bg-primary pointer-events-none"
-        aria-hidden="true"
-        [style.transform]="tabSliderStyle().transform"
-        [style.width]="tabSliderStyle().width"
-        [style.opacity]="tabSliderStyle().opacity"
-      ></span>
+      <nav
+        #tabNav
+        class="relative flex justify-start items-stretch gap-6 mb-6 w-full overflow-x-auto border-b border-border"
+        role="tablist"
+        [attr.aria-label]="sectionTitle()"
+      >
+        <span
+          class="dashboard-tabs-slider absolute bottom-0 left-0 h-0.5 rounded-t-sm bg-primary pointer-events-none"
+          aria-hidden="true"
+          [style.transform]="tabSliderStyle().transform"
+          [style.width]="tabSliderStyle().width"
+          [style.opacity]="tabSliderStyle().opacity"
+        ></span>
 
-      @for (tab of currentTabs(); track tab.route) {
-        <button
-          #tabButton
-          type="button"
-          role="tab"
-          class="dashboard-tab inline-flex shrink-0 items-center gap-2 py-3 text-body-sm font-medium whitespace-nowrap border-0 bg-transparent cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
-          [class.!text-primary]="isTabActive(tab)"
-          [class.text-muted]="!isTabActive(tab)"
-          [class.hover:!text-primary]="isTabActive(tab)"
-          [class.hover:text-foreground]="!isTabActive(tab)"
-          [class.font-semibold]="isTabActive(tab)"
-          [attr.aria-selected]="isTabActive(tab)"
-          (click)="selectTab(tab)"
-        >
-          <i
-            [class]="tab.icon"
-            class="text-sm transition-colors"
+        @for (tab of currentTabs(); track tab.route) {
+          <button
+            #tabButton
+            type="button"
+            role="tab"
+            class="dashboard-tab inline-flex shrink-0 items-center gap-2 py-3 text-body-sm font-medium whitespace-nowrap border-0 bg-transparent cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
             [class.!text-primary]="isTabActive(tab)"
             [class.text-muted]="!isTabActive(tab)"
-            aria-hidden="true"
-          ></i>
-          <span>{{ tab.label }}</span>
-        </button>
-      }
-    </nav>
+            [class.hover:!text-primary]="isTabActive(tab)"
+            [class.hover:text-foreground]="!isTabActive(tab)"
+            [class.font-semibold]="isTabActive(tab)"
+            [attr.aria-selected]="isTabActive(tab)"
+            (click)="selectTab(tab)"
+          >
+            <i
+              [class]="tab.icon"
+              class="text-sm transition-colors"
+              [class.!text-primary]="isTabActive(tab)"
+              [class.text-muted]="!isTabActive(tab)"
+              aria-hidden="true"
+            ></i>
+            <span>{{ tab.label }}</span>
+          </button>
+        }
+      </nav>
 
-    <div class="pt-0" role="tabpanel" [attr.aria-label]="activeTabLabel()">
-      @for (tab of [activeTabKey()]; track tab) {
-        <div class="dashboard-tab-panel min-h-[10rem]">
-          @switch (activeTabKey()) {
-            @case ('users') {
-              <app-admin-users-panel />
+      <div class="pt-0" role="tabpanel" [attr.aria-label]="activeTabLabel()">
+        @for (tab of [activeTabKey()]; track tab) {
+          <div class="dashboard-tab-panel min-h-[10rem]">
+            @switch (activeTabKey()) {
+              @case ('users') {
+                <app-admin-users-panel />
+              }
+              @case ('offices') {
+                <app-admin-offices-panel />
+              }
+              @case ('order-history') {
+                <app-order-history-panel />
+              }
+              @case ('account-information') {
+                <app-account-information-panel />
+              }
+              @case ('download-history') {
+                <app-download-history-panel />
+              }
+              @case ('purchase-history') {
+                <app-purchase-history-panel />
+              }
             }
-            @case ('offices') {
-              <app-admin-offices-panel />
-            }
-            @case ('order-history') {
-              <app-order-history-panel />
-            }
-            @case ('account-information') {
-              <app-account-information-panel />
-            }
-            @case ('download-history') {
-              <app-download-history-panel />
-            }
-            @case ('purchase-history') {
-              <app-purchase-history-panel />
-            }
-          }
-        </div>
-      }
-    </div>
-  </app-card>
-
-  <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 pt-6 items-stretch">
-    <div class="xl:col-span-3 min-w-0 flex flex-col">
-      <app-wallet-balance-card class="flex-1 min-h-0" />
-    </div>
-
-    <div class="xl:col-span-6 min-w-0 flex flex-col">
-      <app-subscription-card
-        class="flex-1 min-h-0"
-        [heightLocked]="!subscriptionExpanded()"
-        (expandedChange)="subscriptionExpanded.set($event)"
-      />
-    </div>
-
-    <div class="xl:col-span-3 min-w-0 flex flex-col">
-      <app-account-settings-card class="flex-1 min-h-0" />
-    </div>
-  </div>
+          </div>
+        }
+      </div>
+    </app-card>
   </div>
 </div>

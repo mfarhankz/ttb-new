@@ -9,8 +9,9 @@
     [class.justify-center]="isCollapsed"
     [class.px-3]="isCollapsed"
   >
+    <!-- Future: vertical.dashboardShortLogoUrl() / vertical.dashboardLogoUrl() -->
     <img
-      [src]="isCollapsed ? vertical.dashboardShortLogoUrl() : vertical.dashboardLogoUrl()"
+      [src]="isCollapsed ? sidebarShortLogoPath : sidebarLogoPath"
       [alt]="vertical.companyName()"
       class="object-contain"
       [class.w-full]="!isCollapsed"

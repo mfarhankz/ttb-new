@@ -14,6 +14,10 @@ import {
 } from '../../../core/config/navigation.config';
 import { VERTICAL_CONFIG } from '../../../core/config/vertical.config';
 
+/** Static logos from public/ until vertical white-label URLs are enabled. */
+const SIDEBAR_LOGO_PATH = VERTICAL_CONFIG.defaultLogoPath;
+const SIDEBAR_SHORT_LOGO_PATH = VERTICAL_CONFIG.defaultShortLogoPath;
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -33,6 +37,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private flyoutHideTimer?: ReturnType<typeof setTimeout>;
 
   readonly vertical = this.verticalService;
+  readonly sidebarLogoPath = SIDEBAR_LOGO_PATH;
+  readonly sidebarShortLogoPath = SIDEBAR_SHORT_LOGO_PATH;
   collapsedChange = output<boolean>();
 
   mainNav = MAIN_NAV;
