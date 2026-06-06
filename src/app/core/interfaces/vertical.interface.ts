@@ -31,11 +31,20 @@ export interface PublicHeaderContent {
   logo_style?: Record<string, string>;
 }
 
+export interface SupportInfo {
+  help_desk_phone?: string;
+  technical_support?: string;
+  contact_us_email?: string;
+}
+
 export interface VerticalCustomContent {
   public_header?: PublicHeaderContent;
   main_page?: {
     heading_desc?: string;
     watch_the_video_link_hide?: boolean;
+  };
+  user_home?: {
+    need_help_hide?: boolean;
   };
   [key: string]: unknown;
 }
@@ -50,7 +59,7 @@ export interface VerticalAppConfig {
 export interface VerticalContentData {
   app_config: VerticalAppConfig;
   company_info: CompanyInfo;
-  support_info?: Record<string, unknown>;
+  support_info?: SupportInfo;
   custom_content: VerticalCustomContent;
   agencies_app_config?: Record<string, Partial<VerticalAppConfig>>;
   [key: string]: unknown;

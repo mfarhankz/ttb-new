@@ -70,18 +70,82 @@ export const routes: Routes = [
       },
       {
         path: 'admin',
-        loadComponent: () => import('./pages/authenticated/admin/admin.component').then(m => m.AdminComponent),
-        title: 'Admin'
+        redirectTo: 'admin/users',
+        pathMatch: 'full'
+      },
+      {
+        path: 'admin/users',
+        loadComponent: () => import('./pages/authenticated/admin/admin-users.component').then(m => m.AdminUsersComponent),
+        title: 'Users'
+      },
+      {
+        path: 'admin/offices',
+        loadComponent: () => import('./pages/authenticated/admin/admin-offices.component').then(m => m.AdminOfficesComponent),
+        title: 'Offices'
       },
       {
         path: 'manage-reports',
-        loadComponent: () => import('./pages/authenticated/admin/manage-reports.component').then(m => m.ManageReportsComponent),
-        title: 'Manage Reports'
+        redirectTo: 'manage-reports/order-history',
+        pathMatch: 'full'
+      },
+      {
+        path: 'manage-reports/order-history',
+        loadComponent: () =>
+          import('./pages/authenticated/admin/manage-reports-order-history.component').then(
+            m => m.ManageReportsOrderHistoryComponent
+          ),
+        title: 'Order History'
       },
       {
         path: 'manage-account',
-        loadComponent: () => import('./pages/authenticated/admin/manage-account.component').then(m => m.ManageAccountComponent),
-        title: 'Manage Account'
+        redirectTo: 'manage-account/account-information',
+        pathMatch: 'full'
+      },
+      {
+        path: 'manage-account/account-information',
+        loadComponent: () =>
+          import('./pages/authenticated/manage-account/account-information.component').then(
+            m => m.AccountInformationComponent
+          ),
+        title: 'Account Information'
+      },
+      {
+        path: 'manage-account/account-settings',
+        loadComponent: () =>
+          import('./pages/authenticated/manage-account/account-settings.component').then(
+            m => m.AccountSettingsComponent
+          ),
+        title: 'Account Settings'
+      },
+      {
+        path: 'manage-account/download-history',
+        loadComponent: () =>
+          import('./pages/authenticated/manage-account/download-history.component').then(
+            m => m.DownloadHistoryComponent
+          ),
+        title: 'Download History'
+      },
+      {
+        path: 'manage-account/purchase-history',
+        loadComponent: () =>
+          import('./pages/authenticated/manage-account/purchase-history.component').then(
+            m => m.PurchaseHistoryComponent
+          ),
+        title: 'Purchase History'
+      },
+      {
+        path: 'manage-account/wallet',
+        loadComponent: () =>
+          import('./pages/authenticated/manage-account/wallet.component').then(m => m.WalletComponent),
+        title: 'Wallet'
+      },
+      {
+        path: 'manage-account/subscription',
+        loadComponent: () =>
+          import('./pages/authenticated/manage-account/subscription.component').then(
+            m => m.SubscriptionComponent
+          ),
+        title: 'Subscription'
       }
     ]
   },

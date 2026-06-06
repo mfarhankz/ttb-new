@@ -8,6 +8,8 @@ export const VERTICAL_CONFIG = {
   defaultLogoPath: '/logo.png',
   /** Compact logo for collapsed sidebar (public/short-logo.png) */
   defaultShortLogoPath: '/short-logo.png',
+  /** Fallback support phone when vertical_conf has no support_info */
+  defaultSupportPhone: '855-276-1159',
   /** Meta is always resolved via demo API (legacy behavior) */
   metaApiOrigin: 'https://demo.api.titletoolbox.com',
   metaEndpoint: '/webservices/vertical_meta.json',

@@ -12,6 +12,7 @@ import {
   SIDEBAR_COLLAPSED_KEY,
   type NavItem
 } from '../../../core/config/navigation.config';
+import { VERTICAL_CONFIG } from '../../../core/config/vertical.config';
 
 @Component({
   selector: 'app-sidebar',
@@ -45,9 +46,29 @@ export class SidebarComponent implements OnInit, OnDestroy {
     const user = this.tbUser();
     return user?.office_name || user?.username || '';
   });
+  showNeedHelp = computed(
+    () => !this.verticalService.content()?.custom_content?.user_home?.need_help_hide
+  );
+  supportPhone = computed(() => {
+    const support = this.verticalService.content()?.support_info;
+    const userType = Number(this.tbUser()?.type ?? 0);
+    if (userType > 1) {
+      return (
+        support?.technical_support ||
+        support?.help_desk_phone ||
+        VERTICAL_CONFIG.defaultSupportPhone
+      );
+    }
+    return (
+      support?.help_desk_phone ||
+      support?.technical_support ||
+      VERTICAL_CONFIG.defaultSupportPhone
+    );
+  });
+  supportPhoneTel = computed(() => this.supportPhone().replace(/[^\d+]/g, ''));
 
   isCollapsed = false;
-  expandedMenus = new Set<string>();
+  expandedMenu: string | null = null;
   hoveredFlyout = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -76,7 +97,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   isMenuExpanded(label: string): boolean {
-    return this.expandedMenus.has(label);
+    return this.expandedMenu === label;
   }
 
   isFlyoutOpen(label: string): boolean {
@@ -93,11 +114,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
     if (this.isCollapsed) return;
-    if (this.expandedMenus.has(item.label)) {
-      this.expandedMenus.delete(item.label);
-    } else {
-      this.expandedMenus.add(item.label);
-    }
+    this.expandedMenu = this.expandedMenu === item.label ? null : item.label;
   }
 
   onParentMouseEnter(item: NavItem): void {
@@ -139,9 +156,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   private syncExpandedMenusFromRoute(): void {
-    for (const item of this.mainNav) {
+    this.expandedMenu = null;
+    for (const item of [...this.mainNav, ...this.adminNav]) {
       if (this.isParentActive(item)) {
-        this.expandedMenus.add(item.label);
+        this.expandedMenu = item.label;
+        break;
       }
     }
   }
