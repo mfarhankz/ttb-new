@@ -2,6 +2,7 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountSettingsService } from '../../../../../core/services/account-settings.service';
 import { AuthService } from '../../../../../core/services/auth.service';
+import { SessionExpiredService } from '../../../../../core/services/session-expired.service';
 import {
   AlertComponent,
   ButtonComponent,
@@ -21,8 +22,7 @@ import {
 export class AccountSettingsCardComponent {
   private readonly authService = inject(AuthService);
   private readonly accountSettingsService = inject(AccountSettingsService);
-
-  private lastFetchedUserId: number | string | null = null;
+  private readonly sessionExpiredService = inject(SessionExpiredService);
 
   readonly isEndUser = computed(() => this.authService.isEndUser());
   readonly settings = this.accountSettingsService.settings;
@@ -35,9 +35,10 @@ export class AccountSettingsCardComponent {
 
   constructor() {
     effect(() => {
+      this.sessionExpiredService.sessionRenewed();
+
       const userId = this.authService.getUserId();
-      if (userId != null && userId !== this.lastFetchedUserId) {
-        this.lastFetchedUserId = userId;
+      if (userId != null) {
         this.accountSettingsService.fetchSettings();
       }
     });

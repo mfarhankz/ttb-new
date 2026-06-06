@@ -1,0 +1,16 @@
+<app-modal
+  #modal
+  id="session-login-modal"
+  title="Session Expired"
+  size="sm"
+  [showCloseButton]="false"
+  [showFooter]="false"
+  [closeOnBackdropClick]="false"
+  [backdropClickable]="false"
+>
+  <app-login
+    [modalMode]="true"
+    [sessionExpired]="true"
+    (loginSuccess)="onLoginSuccess()"
+  />
+</app-modal>

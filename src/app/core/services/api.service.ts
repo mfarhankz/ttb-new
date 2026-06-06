@@ -3,7 +3,9 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { API_CONFIG } from '../config/api.config';
+import { UNAUTHORIZED_MESSAGE } from '../constants/auth.constants';
 import { ApiError } from '../interfaces/api.interface';
+import { SessionExpiredService } from './session-expired.service';
 import { VerticalService } from './vertical.service';
 
 @Injectable({
@@ -12,6 +14,7 @@ import { VerticalService } from './vertical.service';
 export class ApiService {
   private readonly http = inject(HttpClient);
   private readonly verticalService = inject(VerticalService);
+  private readonly sessionExpiredService = inject(SessionExpiredService);
 
   private get baseUrl(): string {
     return this.verticalService.initialized()
@@ -116,7 +119,7 @@ export class ApiService {
       } else if (error.status === 0) {
         errorMessage = 'Unable to connect to server. Please check your internet connection.';
       } else if (error.status === 401) {
-        errorMessage = 'Unauthorized. Please login again.';
+        errorMessage = UNAUTHORIZED_MESSAGE;
       } else if (error.status === 403) {
         errorMessage = 'Access forbidden.';
       } else if (error.status === 404) {
@@ -127,6 +130,8 @@ export class ApiService {
         errorMessage = `Error: ${error.status} ${error.statusText}`;
       }
     }
+
+    this.sessionExpiredService.handleUnauthorized(errorMessage, error.status);
 
     const apiError: ApiError = {
       message: errorMessage,

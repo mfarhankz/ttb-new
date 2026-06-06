@@ -9,13 +9,16 @@ import { ThemeService } from './core/services/theme.service';
 import { VerticalService } from './core/services/vertical.service';
 import { partnerKeyInterceptor } from './core/interceptors/partner-key.interceptor';
 import { ttbSessionInterceptor } from './core/interceptors/ttb-session.interceptor';
+import { unauthorizedInterceptor } from './core/interceptors/unauthorized.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideAnimations(),
-    provideHttpClient(withInterceptors([ttbSessionInterceptor, partnerKeyInterceptor])),
+    provideHttpClient(
+      withInterceptors([ttbSessionInterceptor, partnerKeyInterceptor, unauthorizedInterceptor])
+    ),
     MapScriptsLoaderService,
     {
       provide: APP_INITIALIZER,

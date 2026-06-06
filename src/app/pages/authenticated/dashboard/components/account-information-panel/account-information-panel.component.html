@@ -6,7 +6,7 @@
 } @else if (loadError()) {
   <app-alert type="error">{{ loadError() }}</app-alert>
 } @else {
-  <div class="grid grid-cols-1 gap-8 xl:grid-cols-12">
+  <div class="grid grid-cols-1 gap-24 xl:grid-cols-12">
     <div class="xl:col-span-7">
       <h3 class="text-body font-semibold text-foreground mb-4">Profile Information</h3>
 
@@ -146,7 +146,7 @@
         <h3 class="text-body font-semibold text-foreground mb-4">Profile Picture</h3>
 
         <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
-          <div class="flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-sidebar-active/30">
+          <div class="flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-sidebar-active/30">
             @if (profileImageUrl()) {
               <img
                 [src]="profileImageUrl()"

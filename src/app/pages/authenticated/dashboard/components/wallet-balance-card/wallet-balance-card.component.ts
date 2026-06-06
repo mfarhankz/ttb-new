@@ -1,5 +1,6 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
+import { SessionExpiredService } from '../../../../../core/services/session-expired.service';
 import { VerticalService } from '../../../../../core/services/vertical.service';
 import { WalletService } from '../../../../../core/services/wallet.service';
 import { ButtonComponent, CardComponent } from '../../../../../shared/components';
@@ -13,9 +14,10 @@ import { ButtonComponent, CardComponent } from '../../../../../shared/components
     class: 'block h-full min-h-0'
   }
 })
-export class WalletBalanceCardComponent implements OnInit {
+export class WalletBalanceCardComponent {
   private readonly verticalService = inject(VerticalService);
   private readonly walletService = inject(WalletService);
+  private readonly sessionExpiredService = inject(SessionExpiredService);
 
   readonly walletEnabled = computed(
     () => this.verticalService.content()?.app_config?.support_wallet !== false
@@ -24,10 +26,14 @@ export class WalletBalanceCardComponent implements OnInit {
   readonly walletLoading = this.walletService.loading;
   readonly walletError = this.walletService.error;
 
-  ngOnInit(): void {
-    if (this.walletEnabled()) {
-      this.walletService.fetchBalance();
-    }
+  constructor() {
+    effect(() => {
+      this.sessionExpiredService.sessionRenewed();
+
+      if (this.walletEnabled()) {
+        this.walletService.fetchBalance();
+      }
+    });
   }
 
   refreshBalance(): void {

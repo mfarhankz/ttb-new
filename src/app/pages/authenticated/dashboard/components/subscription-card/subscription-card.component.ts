@@ -2,6 +2,7 @@ import { CurrencyPipe } from '@angular/common';
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { BillingProfile } from '../../../../../core/interfaces/api.interface';
+import { SessionExpiredService } from '../../../../../core/services/session-expired.service';
 import { SubscriptionService } from '../../../../../core/services/subscription.service';
 import { VerticalService } from '../../../../../core/services/vertical.service';
 import { ButtonComponent, CardComponent } from '../../../../../shared/components';
@@ -40,8 +41,7 @@ export class SubscriptionCardComponent {
   private readonly authService = inject(AuthService);
   private readonly verticalService = inject(VerticalService);
   private readonly subscriptionService = inject(SubscriptionService);
-
-  private lastFetchedUserId: number | string | null = null;
+  private readonly sessionExpiredService = inject(SessionExpiredService);
   private readonly expandedProfileId = signal<string | null>(null);
 
   readonly heightLocked = input(true);
@@ -59,13 +59,14 @@ export class SubscriptionCardComponent {
 
   constructor() {
     effect(() => {
+      this.sessionExpiredService.sessionRenewed();
+
       if (!this.subscriptionEnabled()) {
         return;
       }
 
       const userId = this.authService.getUserId();
-      if (userId != null && userId !== this.lastFetchedUserId) {
-        this.lastFetchedUserId = userId;
+      if (userId != null) {
         this.subscriptionService.fetchBillingProfile(userId);
       }
     });

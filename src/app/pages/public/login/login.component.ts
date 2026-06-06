@@ -1,4 +1,4 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -29,6 +29,10 @@ type LoginView = 'login' | 'mfa-phone-register' | 'mfa-otp-verify';
   styles: []
 })
 export class LoginComponent implements OnInit {
+  @Input() modalMode = false;
+  @Input() sessionExpired = false;
+  @Output() loginSuccess = new EventEmitter<void>();
+
   loginForm: FormGroup;
   isLoading = signal(false);
   errorMessage = signal<string>('');
@@ -52,8 +56,12 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.sessionExpired) {
+      this.errorMessage.set('Session expired - Please log back in to continue.');
+    }
+
     // Auto-login if skip login flag is enabled in dev mode
-    if (SKIP_LOGIN_IN_DEV) {
+    if (SKIP_LOGIN_IN_DEV && !this.modalMode) {
       console.log('Skipping login - auto-logging in with default credentials');
       this.onSubmit();
     }
@@ -108,7 +116,11 @@ export class LoginComponent implements OnInit {
         
         // Check if login was successful (MFA disabled in dev mode)
         if (response.success) {
-          // Login successful - navigate to dashboard
+          if (this.modalMode) {
+            this.loginSuccess.emit();
+            return;
+          }
+
           const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
           this.router.navigate([returnUrl]);
           return;
@@ -150,7 +162,11 @@ export class LoginComponent implements OnInit {
   }
 
   onOtpVerified(): void {
-    // OTP verified successfully, complete login
+    if (this.modalMode) {
+      this.loginSuccess.emit();
+      return;
+    }
+
     const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
     this.router.navigate([returnUrl]);
   }
