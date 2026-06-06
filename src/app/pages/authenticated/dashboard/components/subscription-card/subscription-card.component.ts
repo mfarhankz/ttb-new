@@ -12,9 +12,7 @@ import { ButtonComponent, CardComponent } from '../../../../../shared/components
   imports: [CurrencyPipe, CardComponent, ButtonComponent],
   templateUrl: './subscription-card.component.html',
   host: {
-    class: 'block',
-    '[class.h-full]': 'heightLocked()',
-    '[class.min-h-0]': 'heightLocked()'
+    class: 'block h-full min-h-0'
   },
   styles: [
     `

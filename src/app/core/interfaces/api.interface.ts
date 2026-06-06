@@ -93,6 +93,28 @@ export interface TtbSubscriptionOptionsResponse {
   };
 }
 
+export interface UserNotificationSettings {
+  farm_email_notification_enabled: boolean;
+  bcc_on_notification_suppressed: boolean;
+}
+
+export interface TtbUserSettingsResponse {
+  effective_user_settings?: {
+    notification?: {
+      farm_email_notification_enabled?: number | boolean;
+      bcc_on_notification_suppressed?: number | boolean;
+    };
+  };
+}
+
+export interface TtbSaveUserSettingsResponse {
+  response: {
+    status: string;
+    message?: string;
+    data?: unknown;
+  };
+}
+
 export interface ApiError {
   message: string;
   status?: number;

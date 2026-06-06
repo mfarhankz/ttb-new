@@ -1,0 +1,64 @@
+<app-card title="Account Settings" subtitle="Manage notification preferences" [fillHeight]="true">
+  <div class="flex flex-col flex-1 min-h-0 rounded-xl border border-border bg-background p-5 h-full">
+    @if (loading()) {
+      <div class="flex items-center gap-2 py-6 text-body-sm text-muted">
+        <i class="pi pi-spin pi-spinner text-primary"></i>
+        Loading settings…
+      </div>
+    } @else if (fetchError()) {
+      <p class="text-body-sm text-danger py-4">{{ fetchError() }}</p>
+    } @else {
+      <div class="space-y-4">
+        <div>
+          <p class="text-overline uppercase text-muted mb-3">Notifications</p>
+
+          @if (isEndUser()) {
+            <app-toggle
+              id="farm-email-notification"
+              label="Farm email notification enabled"
+              [ngModel]="settings().farm_email_notification_enabled"
+              (ngModelChange)="onFarmEmailChange($event)"
+              [disabled]="loading() || saving()"
+            />
+          } @else {
+            <app-toggle
+              id="bcc-notification-suppressed"
+              label="Suppress bcc from email notification"
+              [ngModel]="settings().bcc_on_notification_suppressed"
+              (ngModelChange)="onBccSuppressChange($event)"
+              [disabled]="loading() || saving()"
+            />
+          }
+        </div>
+
+        @if (statusMessage()) {
+          <app-alert [type]="statusType() === 'success' ? 'success' : 'error'">
+            {{ statusMessage() }}
+          </app-alert>
+        }
+
+        <div class="flex flex-wrap gap-2 pt-2">
+          <app-button
+            type="button"
+            variant="danger"
+            size="sm"
+            [disabled]="loading() || saving()"
+            (onClick)="resetSettings()"
+          >
+            Reset
+          </app-button>
+          <app-button
+            type="button"
+            variant="success"
+            size="sm"
+            [loading]="saving()"
+            [disabled]="loading() || saving()"
+            (onClick)="updateSettings()"
+          >
+            Update Settings
+          </app-button>
+        </div>
+      </div>
+    }
+  </div>
+</app-card>

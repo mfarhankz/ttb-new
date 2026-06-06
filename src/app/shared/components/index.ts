@@ -11,6 +11,7 @@ export { InputComponent } from './input/input.component';
 export { SelectComponent, type SelectOption } from './select/select.component';
 export { TextareaComponent } from './textarea/textarea.component';
 export { CheckboxComponent } from './checkbox/checkbox.component';
+export { ToggleComponent } from './toggle/toggle.component';
 export { RadioComponent } from './radio/radio.component';
 export { ButtonComponent, type ButtonVariant, type ButtonSize } from './button/button.component';
 

@@ -412,6 +412,11 @@ export class AuthService {
     return null;
   }
 
+  isEndUser(): boolean {
+    const type = this._tbUser()?.type;
+    return Number(type) === 1;
+  }
+
   /**
    * User profile image URL from TTB storage (same pattern as legacy app).
    * e.g. https://demo.api.titletoolbox.com/ttb-storage/demo/user_pic/604/604.png?t=...

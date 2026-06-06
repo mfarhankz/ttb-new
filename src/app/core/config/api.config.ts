@@ -20,7 +20,9 @@ export const API_CONFIG = {
     getUserWallet: '/get_user_wallet.json',
     showBillingProfile: '/show_billing_profile.json',
     cancelSubscription: '/cancel_subscription.json',
-    listSubscriptionOptions: '/list_subscription_options.json'
+    listSubscriptionOptions: '/list_subscription_options.json',
+    getUserSettings: '/get_user_settings.json',
+    saveUserSettings: '/save_user_settings.json'
   }
 } as const;
 
