@@ -113,6 +113,11 @@ export class AccountInformationPanelComponent {
   }
 
   onProfileSubmit(): void {
+    if (this.profileForm.pristine) {
+      this.setProfileStatus('error', 'No changes made to save.');
+      return;
+    }
+
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
       this.setProfileStatus('error', 'Please correct the highlighted fields.');

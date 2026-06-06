@@ -111,9 +111,11 @@
         </div>
 
         @if (profileStatusMessage()) {
-          <app-alert [type]="profileStatusType() === 'success' ? 'success' : 'error'">
-            {{ profileStatusMessage() }}
-          </app-alert>
+          <div class="mt-4">
+            <app-alert [type]="profileStatusType() === 'success' ? 'success' : 'error'">
+              {{ profileStatusMessage() }}
+            </app-alert>
+          </div>
         }
 
         <div class="flex flex-wrap gap-2 pt-1">
@@ -121,7 +123,7 @@
             type="button"
             variant="danger"
             size="sm"
-            [disabled]="savingProfile()"
+            [disabled]="savingProfile() || profileForm.pristine"
             (onClick)="onProfileReset()"
           >
             Reset
@@ -131,7 +133,7 @@
             variant="success"
             size="sm"
             [loading]="savingProfile()"
-            [disabled]="savingProfile()"
+            [disabled]="savingProfile() || profileForm.pristine"
           >
             Update my profile
           </app-button>

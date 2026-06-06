@@ -2,7 +2,7 @@ const TTBSID_PARAM = 'TTBSID';
 const AUTH_TOKEN_KEY = 'authToken';
 
 /** Skip session attachment for unauthenticated bootstrap endpoints. */
-const SESSION_SKIP_PATTERNS = ['/login.json', '/vertical_meta.json'];
+const SESSION_SKIP_PATTERNS = ['/login.json', '/vertical_meta.json', '/vertical_conf.json'];
 
 export function attachTtbSessionId(url: string, sessionId: string): string {
   if (!sessionId || url.includes(`${TTBSID_PARAM}=`)) {
