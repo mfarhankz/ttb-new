@@ -11,11 +11,12 @@ import {
   ViewChild,
   ViewChildren
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, NgTemplateOutlet } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { AdminPermissionsService } from '../../../core/services/admin-permissions.service';
+import { DashboardTabToolbarService } from '../../../core/services/dashboard-tab-toolbar.service';
 import { ADMIN_NAV, MANAGE_ACCOUNT_NAV, DASHBOARD_SECTION_NAV, NavItem } from '../../../core/config/navigation.config';
-import { CardComponent } from '../../../shared/components';
+import { CardComponent, TabToolbarComponent } from '../../../shared/components';
 import {
   WalletBalanceCardComponent,
   SubscriptionCardComponent,
@@ -56,6 +57,8 @@ const DEFAULT_TAB: Record<DashboardSectionId, string> = {
     SubscriptionCardComponent,
     AccountSettingsCardComponent,
     CardComponent,
+    NgTemplateOutlet,
+    TabToolbarComponent,
     AccountInformationPanelComponent,
     DownloadHistoryPanelComponent,
     PurchaseHistoryPanelComponent,
@@ -105,6 +108,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly adminPermissions = inject(AdminPermissionsService);
   private readonly platformId = inject(PLATFORM_ID);
+  readonly tabToolbar = inject(DashboardTabToolbarService);
 
   @ViewChild('tabNav') tabNav?: ElementRef<HTMLElement>;
   @ViewChildren('tabButton') tabButtons?: QueryList<ElementRef<HTMLButtonElement>>;

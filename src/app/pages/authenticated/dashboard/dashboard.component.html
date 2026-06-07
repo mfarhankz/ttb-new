@@ -57,45 +57,59 @@
         }
       </div>
 
-      <nav
-        #tabNav
-        class="relative flex justify-start items-stretch gap-6 mb-6 w-full overflow-x-auto border-b border-border"
-        role="tablist"
-        [attr.aria-label]="sectionTitle()"
-      >
-        <span
-          class="dashboard-tabs-slider absolute bottom-0 left-0 h-0.5 rounded-t-sm bg-primary pointer-events-none"
-          aria-hidden="true"
-          [style.transform]="tabSliderStyle().transform"
-          [style.width]="tabSliderStyle().width"
-          [style.opacity]="tabSliderStyle().opacity"
-        ></span>
+      <div class="mb-6 flex w-full items-end gap-4 border-b border-border">
+        <nav
+          #tabNav
+          class="relative flex min-w-0 flex-1 items-stretch gap-6 overflow-x-auto"
+          role="tablist"
+          [attr.aria-label]="sectionTitle()"
+        >
+          <span
+            class="dashboard-tabs-slider absolute bottom-0 left-0 h-0.5 rounded-t-sm bg-primary pointer-events-none"
+            aria-hidden="true"
+            [style.transform]="tabSliderStyle().transform"
+            [style.width]="tabSliderStyle().width"
+            [style.opacity]="tabSliderStyle().opacity"
+          ></span>
 
-        @for (tab of currentTabs(); track tab.route) {
-          <button
-            #tabButton
-            type="button"
-            role="tab"
-            class="dashboard-tab inline-flex shrink-0 items-center gap-2 py-3 text-body-sm font-medium whitespace-nowrap border-0 bg-transparent cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
-            [class.!text-primary]="isTabActive(tab)"
-            [class.text-muted]="!isTabActive(tab)"
-            [class.hover:!text-primary]="isTabActive(tab)"
-            [class.hover:text-foreground]="!isTabActive(tab)"
-            [class.font-semibold]="isTabActive(tab)"
-            [attr.aria-selected]="isTabActive(tab)"
-            (click)="selectTab(tab)"
-          >
-            <i
-              [class]="tab.icon"
-              class="text-sm transition-colors"
+          @for (tab of currentTabs(); track tab.route) {
+            <button
+              #tabButton
+              type="button"
+              role="tab"
+              class="dashboard-tab inline-flex shrink-0 cursor-pointer items-center gap-2 border-0 bg-transparent py-3 text-body-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
               [class.!text-primary]="isTabActive(tab)"
               [class.text-muted]="!isTabActive(tab)"
-              aria-hidden="true"
-            ></i>
-            <span>{{ tab.label }}</span>
-          </button>
-        }
-      </nav>
+              [class.hover:!text-primary]="isTabActive(tab)"
+              [class.hover:text-foreground]="!isTabActive(tab)"
+              [class.font-semibold]="isTabActive(tab)"
+              [attr.aria-selected]="isTabActive(tab)"
+              (click)="selectTab(tab)"
+            >
+              <i
+                [class]="tab.icon"
+                class="text-sm transition-colors"
+                [class.!text-primary]="isTabActive(tab)"
+                [class.text-muted]="!isTabActive(tab)"
+                aria-hidden="true"
+              ></i>
+              <span>{{ tab.label }}</span>
+            </button>
+          }
+        </nav>
+
+        <app-tab-toolbar class="shrink-0 pb-2" />
+      </div>
+
+      @if (tabToolbar.hint()) {
+        <p class="mb-3 max-w-md text-caption leading-snug text-warning">{{ tabToolbar.hint() }}</p>
+      }
+
+      @if (tabToolbar.filtersOpen() && tabToolbar.filterPanel()) {
+        <div class="mb-4">
+          <ng-container *ngTemplateOutlet="tabToolbar.filterPanel()!" />
+        </div>
+      }
 
       <div class="pt-0" role="tabpanel" [attr.aria-label]="activeTabLabel()">
         @for (tab of [activeTabKey()]; track tab) {

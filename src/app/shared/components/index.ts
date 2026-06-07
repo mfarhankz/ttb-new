@@ -17,6 +17,7 @@ export { ButtonComponent, type ButtonVariant, type ButtonSize } from './button/b
 
 // Layout Components
 export { CardComponent } from './card/card.component';
+export { TabToolbarComponent } from './tab-toolbar/tab-toolbar.component';
 export { ModalComponent } from './modal/modal.component';
 
 // Feedback Components

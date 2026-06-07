@@ -1,0 +1,35 @@
+@if (toolbar.showToolbar()) {
+  <div class="flex shrink-0 items-center gap-2">
+    <button
+      type="button"
+      class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border px-3 text-sm font-medium transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus"
+      [class.border-primary]="toolbar.filtersOpen() || toolbar.hasActiveFilters()"
+      [class.bg-primary/10]="toolbar.hasActiveFilters()"
+      [class.text-primary]="toolbar.filtersOpen() || toolbar.hasActiveFilters()"
+      [class.border-border]="!toolbar.filtersOpen() && !toolbar.hasActiveFilters()"
+      [class.bg-transparent]="!toolbar.hasActiveFilters()"
+      [class.text-muted]="!toolbar.filtersOpen() && !toolbar.hasActiveFilters()"
+      (click)="toggleFilters($event)"
+    >
+      <i class="pi pi-filter text-xs" aria-hidden="true"></i>
+      Filters
+    </button>
+
+    <button
+      type="button"
+      class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border text-muted transition-colors hover:bg-sidebar-active hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus"
+      aria-label="More actions"
+      (click)="toggleActionsMenu($event)"
+    >
+      <i class="pi pi-ellipsis-v text-sm" aria-hidden="true"></i>
+    </button>
+
+    <p-menu
+      #actionsMenu
+      styleClass="tab-actions-menu"
+      [model]="toolbar.menuItems()"
+      [popup]="true"
+      appendTo="body"
+    />
+  </div>
+}

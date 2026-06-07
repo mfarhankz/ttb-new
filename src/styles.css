@@ -98,3 +98,7 @@
     @apply font-sans text-body text-foreground bg-background antialiased;
   }
 }
+
+.tab-actions-menu .p-menu-item-label {
+  font-size: 0.95rem;
+}
