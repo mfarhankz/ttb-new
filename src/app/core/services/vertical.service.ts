@@ -3,8 +3,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { VERTICAL_CONFIG } from '../config/vertical.config';
-import { getVerticalColorPreset } from '../config/vertical-theme.presets';
-import { tokensToCssVars } from '../config/theme.config';
+import { getVerticalColorPreset } from '../theme/vertical-theme.presets';
+import { tokensToCssVars } from '../theme/theme.config';
 import {
   AgencyApiOffice,
   AgencyConfig,

@@ -1,4 +1,4 @@
-import { AdminUserRecord } from '../interfaces/admin-users.interface';
+import { AdminUserRecord } from '../../interfaces/admin-users.interface';
 import { DataTableRowAction } from '@app/shared/components/data-table/data-table.types';
 
 export interface AdminUserActionContext {

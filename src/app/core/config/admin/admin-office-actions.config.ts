@@ -1,4 +1,4 @@
-import { AdminOfficeRecord } from '../interfaces/admin-offices.interface';
+import { AdminOfficeRecord } from '../../interfaces/admin-offices.interface';
 import { DataTableRowAction } from '@app/shared/components/data-table/data-table.types';
 
 export interface AdminOfficeActionContext {

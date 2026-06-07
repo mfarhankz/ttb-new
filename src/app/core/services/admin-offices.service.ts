@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { resolveAdminOfficeRowActions } from '../config/admin-office-actions.config';
+import { resolveAdminOfficeRowActions } from '../config/admin/admin-office-actions.config';
 import { ApiService } from './api.service';
 import { AdminPermissionsService } from './admin-permissions.service';
 import { TargetOfficeService } from './target-office.service';

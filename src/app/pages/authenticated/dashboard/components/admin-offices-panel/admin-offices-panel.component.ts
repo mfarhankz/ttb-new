@@ -15,11 +15,11 @@ import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
-import { OFFICE_FILTER_FIELD_OPTIONS } from '@app/core/config/admin-office-filters.config';
+import { OFFICE_FILTER_FIELD_OPTIONS } from '@app/core/config/admin/admin-office-filters.config';
 import {
   AdminOfficeToolbarActionId,
   getAdminOfficeToolbarActions
-} from '@app/core/config/admin-office-toolbar.config';
+} from '@app/core/config/admin/admin-office-toolbar.config';
 import { AdminPermissionsService } from '@app/core/services/admin-permissions.service';
 import { AdminOfficeRecord } from '@app/core/interfaces/admin-offices.interface';
 import { AdminOfficesService } from '@app/core/services/admin-offices.service';

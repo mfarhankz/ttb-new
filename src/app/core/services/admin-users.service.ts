@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { resolveAdminUserRowActions } from '../config/admin-user-actions.config';
+import { resolveAdminUserRowActions } from '../config/admin/admin-user-actions.config';
 import { ApiService } from './api.service';
 import { AdminPermissionsService } from './admin-permissions.service';
 import { AuthService } from './auth.service';

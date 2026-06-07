@@ -5,7 +5,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
-import { TTBPreset } from './core/config/ttb-preset';
+import { TTBPreset } from '@app/core/theme/ttb-preset';
 import { MapScriptsLoaderService } from './core/services/map-scripts-loader.service';
 import { ThemeService } from './core/services/theme.service';
 import { VerticalService } from './core/services/vertical.service';

@@ -19,7 +19,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import {
   AdminUserToolbarActionId,
   getAdminUserToolbarActions
-} from '@app/core/config/admin-user-toolbar.config';
+} from '@app/core/config/admin/admin-user-toolbar.config';
 import { AdminPermissionsService } from '@app/core/services/admin-permissions.service';
 import { AdminUsersService } from '@app/core/services/admin-users.service';
 import { DashboardTabToolbarService } from '@app/core/services/dashboard-tab-toolbar.service';

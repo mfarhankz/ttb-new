@@ -11,7 +11,7 @@ import {
   ThemeTokens,
   tenantOverrideToCssVars,
   tokensToCssVars
-} from '../config/theme.config';
+} from '../theme/theme.config';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {

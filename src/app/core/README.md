@@ -7,7 +7,17 @@ This directory contains core services, guards, and configuration for the applica
 ```
 core/
 ├── config/
-│   └── api.config.ts          # API endpoint configuration
+│   ├── api.config.ts          # API endpoints, dev flags
+│   ├── navigation.config.ts   # Sidebar / dashboard nav
+│   ├── map.config.ts          # OpenLayers defaults
+│   ├── *-labels.config.ts     # Display labels / lookups
+│   ├── vertical.config.ts     # White-label API resolution
+│   └── admin/                 # Admin Users & Offices feature config
+├── theme/
+│   ├── theme.config.ts        # Design tokens (light/dark/brand)
+│   ├── vertical-theme.presets.ts
+│   ├── ttb-preset.ts          # PrimeNG global theme
+│   └── ttb-token-vars.ts      # CSS var refs for preset + Tailwind
 ├── guards/
 │   └── auth.guard.ts          # Authentication route guards
 ├── interfaces/
