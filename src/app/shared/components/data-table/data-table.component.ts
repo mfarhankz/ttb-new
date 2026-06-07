@@ -2,11 +2,12 @@ import {
   Component,
   HostListener,
   Input,
-  OnChanges,
-  SimpleChanges,
   computed,
+  effect,
+  input,
   output,
-  signal
+  signal,
+  untracked
 } from '@angular/core';
 import {
   DataTableBadgeCell,
@@ -22,9 +23,9 @@ import {
   standalone: true,
   templateUrl: './data-table.component.html'
 })
-export class DataTableComponent implements OnChanges {
+export class DataTableComponent {
   @Input({ required: true }) columns: DataTableColumn[] = [];
-  @Input({ required: true }) rows: Record<string, unknown>[] = [];
+  readonly rows = input.required<Record<string, unknown>[]>();
   @Input() loading = false;
   @Input() error: string | null = null;
   @Input() emptyTitle = 'No records found';
@@ -63,23 +64,28 @@ export class DataTableComponent implements OnChanges {
   readonly sortKey = signal<string | null>(null);
   readonly sortDirection = signal<DataTableSortDirection>('asc');
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['rows']) {
-      this.currentPage.set(1);
-      this.sortKey.set(null);
-      this.sortDirection.set('asc');
-    }
+  constructor() {
+    effect(() => {
+      this.rows();
+      untracked(() => {
+        this.currentPage.set(1);
+        this.sortKey.set(null);
+        this.sortDirection.set('asc');
+      });
+    });
   }
 
   readonly sortedRows = computed(() => {
     const key = this.sortKey();
+    const rows = this.rows();
+
     if (!key) {
-      return this.rows;
+      return rows;
     }
 
     const column = this.columns.find(col => col.key === key);
     const direction = this.sortDirection();
-    const sorted = [...this.rows];
+    const sorted = [...rows];
 
     sorted.sort((left, right) => {
       const result = this.compareValues(left[key], right[key], column);
