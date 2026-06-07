@@ -97,22 +97,6 @@ export class AdminUsersPanelComponent implements AfterViewInit, OnDestroy {
       : null
   );
 
-  readonly resultSummary = computed(() => {
-    const shown = this.rows().length;
-    const total = this.totalLoadedCount();
-    const query = this.searchText().trim();
-
-    if (query) {
-      return shown === 1 ? '1 match found' : `${shown} matches found`;
-    }
-
-    if (this.hasActiveFilters()) {
-      return `Showing ${shown} of ${total} users`;
-    }
-
-    return `${total} users`;
-  });
-
   readonly emptyDescription = computed(() =>
     this.hasActiveFilters()
       ? 'No users match your current filters. Try a different search or reset filters.'

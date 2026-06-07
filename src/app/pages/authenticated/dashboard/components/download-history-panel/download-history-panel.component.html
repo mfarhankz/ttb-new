@@ -1,5 +1,15 @@
-<app-usage-report-table
-  [details]="details()"
-  [loading]="loading()"
-  [error]="error()"
-/>
+<div #printRoot class="print-element space-y-4">
+  <div class="hidden text-center print:block">
+    <h2 class="text-h3 font-semibold text-foreground">User Usage</h2>
+    <p class="mt-1 text-body text-foreground">
+      {{ userName() }}
+      <span class="text-muted">(Self)</span>
+    </p>
+  </div>
+
+  <app-usage-report-table
+    [details]="details()"
+    [loading]="loading()"
+    [error]="error()"
+  />
+</div>

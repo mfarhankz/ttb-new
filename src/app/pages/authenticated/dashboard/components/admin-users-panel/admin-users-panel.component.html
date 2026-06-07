@@ -48,12 +48,11 @@
         </label>
       </div>
 
-      <div class="flex shrink-0 items-center gap-1.5 text-caption text-muted sm:ml-auto">
-        @if (searching()) {
+      @if (searching()) {
+        <div class="flex shrink-0 items-center sm:ml-auto">
           <i class="pi pi-spin pi-spinner text-primary" aria-hidden="true"></i>
-        }
-        <span>{{ resultSummary() }}</span>
-      </div>
+        </div>
+      }
     </div>
   </div>
 </ng-template>

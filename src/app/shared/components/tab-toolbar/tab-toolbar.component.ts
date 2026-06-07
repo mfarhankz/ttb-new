@@ -10,15 +10,20 @@ import { DashboardTabToolbarService } from '@app/core/services/dashboard-tab-too
 })
 export class TabToolbarComponent {
   readonly toolbar = inject(DashboardTabToolbarService);
-  readonly actionsMenu = viewChild.required<Menu>('actionsMenu');
+  readonly actionsMenu = viewChild<Menu>('actionsMenu');
 
   toggleFilters(event: Event): void {
     this.toolbar.toggleFilters();
     (event.currentTarget as HTMLButtonElement).blur();
   }
 
+  runPrimaryAction(event: Event): void {
+    this.toolbar.runPrimaryAction();
+    (event.currentTarget as HTMLButtonElement).blur();
+  }
+
   toggleActionsMenu(event: Event): void {
-    this.actionsMenu().toggle(event);
+    this.actionsMenu()?.toggle(event);
     (event.currentTarget as HTMLButtonElement).blur();
   }
 }

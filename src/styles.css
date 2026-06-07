@@ -117,3 +117,26 @@
     @apply font-sans text-body text-foreground bg-background antialiased;
   }
 }
+
+@media print {
+  body.is-printing * {
+    visibility: hidden;
+  }
+
+  body.is-printing .print-element,
+  body.is-printing .print-element * {
+    visibility: visible;
+  }
+
+  body.is-printing .print-element {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    padding: 1rem;
+  }
+
+  body.is-printing .print-hide {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}

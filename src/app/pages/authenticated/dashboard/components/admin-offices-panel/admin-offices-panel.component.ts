@@ -81,17 +81,6 @@ export class AdminOfficesPanelComponent implements AfterViewInit, OnDestroy {
 
   readonly emptyTitle = computed(() => `No ${this.entityLabel().toLowerCase()}s found`);
 
-  readonly resultSummary = computed(() => {
-    const shown = this.rows().length;
-    const total = this.adminOfficesService.totalLoadedCount();
-
-    if (this.hasActiveFilters()) {
-      return shown === 1 ? '1 match found' : `${shown} matches found`;
-    }
-
-    return `${total} ${this.entityLabel().toLowerCase()}${total === 1 ? '' : 's'}`;
-  });
-
   readonly emptyDescription = computed(() =>
     this.hasActiveFilters()
       ? `No ${this.entityLabel().toLowerCase()}s match your current filters. Try a different search or reset filters.`

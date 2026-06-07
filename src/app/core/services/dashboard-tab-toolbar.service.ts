@@ -1,10 +1,18 @@
 import { Injectable, Signal, signal, TemplateRef } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 
+export interface TabToolbarPrimaryAction {
+  label: string;
+  icon: string;
+  disabled: Signal<boolean>;
+  action: () => void;
+}
+
 export interface TabToolbarRegistration {
   menuItems: Signal<MenuItem[]>;
-  hasActiveFilters: Signal<boolean>;
-  filterPanel: TemplateRef<unknown>;
+  hasActiveFilters?: Signal<boolean>;
+  filterPanel?: TemplateRef<unknown>;
+  primaryAction?: TabToolbarPrimaryAction;
   hint?: Signal<string | null>;
 }
 
@@ -20,10 +28,13 @@ export class DashboardTabToolbarService {
 
   readonly menuItems = (): MenuItem[] => this._registration()?.menuItems() ?? [];
 
-  readonly hasActiveFilters = (): boolean => this._registration()?.hasActiveFilters() ?? false;
+  readonly hasActiveFilters = (): boolean => this._registration()?.hasActiveFilters?.() ?? false;
 
   readonly filterPanel = (): TemplateRef<unknown> | null =>
     this._registration()?.filterPanel ?? null;
+
+  readonly primaryAction = (): TabToolbarPrimaryAction | null =>
+    this._registration()?.primaryAction ?? null;
 
   readonly hint = (): string | null => {
     const hintSignal = this._registration()?.hint;
@@ -41,10 +52,14 @@ export class DashboardTabToolbarService {
   }
 
   toggleFilters(): void {
-    if (!this._registration()) {
+    if (!this._registration()?.filterPanel) {
       return;
     }
 
     this.filtersOpen.update((open) => !open);
+  }
+
+  runPrimaryAction(): void {
+    this._registration()?.primaryAction?.action();
   }
 }
