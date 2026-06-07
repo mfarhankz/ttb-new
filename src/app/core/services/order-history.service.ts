@@ -7,7 +7,7 @@ import {
   OrderHistoryRecord,
   OrderPipelineResponse
 } from '../interfaces/order-history.interface';
-import { DataTableColumn } from '../../shared/components/data-table/data-table.types';
+import { DataTableColumn } from '@app/shared/components/data-table/data-table.types';
 
 export const ORDER_HISTORY_COLUMNS: DataTableColumn[] = [
   { key: 'orderedBy', label: 'Ordered By', sortType: 'text', truncate: true, width: 'min-w-[10rem]' },

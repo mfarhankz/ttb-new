@@ -1,7 +1,7 @@
 import { Component, effect, inject } from '@angular/core';
-import { AuthService } from '../../../../../core/services/auth.service';
-import { PurchaseHistoryService } from '../../../../../core/services/purchase-history.service';
-import { DataTableComponent } from '../../../../../shared/components/data-table/data-table.component';
+import { AuthService } from '@app/core/services/auth.service';
+import { PurchaseHistoryService } from '@app/core/services/purchase-history.service';
+import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
 
 @Component({
   selector: 'app-purchase-history-panel',

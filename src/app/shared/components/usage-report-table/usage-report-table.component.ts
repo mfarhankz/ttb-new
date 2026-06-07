@@ -5,7 +5,7 @@ import {
   USAGE_REPORT_GROUPS,
   UsageMetricPair,
   UserUsageDetails
-} from '../../../core/interfaces/user-usage.interface';
+} from '@app/core/interfaces/user-usage.interface';
 
 @Component({
   selector: 'app-usage-report-table',

@@ -1,10 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { API_CONFIG } from '../config/api.config';
 import { UNAUTHORIZED_MESSAGE } from '../constants/auth.constants';
 import { ApiError } from '../interfaces/api.interface';
+import { extractTtbErrorMessage } from '../utils/ttb-response.util';
 import { SessionExpiredService } from './session-expired.service';
 import { VerticalService } from './vertical.service';
 
@@ -39,7 +40,10 @@ export class ApiService {
       .get<T>(`${this.baseUrl}${endpoint}`, {
         headers: this.getHeaders()
       })
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap((data) => this.inspectTtbResponseForAuth(data)),
+        catchError(this.handleError)
+      );
   }
 
   /**
@@ -54,6 +58,7 @@ export class ApiService {
       })
       .pipe(
         map((body) => this.parseJsonBody<T>(body, options?.treatEmptyAs)),
+        tap((data) => this.inspectTtbResponseForAuth(data)),
         catchError(this.handleError)
       );
   }
@@ -145,6 +150,7 @@ export class ApiService {
       })
       .pipe(
         map((response) => this.parseJsonBody<T>(response, options?.treatEmptyAs)),
+        tap((data) => this.inspectTtbResponseForAuth(data)),
         catchError(this.handleError)
       );
   }
@@ -172,7 +178,10 @@ export class ApiService {
       .post<T>(url, body, {
         headers: headers
       })
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap((data) => this.inspectTtbResponseForAuth(data)),
+        catchError(this.handleError)
+      );
   }
 
   /**
@@ -207,10 +216,17 @@ export class ApiService {
   /**
    * Handle HTTP errors and non-HTTP failures (e.g. JSON parse errors from getParsedJson).
    */
-  private handleError = (error: unknown): Observable<never> => {
-    const { message: errorMessage, status, errors } = this.resolveErrorDetails(error);
+  private inspectTtbResponseForAuth(data: unknown): void {
+    const message = extractTtbErrorMessage(data);
+    if (message) {
+      this.sessionExpiredService.handleUnauthorized(message);
+    }
+  }
 
-    this.sessionExpiredService.handleUnauthorized(errorMessage, status);
+  private handleError = (error: unknown): Observable<never> => {
+    const { message: errorMessage, status, errors, url } = this.resolveErrorDetails(error);
+
+    this.sessionExpiredService.handleUnauthorized(errorMessage, status, url);
 
     const apiError: ApiError = {
       message: errorMessage,
@@ -225,12 +241,17 @@ export class ApiService {
     message: string;
     status?: number;
     errors?: Record<string, string[]>;
+    url?: string;
   } {
     if (error instanceof HttpErrorResponse) {
+      const message = this.resolveHttpErrorMessage(error);
+      this.inspectTtbResponseForAuth(error.error);
+
       return {
-        message: this.resolveHttpErrorMessage(error),
+        message,
         status: error.status,
-        errors: error.error?.errors
+        errors: error.error?.errors,
+        url: error.url ?? undefined
       };
     }
 

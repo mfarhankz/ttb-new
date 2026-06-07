@@ -1,8 +1,10 @@
-<div class="min-h-[calc(100vh-8rem)] flex items-center justify-center">
-  <div class="max-w-md w-full space-y-8 p-8 bg-surface rounded-lg shadow-md">
+<div [class]="modalMode ? 'w-full' : 'min-h-[calc(100vh-8rem)] flex items-center justify-center'">
+  <div [class]="modalMode ? 'w-full space-y-6' : 'max-w-md w-full space-y-8 p-8 bg-surface rounded-lg shadow-md'">
     <div>
-      <h2 class="text-h1 font-bold text-center text-foreground">Register Phone for MFA</h2>
-      <p class="mt-2 text-center text-body-sm text-muted">
+      <h2 [class]="modalMode ? 'text-h3 font-semibold text-foreground' : 'text-h1 font-bold text-center text-foreground'">
+        Register Phone for MFA
+      </h2>
+      <p [class]="modalMode ? 'mt-2 text-body-sm text-muted' : 'mt-2 text-center text-body-sm text-muted'">
         For added security, we use Multi-Factor Authentication (MFA)
       </p>
     </div>

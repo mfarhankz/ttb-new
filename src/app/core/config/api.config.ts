@@ -27,6 +27,8 @@ export const API_CONFIG = {
     orderPipeline: '/order_pipeline/page',
     userPipeline: '/user_pipeline',
     searchUserPipeline: '/search_user_pipeline/limit:1000',
+    listOffices: '/list_offices',
+    searchOffice: '/search_office.json',
     userUsageReport: '/usage_report',
     loadEditUser: '/load_edit_user.json',
     editUser: '/edit_user.json',

@@ -4,6 +4,7 @@ import {
   computed,
   effect,
   inject,
+  untracked,
   OnDestroy,
   TemplateRef,
   viewChild
@@ -18,13 +19,13 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import {
   AdminUserToolbarActionId,
   getAdminUserToolbarActions
-} from '../../../../../core/config/admin-user-toolbar.config';
-import { AdminPermissionsService } from '../../../../../core/services/admin-permissions.service';
-import { AdminUsersService } from '../../../../../core/services/admin-users.service';
-import { DashboardTabToolbarService } from '../../../../../core/services/dashboard-tab-toolbar.service';
-import { SessionExpiredService } from '../../../../../core/services/session-expired.service';
-import { VerticalService } from '../../../../../core/services/vertical.service';
-import { DataTableComponent } from '../../../../../shared/components/data-table/data-table.component';
+} from '@app/core/config/admin-user-toolbar.config';
+import { AdminPermissionsService } from '@app/core/services/admin-permissions.service';
+import { AdminUsersService } from '@app/core/services/admin-users.service';
+import { DashboardTabToolbarService } from '@app/core/services/dashboard-tab-toolbar.service';
+import { SessionExpiredService } from '@app/core/services/session-expired.service';
+import { VerticalService } from '@app/core/services/vertical.service';
+import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
 
 @Component({
   selector: 'app-admin-users-panel',
@@ -121,7 +122,7 @@ export class AdminUsersPanelComponent implements AfterViewInit, OnDestroy {
   constructor() {
     effect(() => {
       this.sessionExpiredService.sessionRenewed();
-      this.adminUsersService.fetchUsers();
+      untracked(() => this.adminUsersService.fetchUsers());
     });
   }
 

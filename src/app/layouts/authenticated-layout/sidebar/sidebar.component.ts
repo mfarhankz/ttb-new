@@ -2,16 +2,16 @@ import { Component, computed, inject, OnDestroy, OnInit, output, signal } from '
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../../core/services/auth.service';
-import { LayoutService } from '../../../core/services/layout.service';
-import { VerticalService } from '../../../core/services/vertical.service';
+import { AuthService } from '@app/core/services/auth.service';
+import { LayoutService } from '@app/core/services/layout.service';
+import { VerticalService } from '@app/core/services/vertical.service';
 import {
   MAIN_NAV,
   SETTINGS_NAV,
   SIDEBAR_COLLAPSED_KEY,
   type NavItem
-} from '../../../core/config/navigation.config';
-import { VERTICAL_CONFIG } from '../../../core/config/vertical.config';
+} from '@app/core/config/navigation.config';
+import { VERTICAL_CONFIG } from '@app/core/config/vertical.config';
 
 /** Static logos from public/ until vertical white-label URLs are enabled. */
 const SIDEBAR_LOGO_PATH = VERTICAL_CONFIG.defaultLogoPath;

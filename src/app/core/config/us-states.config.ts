@@ -1,4 +1,4 @@
-import { SelectOption } from '../../shared/components/select/select.component';
+import { SelectOption } from '@app/shared/components/select/select.component';
 
 /** US states for profile address dropdown (matches legacy state choices). */
 export const US_STATE_OPTIONS: SelectOption[] = [

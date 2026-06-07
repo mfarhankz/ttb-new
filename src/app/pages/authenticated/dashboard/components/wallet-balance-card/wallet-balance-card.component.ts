@@ -1,9 +1,9 @@
 import { CurrencyPipe } from '@angular/common';
 import { Component, computed, effect, inject } from '@angular/core';
-import { SessionExpiredService } from '../../../../../core/services/session-expired.service';
-import { VerticalService } from '../../../../../core/services/vertical.service';
-import { WalletService } from '../../../../../core/services/wallet.service';
-import { ButtonComponent, CardComponent } from '../../../../../shared/components';
+import { SessionExpiredService } from '@app/core/services/session-expired.service';
+import { VerticalService } from '@app/core/services/vertical.service';
+import { WalletService } from '@app/core/services/wallet.service';
+import { ButtonComponent, CardComponent } from '@app/shared/components';
 
 @Component({
   selector: 'app-wallet-balance-card',

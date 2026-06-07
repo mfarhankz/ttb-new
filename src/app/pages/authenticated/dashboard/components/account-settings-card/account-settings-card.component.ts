@@ -1,14 +1,14 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AccountSettingsService } from '../../../../../core/services/account-settings.service';
-import { AuthService } from '../../../../../core/services/auth.service';
-import { SessionExpiredService } from '../../../../../core/services/session-expired.service';
+import { AccountSettingsService } from '@app/core/services/account-settings.service';
+import { AuthService } from '@app/core/services/auth.service';
+import { SessionExpiredService } from '@app/core/services/session-expired.service';
 import {
   AlertComponent,
   ButtonComponent,
   CardComponent,
   ToggleComponent
-} from '../../../../../shared/components';
+} from '@app/shared/components';
 
 @Component({
   selector: 'app-account-settings-card',

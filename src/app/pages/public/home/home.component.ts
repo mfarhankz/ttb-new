@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { VerticalService } from '../../../core/services/vertical.service';
+import { VerticalService } from '@app/core/services/vertical.service';
 
 @Component({
   selector: 'app-home',

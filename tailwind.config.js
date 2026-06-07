@@ -1,5 +1,6 @@
 const primeui = require('tailwindcss-primeui');
 
+/** Colors / radius / typography reference CSS variables in src/styles.css */
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/**/*.{html,ts}'],
@@ -72,9 +73,9 @@ module.exports = {
         h2: ['1.5rem', { lineHeight: '2rem', fontWeight: '600' }],
         h3: ['1.25rem', { lineHeight: '1.75rem', fontWeight: '600' }],
         h4: ['1.125rem', { lineHeight: '1.5rem', fontWeight: '600' }],
-        body: ['1rem', { lineHeight: '1.5rem' }],
-        'body-sm': ['0.875rem', { lineHeight: '1.25rem' }],
-        caption: ['0.8125rem', { lineHeight: '1.125rem' }],
+        body: ['var(--font-size-body)', { lineHeight: 'var(--line-height-body)' }],
+        'body-sm': ['var(--font-size-body-sm)', { lineHeight: 'var(--line-height-body-sm)' }],
+        caption: ['var(--font-size-caption)', { lineHeight: 'var(--line-height-caption)' }],
         overline: ['0.65rem', { lineHeight: '1rem', letterSpacing: '0.08em', fontWeight: '600' }]
       },
       borderRadius: {

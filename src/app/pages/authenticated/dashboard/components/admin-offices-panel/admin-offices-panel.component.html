@@ -1,5 +1,56 @@
-<app-admin-section-shell
-  title="Manage your offices"
-  description="Add a new office, search, and update office profiles."
-  icon="pi pi-building"
+<ng-template #officesFilterPanel>
+  <div class="rounded-lg border border-border bg-surface px-2.5 py-1.5">
+    <div class="flex flex-wrap items-center gap-2">
+      <p-iconfield class="w-full min-w-0 sm:w-64">
+        <p-inputicon class="pi pi-search" />
+        <input
+          id="admin-offices-search"
+          pInputText
+          type="search"
+          class="w-full h-[42px]"
+          pSize="small"
+          placeholder="Search name or email"
+          [value]="searchText()"
+          (input)="onSearchInput($event)"
+        />
+        @if (searchText()) {
+          <p-inputicon
+            class="pi pi-times cursor-pointer"
+            role="button"
+            tabindex="0"
+            aria-label="Clear search"
+            (click)="clearSearch()"
+            (keydown.enter)="clearSearch()"
+          />
+        }
+      </p-iconfield>
+
+      <p-select
+        inputId="admin-offices-search-field"
+        size="small"
+        class="w-full shrink-0 sm:min-w-64 sm:w-auto"
+        [options]="searchFieldOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Search by"
+        [ngModel]="searchField()"
+        (ngModelChange)="onSearchFieldChange($event)"
+      />
+
+      <div class="flex shrink-0 items-center gap-1.5 text-caption text-muted sm:ml-auto">
+        <span>{{ resultSummary() }}</span>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<app-data-table
+  [columns]="columns"
+  [rows]="rows()"
+  [loading]="loading()"
+  [error]="error()"
+  [pageSize]="100"
+  [emptyTitle]="emptyTitle()"
+  [emptyDescription]="emptyDescription()"
+  (rowAction)="onRowAction($event)"
 />

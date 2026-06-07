@@ -3,9 +3,9 @@ import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
-import Aura from '@primeuix/themes/aura';
 
 import { routes } from './app.routes';
+import { TTBPreset } from './core/config/ttb-preset';
 import { MapScriptsLoaderService } from './core/services/map-scripts-loader.service';
 import { ThemeService } from './core/services/theme.service';
 import { VerticalService } from './core/services/vertical.service';
@@ -20,7 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     providePrimeNG({
       theme: {
-        preset: Aura,
+        preset: TTBPreset,
         options: {
           darkModeSelector: '[data-theme="dark"]'
         }

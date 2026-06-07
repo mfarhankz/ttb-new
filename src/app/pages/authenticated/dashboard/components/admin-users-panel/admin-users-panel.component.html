@@ -1,7 +1,7 @@
 <ng-template #usersFilterPanel>
   <div class="rounded-lg border border-border bg-surface px-2.5 py-1.5">
     <div class="flex flex-wrap items-center gap-2">
-      <p-iconfield class="w-full min-w-0 sm:w-52">
+      <p-iconfield class="w-full min-w-0 sm:w-64">
         <p-inputicon class="pi pi-search" />
         <input
           id="admin-users-search"
@@ -27,7 +27,8 @@
 
       <p-select
         inputId="admin-users-type"
-        class="w-full shrink-0 sm:min-w-[11rem] sm:w-auto"
+        size="small"
+        class="w-full shrink-0 sm:min-w-64 sm:w-auto"
         [options]="userTypeOptions()"
         optionLabel="label"
         optionValue="value"

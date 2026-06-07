@@ -37,6 +37,11 @@ export class DataTableComponent implements OnChanges {
   readonly rowAction = output<{ actionId: string; row: Record<string, unknown> }>();
 
   readonly openActionsRowId = signal<string | null>(null);
+  readonly openActionsRow = signal<Record<string, unknown> | null>(null);
+  readonly actionsMenuPosition = signal<{ top: number; left: number } | null>(null);
+
+  private readonly actionsMenuEstimatedItemHeight = 32;
+  private readonly actionsMenuVerticalGap = 4;
 
   resolvedEmptyTitle(): string {
     if (this.emptyTitle !== 'No records found') {
@@ -236,6 +241,24 @@ export class DataTableComponent implements OnChanges {
     return classes.join(' ');
   }
 
+  badgesContainerClasses(column: DataTableColumn): string {
+    if (column.badgesLayout === 'stacked') {
+      return 'flex flex-col items-start gap-1';
+    }
+
+    return 'flex flex-wrap items-center gap-1.5';
+  }
+
+  textBadgeClasses(column: DataTableColumn): string {
+    const classes = ['font-medium text-foreground'];
+
+    if (column.truncate) {
+      classes.push('max-w-[16rem] truncate xl:max-w-[22rem]');
+    }
+
+    return classes.join(' ');
+  }
+
   cellClasses(column: DataTableColumn, index: number, isLast: boolean): string {
     const classes = ['px-4 py-2 text-body-sm text-foreground', this.cellAlignClass(column, index)];
 
@@ -267,8 +290,12 @@ export class DataTableComponent implements OnChanges {
   }
 
   @HostListener('document:click')
+  @HostListener('window:resize')
+  @HostListener('window:scroll')
   closeActionsMenu(): void {
     this.openActionsRowId.set(null);
+    this.openActionsRow.set(null);
+    this.actionsMenuPosition.set(null);
   }
 
   actionList(value: unknown): DataTableRowAction[] {
@@ -289,7 +316,43 @@ export class DataTableComponent implements OnChanges {
   toggleActionsMenu(event: MouseEvent, row: Record<string, unknown>, index: number): void {
     event.stopPropagation();
     const rowId = this.trackRow(index, row);
-    this.openActionsRowId.update((current) => (current === rowId ? null : rowId));
+    const isClosing = this.openActionsRowId() === rowId;
+
+    if (isClosing) {
+      this.closeActionsMenu();
+      return;
+    }
+
+    const button = event.currentTarget as HTMLElement;
+    const rect = button.getBoundingClientRect();
+    const actions = this.rowActions(row);
+    const menuHeight = Math.max(actions.length, 1) * this.actionsMenuEstimatedItemHeight + 8;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const openAbove = spaceBelow < menuHeight && rect.top > menuHeight;
+    const top = openAbove
+      ? rect.top - menuHeight - this.actionsMenuVerticalGap
+      : rect.bottom + this.actionsMenuVerticalGap;
+
+    this.openActionsRowId.set(rowId);
+    this.openActionsRow.set(row);
+    this.actionsMenuPosition.set({
+      top: Math.max(8, top),
+      left: rect.left
+    });
+  }
+
+  openRowActions(): DataTableRowAction[] {
+    const row = this.openActionsRow();
+    return row ? this.rowActions(row) : [];
+  }
+
+  private rowActions(row: Record<string, unknown>): DataTableRowAction[] {
+    const actionsColumn = this.columns.find((column) => column.variant === 'actions');
+    if (!actionsColumn) {
+      return [];
+    }
+
+    return this.actionList(row[actionsColumn.key]);
   }
 
   onRowActionClick(event: MouseEvent, action: DataTableRowAction, row: Record<string, unknown>): void {

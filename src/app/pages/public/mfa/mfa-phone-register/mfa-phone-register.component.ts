@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../../../core/services/auth.service';
-import { SKIP_PHONE_REGISTER_IN_DEV } from '../../../../core/config/api.config';
-import { InputComponent, ButtonComponent, AlertComponent } from '../../../../shared/components';
+import { AuthService } from '@app/core/services/auth.service';
+import { SKIP_PHONE_REGISTER_IN_DEV } from '@app/core/config/api.config';
+import { InputComponent, ButtonComponent, AlertComponent } from '@app/shared/components';
 
 @Component({
   selector: 'app-mfa-phone-register',
@@ -15,6 +15,7 @@ import { InputComponent, ButtonComponent, AlertComponent } from '../../../../sha
 export class MfaPhoneRegisterComponent implements OnInit {
   @Input() email: string = '';
   @Input() existingPhone?: string;
+  @Input() modalMode = false;
   @Output() phoneRegistered = new EventEmitter<string>();
   @Output() cancel = new EventEmitter<void>();
 

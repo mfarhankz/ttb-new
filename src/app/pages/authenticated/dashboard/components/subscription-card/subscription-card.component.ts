@@ -1,11 +1,11 @@
 import { CurrencyPipe } from '@angular/common';
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
-import { AuthService } from '../../../../../core/services/auth.service';
-import { BillingProfile } from '../../../../../core/interfaces/api.interface';
-import { SessionExpiredService } from '../../../../../core/services/session-expired.service';
-import { SubscriptionService } from '../../../../../core/services/subscription.service';
-import { VerticalService } from '../../../../../core/services/vertical.service';
-import { ButtonComponent, CardComponent } from '../../../../../shared/components';
+import { AuthService } from '@app/core/services/auth.service';
+import { BillingProfile } from '@app/core/interfaces/api.interface';
+import { SessionExpiredService } from '@app/core/services/session-expired.service';
+import { SubscriptionService } from '@app/core/services/subscription.service';
+import { VerticalService } from '@app/core/services/vertical.service';
+import { ButtonComponent, CardComponent } from '@app/shared/components';
 
 @Component({
   selector: 'app-subscription-card',

@@ -56,9 +56,13 @@
                       {{ formatCell(row[column.key]) }}
                     </span>
                   } @else if (column.variant === 'badges') {
-                    <div class="flex flex-wrap gap-1.5">
+                    <div [class]="badgesContainerClasses(column)">
                       @for (badge of badgeList(row[column.key]); track badge.label) {
-                        <span [class]="badgeToneClasses(badge)">{{ badge.label }}</span>
+                        @if (badge.display === 'text') {
+                          <span [class]="textBadgeClasses(column)">{{ badge.label }}</span>
+                        } @else {
+                          <span [class]="badgeToneClasses(badge)">{{ badge.label }}</span>
+                        }
                       }
                     </div>
                   } @else if (column.variant === 'actions') {
@@ -75,24 +79,6 @@
                         
                       </button>
 
-                      @if (isActionsMenuOpen(row, rowIndex)) {
-                        <div
-                          class="absolute left-0 top-full z-30 mt-1 min-w-[12.5rem] overflow-hidden rounded-md border border-border bg-surface py-1 shadow-lg"
-                          role="menu"
-                          (click)="$event.stopPropagation()"
-                        >
-                          @for (action of actionList(row[column.key]); track action.id) {
-                            <button
-                              type="button"
-                              class="block w-full border-0 bg-transparent px-3 py-2 text-left text-body-sm text-foreground transition-colors hover:bg-sidebar-hover focus:outline-none focus-visible:bg-sidebar-hover"
-                              role="menuitem"
-                              (click)="onRowActionClick($event, action, row)"
-                            >
-                              {{ action.label }}
-                            </button>
-                          }
-                        </div>
-                      }
                     </div>
                   } @else if (column.truncate) {
                     <span
@@ -111,6 +97,27 @@
         </tbody>
       </table>
     </div>
+
+    @if (openActionsRowId() && actionsMenuPosition(); as menuPosition) {
+      <div
+        class="fixed z-50 min-w-[12.5rem] overflow-hidden rounded-md border border-border bg-surface py-1 shadow-lg"
+        role="menu"
+        [style.top.px]="menuPosition.top"
+        [style.left.px]="menuPosition.left"
+        (click)="$event.stopPropagation()"
+      >
+        @for (action of openRowActions(); track action.id) {
+          <button
+            type="button"
+            class="block w-full border-0 bg-transparent px-[var(--form-padding-x)] py-[var(--form-padding-y-sm)] text-left text-body-sm text-foreground transition-colors hover:bg-sidebar-hover focus:outline-none focus-visible:bg-sidebar-hover"
+            role="menuitem"
+            (click)="onRowActionClick($event, action, openActionsRow()!)"
+          >
+            {{ action.label }}
+          </button>
+        }
+      </div>
+    }
 
     @if (paginated) {
       <div

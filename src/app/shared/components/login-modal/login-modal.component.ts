@@ -1,13 +1,13 @@
 import { Component, effect, inject, viewChild } from '@angular/core';
 import { ModalComponent } from '../modal/modal.component';
-import { LoginComponent } from '../../../pages/public/login/login.component';
-import { AdminUsersService } from '../../../core/services/admin-users.service';
-import { AccountInformationService } from '../../../core/services/account-information.service';
-import { AccountSettingsService } from '../../../core/services/account-settings.service';
-import { OrderHistoryService } from '../../../core/services/order-history.service';
-import { SessionExpiredService } from '../../../core/services/session-expired.service';
-import { SubscriptionService } from '../../../core/services/subscription.service';
-import { WalletService } from '../../../core/services/wallet.service';
+import { LoginComponent } from '@app/pages/public/login/login.component';
+import { AdminUsersService } from '@app/core/services/admin-users.service';
+import { AccountInformationService } from '@app/core/services/account-information.service';
+import { AccountSettingsService } from '@app/core/services/account-settings.service';
+import { OrderHistoryService } from '@app/core/services/order-history.service';
+import { SessionExpiredService } from '@app/core/services/session-expired.service';
+import { SubscriptionService } from '@app/core/services/subscription.service';
+import { WalletService } from '@app/core/services/wallet.service';
 
 @Component({
   selector: 'app-login-modal',

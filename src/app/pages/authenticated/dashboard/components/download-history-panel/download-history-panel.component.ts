@@ -1,7 +1,7 @@
 import { Component, effect, inject } from '@angular/core';
-import { AuthService } from '../../../../../core/services/auth.service';
-import { UserUsageService } from '../../../../../core/services/user-usage.service';
-import { UsageReportTableComponent } from '../../../../../shared/components/usage-report-table/usage-report-table.component';
+import { AuthService } from '@app/core/services/auth.service';
+import { UserUsageService } from '@app/core/services/user-usage.service';
+import { UsageReportTableComponent } from '@app/shared/components/usage-report-table/usage-report-table.component';
 
 @Component({
   selector: 'app-download-history-panel',

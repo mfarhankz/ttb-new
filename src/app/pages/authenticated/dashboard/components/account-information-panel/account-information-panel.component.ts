@@ -6,18 +6,18 @@ import {
   ValidationErrors,
   Validators
 } from '@angular/forms';
-import { AccountInformationService } from '../../../../../core/services/account-information.service';
-import { AuthService } from '../../../../../core/services/auth.service';
-import { SessionExpiredService } from '../../../../../core/services/session-expired.service';
-import { VerticalService } from '../../../../../core/services/vertical.service';
-import { US_STATE_OPTIONS } from '../../../../../core/config/us-states.config';
-import { UserProfileModel } from '../../../../../core/interfaces/user-profile.interface';
+import { AccountInformationService } from '@app/core/services/account-information.service';
+import { AuthService } from '@app/core/services/auth.service';
+import { SessionExpiredService } from '@app/core/services/session-expired.service';
+import { VerticalService } from '@app/core/services/vertical.service';
+import { US_STATE_OPTIONS } from '@app/core/config/us-states.config';
+import { UserProfileModel } from '@app/core/interfaces/user-profile.interface';
 import {
   AlertComponent,
   ButtonComponent,
   InputComponent,
   SelectComponent
-} from '../../../../../shared/components';
+} from '@app/shared/components';
 
 function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value;

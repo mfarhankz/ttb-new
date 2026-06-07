@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../../../core/services/auth.service';
-import { InputComponent, ButtonComponent, AlertComponent, CheckboxComponent } from '../../../../shared/components';
+import { AuthService } from '@app/core/services/auth.service';
+import { InputComponent, ButtonComponent, AlertComponent, CheckboxComponent } from '@app/shared/components';
 
 @Component({
   selector: 'app-mfa-otp-verify',
@@ -14,6 +14,7 @@ import { InputComponent, ButtonComponent, AlertComponent, CheckboxComponent } fr
 export class MfaOtpVerifyComponent {
   @Input() phone: string = '';
   @Input() email: string = '';
+  @Input() modalMode = false;
   @Output() otpVerified = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
 

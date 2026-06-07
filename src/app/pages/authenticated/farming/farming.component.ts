@@ -1,11 +1,11 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { ButtonComponent } from '../../../shared/components';
-import { LayoutService } from '../../../core/services/layout.service';
-import { OlMapComponent } from '../../../shared/components/ol-map/ol-map.component';
-import { OlMapService, type MapObjectRefs } from '../../../core/services/ol-map.service';
-import { MAP_DEFAULTS } from '../../../core/config/map.config';
+import { ButtonComponent } from '@app/shared/components';
+import { LayoutService } from '@app/core/services/layout.service';
+import { OlMapComponent } from '@app/shared/components/ol-map/ol-map.component';
+import { OlMapService, type MapObjectRefs } from '@app/core/services/ol-map.service';
+import { MAP_DEFAULTS } from '@app/core/config/map.config';
 
 export type FarmingMapMode = 'radius' | 'boundary';
 

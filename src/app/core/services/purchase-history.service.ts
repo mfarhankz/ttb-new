@@ -3,7 +3,7 @@ import { ApiService } from './api.service';
 import { AuthService } from './auth.service';
 import { API_CONFIG } from '../config/api.config';
 import { PurchaseHistoryRecord, TtbPurchaseHistoryResponse } from '../interfaces/api.interface';
-import { DataTableColumn } from '../../shared/components/data-table/data-table.types';
+import { DataTableColumn } from '@app/shared/components/data-table/data-table.types';
 
 export const PURCHASE_HISTORY_COLUMNS: DataTableColumn[] = [
   { key: 'purchaseId', label: 'Purchase ID', variant: 'numeric', sortType: 'number', width: 'w-28', nowrap: true },

@@ -2,10 +2,10 @@ import { Component, EventEmitter, Input, Output, signal, OnInit } from '@angular
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../../core/services/auth.service';
-import { SKIP_LOGIN_IN_DEV } from '../../../core/config/api.config';
-import { LOGIN_DEFAULTS } from '../../../../environments/login-defaults.generated';
-import { InputComponent, ButtonComponent, AlertComponent } from '../../../shared/components';
+import { AuthService } from '@app/core/services/auth.service';
+import { SKIP_LOGIN_IN_DEV } from '@app/core/config/api.config';
+import { LOGIN_DEFAULTS } from '@env/login-defaults.generated';
+import { InputComponent, ButtonComponent, AlertComponent } from '@app/shared/components';
 import { MfaPhoneRegisterComponent } from '../mfa/mfa-phone-register/mfa-phone-register.component';
 import { MfaOtpVerifyComponent } from '../mfa/mfa-otp-verify/mfa-otp-verify.component';
 
@@ -56,8 +56,14 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.resetFlow();
+
     if (this.sessionExpired) {
       this.errorMessage.set('Session expired - Please log back in to continue.');
+      const storedEmail = this.authService.tbUser()?.username;
+      if (storedEmail) {
+        this.loginForm.patchValue({ email: storedEmail });
+      }
     }
 
     // Auto-login if skip login flag is enabled in dev mode
@@ -172,11 +178,21 @@ export class LoginComponent implements OnInit {
   }
 
   onMfaCancel(): void {
-    // Cancel MFA flow, return to login
+    this.resetFlow();
+    if (this.sessionExpired) {
+      this.errorMessage.set('Session expired - Please log back in to continue.');
+    }
+  }
+
+  private resetFlow(): void {
     this.currentView.set('login');
     this.mfaEmail.set('');
     this.mfaPhone.set('');
     this.loginResponse = null;
+    this.isLoading.set(false);
+    this.loginForm.markAsPristine();
+    this.loginForm.markAsUntouched();
+    this.loginForm.patchValue({ password: '' });
   }
 }
 

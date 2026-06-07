@@ -19,7 +19,8 @@ import {
   AdminUserTableBadge,
   AdminUserUserCol
 } from '../interfaces/admin-users.interface';
-import { DataTableColumn } from '../../shared/components/data-table/data-table.types';
+import { DataTableColumn } from '@app/shared/components/data-table/data-table.types';
+import { TargetOfficeService } from './target-office.service';
 
 export const ADMIN_USERS_COLUMNS: DataTableColumn[] = [
   { key: 'actions', label: '', variant: 'actions', sortable: false, align: 'center', width: 'w-12' },
@@ -38,6 +39,7 @@ export class AdminUsersService {
   private readonly authService = inject(AuthService);
   private readonly adminPermissions = inject(AdminPermissionsService);
   private readonly verticalService = inject(VerticalService);
+  private readonly targetOfficeService = inject(TargetOfficeService);
 
   private readonly _allRows = signal<Record<string, unknown>[]>([]);
   private readonly _rows = signal<Record<string, unknown>[]>([]);
@@ -74,6 +76,8 @@ export class AdminUsersService {
   private searchRequestId = 0;
 
   fetchUsers(page = 1, force = false): void {
+    this.targetOfficeService.ensureDefault();
+
     if (!force && this.loadSucceeded) {
       this.refreshFilteredRows();
       return;
@@ -275,17 +279,7 @@ export class AdminUsersService {
   }
 
   private getTargetOfficeId(): number | string | null {
-    try {
-      const raw = localStorage.getItem('targetOfficeInfo');
-      if (!raw) {
-        return null;
-      }
-
-      const parsed = JSON.parse(raw) as { officeId?: number | string };
-      return parsed.officeId ?? null;
-    } catch {
-      return null;
-    }
+    return this.targetOfficeService.getTargetOfficeId();
   }
 
   private normalizeRecords(response: AdminUserPipelineResponse): AdminUserRecord[] {

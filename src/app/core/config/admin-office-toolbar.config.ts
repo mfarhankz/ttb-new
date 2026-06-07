@@ -1,9 +1,16 @@
-import { MenuItem } from 'primeng/api';
+export type AdminOfficeToolbarActionId = 'add-office' | 'advanced-search' | 'reset-default';
 
-/** Placeholder — wire offices tab actions when the offices pipeline is implemented. */
-export function getAdminOfficeToolbarMenuItems(): MenuItem[] {
+export interface AdminOfficeToolbarAction {
+  id: AdminOfficeToolbarActionId;
+  label: string;
+  variant: 'primary' | 'danger';
+  icon: string;
+}
+
+export function getAdminOfficeToolbarActions(entityLabel: 'Office' | 'Agency'): AdminOfficeToolbarAction[] {
   return [
-    { label: 'Add New Office', icon: 'pi pi-plus', disabled: true },
-    { label: 'Export', icon: 'pi pi-download', disabled: true }
+    { id: 'add-office', label: `Add New ${entityLabel}`, variant: 'primary', icon: 'pi pi-plus' },
+    { id: 'advanced-search', label: 'Advanced Search', variant: 'primary', icon: 'pi pi-search-plus' },
+    { id: 'reset-default', label: 'Reset Default', variant: 'danger', icon: 'pi pi-replay' }
   ];
 }

@@ -1,5 +1,5 @@
 import { AdminUserRecord } from '../interfaces/admin-users.interface';
-import { DataTableRowAction } from '../../shared/components/data-table/data-table.types';
+import { DataTableRowAction } from '@app/shared/components/data-table/data-table.types';
 
 export interface AdminUserActionContext {
   loggedInUserType: number;
