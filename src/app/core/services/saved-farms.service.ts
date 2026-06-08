@@ -1,4 +1,4 @@
-import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import {
   SAVED_FARMS_COLUMNS,
   SAVED_FARM_TABS,
@@ -62,17 +62,10 @@ export class SavedFarmsService {
   private searchDebounce?: ReturnType<typeof setTimeout>;
   private readonly _rawFarms = signal<SavedFarmRecord[]>([]);
 
-  constructor() {
-    effect(() => {
-      const records = this._rawFarms();
-      // Re-bucket when vertical config loads so PH/EM prefix is available (legacy timing).
-      this.verticalService.content();
-
-      untracked(() => {
-        this._farmsByTab.set(this.bucketFarms(records));
-        this.refreshFilteredRows();
-      });
-    });
+  /** Re-apply tab buckets (e.g. after vertical config loads PH/EM prefix). */
+  rebucketFarms(): void {
+    this._farmsByTab.set(this.bucketFarms(this._rawFarms()));
+    this.refreshFilteredRows();
   }
 
   fetchFarmsList(force = false): void {
@@ -102,6 +95,7 @@ export class SavedFarmsService {
         const records = this.normalizeFarmRecords(payload.data);
         this._rawFarms.set(records);
         this.loadSucceeded = true;
+        this.rebucketFarms();
         this._loading.set(false);
       },
       error: (err) => {

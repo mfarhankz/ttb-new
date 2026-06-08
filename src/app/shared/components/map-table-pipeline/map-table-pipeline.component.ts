@@ -59,6 +59,16 @@ export class MapTablePipelineComponent implements OnInit, OnDestroy {
     this.scheduleMapResize();
   }
 
+  /** Show map panel when table row preview needs geometry (e.g. farm hover). */
+  ensureMapVisibleForPreview(): void {
+    if (this.viewMode() === 'list') {
+      this.onViewModeChange('both');
+      return;
+    }
+
+    this.scheduleMapResize();
+  }
+
   onSplitRatioChange(ratio: MapPipelineSplitRatio): void {
     this.splitRatio.set(ratio);
     this.splitRatioChange.emit(ratio);

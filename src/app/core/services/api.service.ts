@@ -290,7 +290,7 @@ export class ApiService {
     }
 
     if (error.status === 0) {
-      return 'Unable to connect to server. Please check your internet connection.';
+      return 'Error occurred in contacting Server. Please try again later.';
     }
 
     if (error.status === 401) {

@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, OnInit, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal, untracked, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
@@ -23,6 +23,7 @@ import { MapTableSyncService } from '@app/core/services/map-table-sync.service';
 import { OlMapService, type MapObjectRefs } from '@app/core/services/ol-map.service';
 import { SavedFarmsService } from '@app/core/services/saved-farms.service';
 import { SessionExpiredService } from '@app/core/services/session-expired.service';
+import { VerticalService } from '@app/core/services/vertical.service';
 
 @Component({
   selector: 'app-saved-farms',
@@ -42,8 +43,11 @@ import { SessionExpiredService } from '@app/core/services/session-expired.servic
   templateUrl: './saved-farms.component.html'
 })
 export class SavedFarmsComponent implements OnInit {
+  @ViewChild(MapTablePipelineComponent) private mapPipeline?: MapTablePipelineComponent;
+
   private readonly authService = inject(AuthService);
   private readonly savedFarmsService = inject(SavedFarmsService);
+  private readonly verticalService = inject(VerticalService);
   private readonly sessionExpiredService = inject(SessionExpiredService);
   private readonly mapTableSync = inject(MapTableSyncService);
   private readonly olMapService = inject(OlMapService);
@@ -110,6 +114,11 @@ export class SavedFarmsComponent implements OnInit {
         untracked(() => this.savedFarmsService.fetchFarmsList());
       }
     });
+
+    effect(() => {
+      this.verticalService.content();
+      untracked(() => this.savedFarmsService.rebucketFarms());
+    });
   }
 
   ngOnInit(): void {
@@ -150,7 +159,7 @@ export class SavedFarmsComponent implements OnInit {
 
   onFarmHover(row: Record<string, unknown>): void {
     const geometry = row['geometry'];
-    if (!geometry || !this.mapObject.map) {
+    if (!geometry) {
       return;
     }
 
@@ -159,7 +168,20 @@ export class SavedFarmsComponent implements OnInit {
       this.mapObject.hovers.hoverOnFarm = true;
     }
 
+    this.mapPipeline?.ensureMapVisibleForPreview();
+    this.drawFarmGeometryWhenReady(geometry);
+  }
+
+  private drawFarmGeometryWhenReady(geometry: unknown, attempt = 0): void {
+    if (!this.mapObject.shapesLayer || !this.mapObject.map) {
+      if (attempt < 20) {
+        setTimeout(() => this.drawFarmGeometryWhenReady(geometry, attempt + 1), 100);
+      }
+      return;
+    }
+
     this.mapTableSync.showFarmGeometry(this.mapObject, geometry);
+    this.mapTableSync.scheduleMapResize(this.mapObject, attempt === 0 ? 220 : 120);
   }
 
   onFarmHoverEnd(): void {

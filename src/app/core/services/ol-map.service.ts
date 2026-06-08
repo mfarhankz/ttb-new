@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { MAP_DEFAULTS, DEFAULT_LON_LAT } from '../config/map.config';
 
+const METERS_PER_MILE = 1609.344;
+/** Legacy olFactory.et() — Web Mercator circle display adjustment. */
+const LEGACY_CIRCLE_RADIUS_ADJUST = 1.195;
+
 /** OpenLayers global (loaded from CDN v7.4.0). */
 declare const ol: any;
 
@@ -55,8 +59,25 @@ export class OlMapService {
   createLayer(layerName: 'vectorLayer' | 'shapesLayer', refs: MapObjectRefs): void {
     const source = new ol.source.Vector();
     const layer = new ol.layer.Vector({ source });
+
+    if (layerName === 'shapesLayer') {
+      layer.setStyle(this.getShapesLayerStyle());
+      layer.setZIndex(1);
+    } else {
+      layer.setZIndex(2);
+    }
+
     (refs as any)[layerName] = layer;
     if (refs.map) refs.map.addLayer(layer);
+  }
+
+  /** Legacy olFactory layer style for radius / polygon shapes. */
+  private getShapesLayerStyle(): any {
+    const { fill, stroke, strokeWidth } = MAP_DEFAULTS.shapesLayerStyle;
+    return new ol.style.Style({
+      fill: new ol.style.Fill({ color: fill }),
+      stroke: new ol.style.Stroke({ color: stroke, width: strokeWidth })
+    });
   }
 
   /** Clear map: clear vector and shapes layers, optionally reset center/zoom. */
@@ -99,12 +120,22 @@ export class OlMapService {
       proj.geographic,
       proj.proj3857
     );
-    const radius = radiusInMeters || 0;
+    const radiusMiles = Number(geometry.value.radius ?? 0);
+    const radius = this.milesToMapRadius(radiusMiles);
     const circle = new ol.geom.Circle(center, radius);
     const feature = new ol.Feature({ geometry: circle });
     feature.setId('circle');
     refs.shapesLayer.getSource().addFeature(feature);
     return feature;
+  }
+
+  /** Convert saved-farm radius (miles) to OpenLayers circle radius (meters). */
+  private milesToMapRadius(miles: number): number {
+    if (!Number.isFinite(miles) || miles <= 0) {
+      return 0;
+    }
+
+    return miles * METERS_PER_MILE * LEGACY_CIRCLE_RADIUS_ADJUST;
   }
 
   /** Change radius of existing circle. */
@@ -181,10 +212,20 @@ export class OlMapService {
       return;
     }
 
+    // Legacy onFarmMouseEnter unwraps single-item geometry arrays.
+    let normalizedInput = geometryInput;
+    if (Array.isArray(geometryInput) && geometryInput.length === 1) {
+      normalizedInput = geometryInput[0];
+    }
+
     this.clearShapesLayer(refs);
 
-    const geometries = this.normalizeGeometries(geometryInput);
+    const geometries = this.normalizeGeometries(normalizedInput);
     geometries.forEach((geometry) => this.drawSingleGeometry(refs, geometry));
+
+    if (refs.map?.updateSize) {
+      refs.map.updateSize();
+    }
 
     this.fitMapToShapes(refs);
   }

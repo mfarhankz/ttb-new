@@ -26,6 +26,12 @@ export const MAP_DEFAULTS = {
   projections: {
     geographic: 'EPSG:4326',
     proj3857: 'EPSG:3857'
+  },
+  /** Legacy olFactory shapesLayer — radius / polygon preview on map. */
+  shapesLayerStyle: {
+    fill: 'rgba(0, 0, 255, 0.3)',
+    stroke: 'rgba(0, 0, 255, 0.1)',
+    strokeWidth: 2
   }
 } as const;
 
