@@ -14,6 +14,14 @@ export class LayoutService {
     this.sidebarResize$.next();
   }
 
+  /** Collapse or expand the sidebar from page content (e.g. map split view). */
+  requestSidebarCollapse(collapsed: boolean): void {
+    this.sidebarCollapseRequest$.next(collapsed);
+  }
+
+  private readonly sidebarCollapseRequest$ = new Subject<boolean>();
+  readonly onSidebarCollapseRequest = this.sidebarCollapseRequest$.asObservable();
+
   notifySidebarResize(): void {
     this.sidebarResize$.next();
   }

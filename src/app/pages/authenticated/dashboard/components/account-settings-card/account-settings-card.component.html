@@ -60,5 +60,18 @@
         </div>
       </div>
     }
+
+    @if (showNeedHelp()) {
+      <div class="mt-auto border-t border-border pt-4">
+        <p class="text-body-sm font-semibold text-secondary leading-snug">Need Help?</p>
+        <p class="mt-1 text-body-sm text-secondary leading-snug">
+          Give us a call at
+          <a
+            [href]="'tel:' + supportPhoneTel()"
+            class="font-medium text-foreground no-underline hover:underline"
+          >{{ supportPhone() }}</a>
+        </p>
+      </div>
+    }
   </div>
 </app-card>

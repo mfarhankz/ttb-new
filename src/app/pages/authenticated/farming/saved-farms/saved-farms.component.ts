@@ -1,4 +1,14 @@
-import { Component, computed, effect, inject, OnInit, signal, untracked, ViewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  untracked,
+  ViewChild
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
@@ -21,6 +31,7 @@ import {
   SavedFarmTabId
 } from '@app/core/config/saved-farms.config';
 import { AuthService } from '@app/core/services/auth.service';
+import { LayoutService } from '@app/core/services/layout.service';
 import { MapTableSyncService } from '@app/core/services/map-table-sync.service';
 import { OlMapService, type MapObjectRefs } from '@app/core/services/ol-map.service';
 import { SavedFarmsService } from '@app/core/services/saved-farms.service';
@@ -45,7 +56,7 @@ import { VerticalService } from '@app/core/services/vertical.service';
   ],
   templateUrl: './saved-farms.component.html'
 })
-export class SavedFarmsComponent implements OnInit {
+export class SavedFarmsComponent implements OnInit, OnDestroy {
   @ViewChild('deleteConfirmModal') private deleteConfirmModal?: ModalComponent;
 
   private readonly authService = inject(AuthService);
@@ -54,6 +65,7 @@ export class SavedFarmsComponent implements OnInit {
   private readonly sessionExpiredService = inject(SessionExpiredService);
   private readonly mapTableSync = inject(MapTableSyncService);
   private readonly olMapService = inject(OlMapService);
+  private readonly layoutService = inject(LayoutService);
 
   readonly columns = this.savedFarmsService.columns;
   readonly rows = this.savedFarmsService.rows;
@@ -126,6 +138,7 @@ export class SavedFarmsComponent implements OnInit {
   };
 
   private hoverActive = false;
+  private autoCollapsedNavForSplit = false;
 
   constructor() {
     effect(() => {
@@ -145,6 +158,12 @@ export class SavedFarmsComponent implements OnInit {
     this.mapObject.resetMapHandler = (refs, setCenterReset) => {
       this.olMapService.clearMap(refs, setCenterReset ?? false);
     };
+  }
+
+  ngOnDestroy(): void {
+    if (this.autoCollapsedNavForSplit) {
+      this.layoutService.requestSidebarCollapse(false);
+    }
   }
 
   onTabChange(tabId: string): void {
@@ -179,10 +198,25 @@ export class SavedFarmsComponent implements OnInit {
   }
 
   onPipelineViewModeChange(mode: MapPipelineViewMode): void {
+    const previousMode = this.pipelineViewMode();
     this.pipelineViewMode.set(mode);
 
     if (mode === 'list') {
       this.onFarmHoverEnd();
+    }
+
+    if (mode === 'both' && previousMode === 'list') {
+      if (!this.layoutService.sidebarCollapsed()) {
+        this.layoutService.requestSidebarCollapse(true);
+        this.autoCollapsedNavForSplit = true;
+      }
+    } else if (mode === 'list' && this.autoCollapsedNavForSplit) {
+      this.layoutService.requestSidebarCollapse(false);
+      this.autoCollapsedNavForSplit = false;
+    }
+
+    if (mode === 'both' || previousMode === 'both') {
+      setTimeout(() => this.onMapResize(), 220);
     }
   }
 

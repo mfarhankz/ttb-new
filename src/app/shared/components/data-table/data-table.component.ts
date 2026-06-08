@@ -206,15 +206,31 @@ export class DataTableComponent {
   }
 
   sortIconClass(column: DataTableColumn): string {
-    const base = 'pi text-[0.65rem] shrink-0';
+    const base = 'pi shrink-0 !text-[0.875rem]';
 
     if (!this.isSorted(column)) {
       return `${base} pi-sort-alt text-subtle/80`;
     }
 
-    return this.sortDirection() === 'asc'
-      ? `${base} pi-sort-up-fill text-primary`
-      : `${base} pi-sort-down-fill text-primary`;
+    const family = this.resolveSortIconFamily(column);
+    const direction = this.sortDirection() === 'asc' ? 'up' : 'down';
+
+    return `${base} pi-sort-${family}-${direction} text-primary`;
+  }
+
+  /** Maps column sort type to PrimeIcons sort family (alpha, numeric, amount). */
+  private resolveSortIconFamily(column: DataTableColumn): 'alpha' | 'numeric' | 'amount' {
+    const sortType = column.sortType ?? this.inferSortType(column);
+
+    if (sortType === 'number') {
+      return 'numeric';
+    }
+
+    if (sortType === 'date') {
+      return 'amount';
+    }
+
+    return 'alpha';
   }
 
   sortAriaLabel(column: DataTableColumn): string {

@@ -50,30 +50,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
     const user = this.tbUser();
     return user?.office_name || user?.username || '';
   });
-  showNeedHelp = computed(
-    () => !this.verticalService.content()?.custom_content?.user_home?.need_help_hide
-  );
-  supportPhone = computed(() => {
-    const support = this.verticalService.content()?.support_info;
-    const userType = Number(this.tbUser()?.type ?? 0);
-    if (userType > 1) {
-      return (
-        support?.technical_support ||
-        support?.help_desk_phone ||
-        VERTICAL_CONFIG.defaultSupportPhone
-      );
-    }
-    return (
-      support?.help_desk_phone ||
-      support?.technical_support ||
-      VERTICAL_CONFIG.defaultSupportPhone
-    );
-  });
-  supportPhoneTel = computed(() => this.supportPhone().replace(/[^\d+]/g, ''));
-
   isCollapsed = false;
   expandedMenu: string | null = null;
   hoveredFlyout = signal<string | null>(null);
+
+  private layoutCollapseSub?: Subscription;
 
   ngOnInit(): void {
     const stored = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
@@ -82,6 +63,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
     } else {
       this.applySidebarWidth();
     }
+    this.layoutCollapseSub = this.layoutService.onSidebarCollapseRequest.subscribe((collapsed) => {
+      if (this.isCollapsed !== collapsed) {
+        this.setCollapsed(collapsed);
+      }
+    });
     this.syncExpandedMenusFromRoute();
     this.routerSub = this.router.events
       .pipe(filter((e) => e instanceof NavigationEnd))
@@ -92,6 +78,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.layoutCollapseSub?.unsubscribe();
     this.routerSub?.unsubscribe();
     if (this.flyoutHideTimer) clearTimeout(this.flyoutHideTimer);
   }

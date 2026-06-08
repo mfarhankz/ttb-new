@@ -10,15 +10,29 @@
         Total saved farms:
         <span class="font-medium text-foreground">{{ totalCount() }}</span>
       </span>
-      <app-button
-        variant="outline"
-        size="sm"
-        icon="pi pi-refresh"
+      <button
+        type="button"
+        class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-border bg-transparent px-3 text-sm font-medium text-muted transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus disabled:pointer-events-none disabled:opacity-40"
         [disabled]="loading()"
-        (onClick)="refreshFarms()"
+        (click)="refreshFarms()"
       >
+        <i class="pi pi-refresh text-xs" [class.animate-spin]="loading()" aria-hidden="true"></i>
         Refresh
-      </app-button>
+      </button>
+      <button
+        type="button"
+        class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border px-3 text-sm font-medium transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus"
+        [class.border-primary]="filtersOpen() || hasActiveFilters()"
+        [class.bg-primary/10]="hasActiveFilters()"
+        [class.text-primary]="filtersOpen() || hasActiveFilters()"
+        [class.border-border]="!filtersOpen() && !hasActiveFilters()"
+        [class.bg-transparent]="!hasActiveFilters()"
+        [class.text-muted]="!filtersOpen() && !hasActiveFilters()"
+        (click)="toggleFilters($event)"
+      >
+        <i class="pi pi-filter text-xs" aria-hidden="true"></i>
+        Filters
+      </button>
     </div>
 
     <div mapTablePipelineMap class="h-full w-full">
@@ -31,7 +45,7 @@
     </div>
 
     <div mapTablePipelineTable class="flex h-full min-h-0 flex-1 flex-col gap-3">
-      <div class="flex w-full shrink-0 items-end gap-4 border-b border-border">
+      <div class="flex w-full shrink-0 items-end border-b border-border">
         <app-tab-nav
           class="min-w-0 flex-1"
           ariaLabel="Saved farm categories"
@@ -39,23 +53,6 @@
           [activeId]="activeTab()"
           (activeIdChange)="onTabChange($event)"
         />
-
-        <div class="flex shrink-0 items-center gap-2 pb-2">
-          <button
-            type="button"
-            class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border px-3 text-sm font-medium transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus"
-            [class.border-primary]="filtersOpen() || hasActiveFilters()"
-            [class.bg-primary/10]="hasActiveFilters()"
-            [class.text-primary]="filtersOpen() || hasActiveFilters()"
-            [class.border-border]="!filtersOpen() && !hasActiveFilters()"
-            [class.bg-transparent]="!hasActiveFilters()"
-            [class.text-muted]="!filtersOpen() && !hasActiveFilters()"
-            (click)="toggleFilters($event)"
-          >
-            <i class="pi pi-filter text-xs" aria-hidden="true"></i>
-            Filters
-          </button>
-        </div>
       </div>
 
       @if (filtersOpen()) {

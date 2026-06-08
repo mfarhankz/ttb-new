@@ -60,11 +60,11 @@
             [class.font-medium]="isParentActive(item)"
             (click)="toggleMenu(item, $event)"
           >
-            <i [class]="item.icon" class="text-lg flex-shrink-0"></i>
-            <span class="truncate flex-1" [class.hidden]="isCollapsed">{{ item.label }}</span>
+            <i [class]="item.icon" class="!text-lg flex-shrink-0"></i>
+            <span class="truncate flex-1 !font-lg font-semibold" [class.hidden]="isCollapsed">{{ item.label }}</span>
             @if (!isCollapsed) {
               <i
-                class="pi text-caption flex-shrink-0 transition-transform duration-200"
+                class="pi flex-shrink-0 !text-[0.8rem] transition-transform duration-200"
                 [class.pi-chevron-up]="isMenuExpanded(item.label)"
                 [class.pi-chevron-down]="!isMenuExpanded(item.label)"
               ></i>
@@ -76,7 +76,7 @@
             <div class="ml-4 pl-3 border-l border-sidebar-border mt-1 mb-2">
               @for (child of item.children; track child.label) {
                 <a
-                  class="flex items-center w-full px-3 py-2 mb-0.5 rounded-lg text-caption text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium"
+                  class="flex items-center w-full px-3 py-2 mb-0.5 text-sm rounded-lg text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium"
                   [routerLink]="child.route"
                   routerLinkActive="active"
                 >
@@ -113,7 +113,7 @@
         } @else {
           <div class="relative group">
             <a
-              class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-body-sm text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium"
+              class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-sm font-semibold text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-bold"
               [class.justify-center]="isCollapsed"
               [class.px-2]="isCollapsed"
               [routerLink]="item.route"
@@ -146,7 +146,7 @@
       <div class="relative mb-1 group">
         @if (item.route) {
           <a
-            class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-body-sm text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium"
+            class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-sm font-semibold text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-bold"
             [class.justify-center]="isCollapsed"
             [class.px-2]="isCollapsed"
             [routerLink]="item.route"
@@ -158,7 +158,7 @@
         } @else if (item.action === 'logout') {
           <button
             type="button"
-            class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-body-sm text-sidebar-foreground border-0 bg-transparent cursor-pointer text-left transition-colors hover:bg-sidebar-hover"
+            class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-sm font-semibold text-sidebar-foreground border-0 bg-transparent cursor-pointer text-left transition-colors hover:bg-sidebar-hover"
             [class.justify-center]="isCollapsed"
             [class.px-2]="isCollapsed"
             (click)="onNavAction(item)"
@@ -207,17 +207,4 @@
       }
     </div>
   </div>
-
-  @if (showNeedHelp() && !isCollapsed) {
-    <div class="px-4 py-3 border-t border-sidebar-border flex-shrink-0">
-      <p class="text-body-sm font-semibold text-secondary leading-snug">Need Help?</p>
-      <p class="text-body-sm text-secondary leading-snug mt-1">
-        Give us a call at
-        <a
-          [href]="'tel:' + supportPhoneTel()"
-          class="text-foreground font-medium no-underline hover:underline"
-        >{{ supportPhone() }}</a>
-      </p>
-    </div>
-  }
 </nav>

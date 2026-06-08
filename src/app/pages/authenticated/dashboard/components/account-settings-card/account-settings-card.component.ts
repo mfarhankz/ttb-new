@@ -1,8 +1,10 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { VERTICAL_CONFIG } from '@app/core/config/vertical.config';
 import { AccountSettingsService } from '@app/core/services/account-settings.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { SessionExpiredService } from '@app/core/services/session-expired.service';
+import { VerticalService } from '@app/core/services/vertical.service';
 import {
   AlertComponent,
   ButtonComponent,
@@ -23,8 +25,31 @@ export class AccountSettingsCardComponent {
   private readonly authService = inject(AuthService);
   private readonly accountSettingsService = inject(AccountSettingsService);
   private readonly sessionExpiredService = inject(SessionExpiredService);
+  private readonly verticalService = inject(VerticalService);
 
   readonly isEndUser = computed(() => this.authService.isEndUser());
+  readonly showNeedHelp = computed(
+    () => !this.verticalService.content()?.custom_content?.user_home?.need_help_hide
+  );
+  readonly supportPhone = computed(() => {
+    const support = this.verticalService.content()?.support_info;
+    const userType = Number(this.authService.tbUser()?.type ?? 0);
+
+    if (userType > 1) {
+      return (
+        support?.technical_support ||
+        support?.help_desk_phone ||
+        VERTICAL_CONFIG.defaultSupportPhone
+      );
+    }
+
+    return (
+      support?.help_desk_phone ||
+      support?.technical_support ||
+      VERTICAL_CONFIG.defaultSupportPhone
+    );
+  });
+  readonly supportPhoneTel = computed(() => this.supportPhone().replace(/[^\d+]/g, ''));
   readonly settings = this.accountSettingsService.settings;
   readonly loading = this.accountSettingsService.loading;
   readonly saving = this.accountSettingsService.saving;
