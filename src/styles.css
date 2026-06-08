@@ -140,3 +140,26 @@
     visibility: hidden !important;
   }
 }
+
+@layer components {
+  .map-pin {
+    display: inline-flex;
+    height: 1.8125rem;
+    width: 1.5625rem;
+    align-items: flex-start;
+    justify-content: center;
+    background: url('/assets/images/_pin.png') no-repeat center center;
+    background-size: 22px 28px;
+    padding-top: 0.25rem;
+    padding-right: 0.1875rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+  }
+
+  .map-pin--owner {
+    background-image: url('/assets/images/_map-pin-green.png');
+  }
+}

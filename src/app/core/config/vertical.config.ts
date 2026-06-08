@@ -33,6 +33,7 @@ export const VERTICAL_CONFIG = {
     'signup',
     'forgot-password',
     'dashboard',
+    'detail',
     'property-search',
     'farming',
     'statistics',

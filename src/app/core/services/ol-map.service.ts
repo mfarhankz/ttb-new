@@ -295,17 +295,53 @@ export class OlMapService {
     if (!refs.vectorLayer || !records?.length) return;
     const source = refs.vectorLayer.getSource();
     const proj = this.getProjections();
-    records.forEach((r: any, i: number) => {
-      const lon = r.center_lng ?? r.longitude ?? r.lng;
-      const lat = r.center_lat ?? r.latitude ?? r.lat;
+
+    records.forEach((record: any, index: number) => {
+      const lon = record.center_lng ?? record.longitude ?? record.lng ?? record.sa_x_coord;
+      const lat = record.center_lat ?? record.latitude ?? record.lat ?? record.sa_y_coord;
       if (lon == null || lat == null) return;
+
       const coord = ol.proj.transform([Number(lon), Number(lat)], proj.geographic, proj.proj3857);
+      const serialNumber = Number(record.serialNumber ?? record.serial_number ?? index + 1);
       const feature = new ol.Feature({
         geometry: new ol.geom.Point(coord),
-        index: i,
-        ...r
+        index: serialNumber,
+        serialNumber,
+        ...record
       });
+
+      feature.setId(`pointer-hover-${serialNumber}`);
+      feature.setStyle(this.createMarkerPinStyle(record, serialNumber));
       source.addFeature(feature);
+    });
+  }
+
+  /** Legacy olFactory.markerPinImageWithText — pin image with serial number label. */
+  private createMarkerPinStyle(record: any, serialNumber: number, highlighted = false): any {
+    const imageSrc =
+      record.sa_site_mail_same === 'Y'
+        ? '/assets/images/_map-pin-green.png'
+        : '/assets/images/_pin.png';
+
+    return new ol.style.Style({
+      image: new ol.style.Icon({
+        anchor: [0.5, 46],
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'pixels',
+        src: imageSrc
+      }),
+      text: new ol.style.Text({
+        text: String(serialNumber),
+        font: 'bold 14px Calibri, sans-serif',
+        offsetY: -25,
+        fill: new ol.style.Fill({
+          color: highlighted ? '#00AAFF' : '#f9f9f9'
+        }),
+        stroke: new ol.style.Stroke({
+          color: highlighted ? '#079ca5' : 'rgb(113, 113, 113)',
+          width: 0.5
+        })
+      })
     });
   }
 

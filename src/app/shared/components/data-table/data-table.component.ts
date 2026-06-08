@@ -13,6 +13,7 @@ import {
 import {
   DataTableBadgeCell,
   DataTableColumn,
+  DataTableLeadDetailItem,
   DataTableColumnAlign,
   DataTableRowAction,
   DataTableSortDirection,
@@ -62,6 +63,10 @@ export class DataTableComponent {
   /** Optional icon class for a bulk-select control in the actions column header. */
   @Input() actionsHeaderIcon: string | null = null;
   @Input() actionsHeaderDisabled = false;
+  /** Optional secondary row action icon shown beside the gear menu (e.g. notes). */
+  @Input() showSecondaryRowAction = false;
+  @Input() secondaryRowActionIcon = 'pi pi-file-o';
+  @Input() secondaryRowActionLabel = 'Open notes';
   /** Selected row ids (from {@link trackRow}). */
   readonly selectedRowIds = input<ReadonlySet<string>>(new Set<string>());
 
@@ -69,6 +74,7 @@ export class DataTableComponent {
   private readonly pageSizeUserOverridden = signal(false);
 
   readonly rowAction = output<{ actionId: string; row: Record<string, unknown> }>();
+  readonly secondaryRowActionClick = output<{ row: Record<string, unknown> }>();
   readonly actionsHeaderClick = output<void>();
   readonly selectionChange = output<{ rowId: string; selected: boolean }>();
   readonly selectAllChange = output<{ rowIds: string[]; selected: boolean }>();
@@ -273,7 +279,7 @@ export class DataTableComponent {
 
   headerClasses(column: DataTableColumn, index: number, isLast: boolean): string {
     const classes = [
-      'bg-sidebar-active px-4 py-3 text-caption font-semibold uppercase tracking-wide text-foreground',
+      'bg-sidebar-active px-4 py-3 text-caption font-semibold uppercase tracking-wide text-foreground whitespace-nowrap',
       this.headerAlignClass(column, index)
     ];
 
@@ -285,10 +291,6 @@ export class DataTableComponent {
       classes.push(column.width);
     }
 
-    if (column.nowrap) {
-      classes.push('whitespace-nowrap');
-    }
-
     if (!isLast) {
       classes.push('border-r border-border/60');
     }
@@ -298,7 +300,7 @@ export class DataTableComponent {
 
   headerButtonClasses(column: DataTableColumn, index: number): string {
     const classes = [
-      'inline-flex w-full items-center gap-1.5 transition-colors',
+      'inline-flex w-full items-center gap-1.5 whitespace-nowrap transition-colors',
       this.headerAlignClass(column, index)
     ];
 
@@ -358,6 +360,14 @@ export class DataTableComponent {
 
     if (column.variant === 'muted') {
       classes.push('text-muted');
+    }
+
+    if (column.variant === 'leadDetails') {
+      classes.push('align-top', 'whitespace-normal', 'min-w-[600px]');
+    }
+
+    if (column.variant === 'mapPin') {
+      classes.push('text-center');
     }
 
     if (!isLast) {
@@ -449,6 +459,12 @@ export class DataTableComponent {
     this.rowAction.emit({ actionId: action.id, row });
   }
 
+  onSecondaryRowActionClick(event: MouseEvent, row: Record<string, unknown>): void {
+    event.stopPropagation();
+    this.closeActionsMenu();
+    this.secondaryRowActionClick.emit({ row });
+  }
+
   showActionsHeaderControl(): boolean {
     return !!(this.actionsHeaderLabel || this.actionsHeaderIcon);
   }
@@ -504,6 +520,48 @@ export class DataTableComponent {
     const rowIds = this.visibleRowIds();
     const selectAll = !this.isAllVisibleSelected();
     this.selectAllChange.emit({ rowIds, selected: selectAll });
+  }
+
+  mapPinNumber(row: Record<string, unknown>, column: DataTableColumn): string {
+    const value = row[column.key];
+    if (value == null || value === '') {
+      return '';
+    }
+
+    return String(value);
+  }
+
+  mapPinClasses(row: Record<string, unknown>): string {
+    return row['sa_site_mail_same'] === 'Y' ? 'map-pin map-pin--owner' : 'map-pin';
+  }
+
+  leadDetailItems(value: unknown): DataTableLeadDetailItem[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value.filter(
+      (item): item is DataTableLeadDetailItem =>
+        !!item &&
+        typeof item === 'object' &&
+        'key' in item &&
+        typeof (item as DataTableLeadDetailItem).key === 'string'
+    );
+  }
+
+  formatLeadDetailKey(key: string): string {
+    return key
+      .split(' ')
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+      .join(' ');
+  }
+
+  formatLeadDetailValue(value: unknown): string {
+    if (value == null || value === '') {
+      return '-';
+    }
+
+    return String(value);
   }
 
   badgeList(value: unknown): DataTableBadgeCell[] {

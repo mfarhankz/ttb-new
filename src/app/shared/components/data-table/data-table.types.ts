@@ -1,6 +1,19 @@
 export type DataTableColumnAlign = 'left' | 'center' | 'right';
 
-export type DataTableColumnVariant = 'default' | 'numeric' | 'badge' | 'badges' | 'actions' | 'muted';
+export type DataTableColumnVariant =
+  | 'default'
+  | 'numeric'
+  | 'badge'
+  | 'badges'
+  | 'actions'
+  | 'muted'
+  | 'leadDetails'
+  | 'mapPin';
+
+export interface DataTableLeadDetailItem {
+  key: string;
+  value: unknown;
+}
 
 export type DataTableBadgesLayout = 'inline' | 'stacked';
 

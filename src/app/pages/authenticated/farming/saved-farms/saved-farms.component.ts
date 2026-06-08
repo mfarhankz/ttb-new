@@ -10,6 +10,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
@@ -66,6 +67,7 @@ export class SavedFarmsComponent implements OnInit, OnDestroy {
   private readonly mapTableSync = inject(MapTableSyncService);
   private readonly olMapService = inject(OlMapService);
   private readonly layoutService = inject(LayoutService);
+  private readonly router = inject(Router);
 
   readonly columns = this.savedFarmsService.columns;
   readonly rows = this.savedFarmsService.rows;
@@ -267,7 +269,13 @@ export class SavedFarmsComponent implements OnInit, OnDestroy {
 
     switch (event.actionId) {
       case 'select':
-        this.showActionNotice('Opening farm properties will be available in a future update.');
+        this.router.navigate(['/detail/farm', farmId], {
+          queryParams: { returnUrl: '/farming/saved-farms' },
+          state: {
+            title: event.row['name'],
+            geometry: event.row['geometry']
+          }
+        });
         break;
       case 'rename':
         this.showActionNotice('Rename farm will be available in a future update.');

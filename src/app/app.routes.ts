@@ -49,6 +49,12 @@ export const routes: Routes = [
         title: 'Saved Farms'
       },
       {
+        path: 'detail/:source/:sourceId',
+        loadComponent: () =>
+          import('./pages/authenticated/detail/detail-page.component').then(m => m.DetailPageComponent),
+        title: 'Detail'
+      },
+      {
         path: 'farming/radius-search',
         loadComponent: () => import('./pages/authenticated/farming/farming.component').then(m => m.FarmingComponent),
         title: 'Radius search',

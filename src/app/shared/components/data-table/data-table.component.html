@@ -65,7 +65,7 @@
                 @if (isSortable(column)) {
                   <button
                     type="button"
-                    [class]="'border-0 bg-transparent p-0 font-inherit text-inherit uppercase tracking-wide ' + headerButtonClasses(column, colIndex)"
+                    [class]="'border-0 bg-transparent p-0 font-inherit text-inherit uppercase tracking-wide whitespace-nowrap ' + headerButtonClasses(column, colIndex)"
                     [attr.aria-label]="sortAriaLabel(column)"
                     (click)="toggleSort(column)"
                   >
@@ -76,7 +76,7 @@
                   @if (showActionsHeaderControl()) {
                     <button
                       type="button"
-                      class="inline-flex w-full items-center justify-center gap-1 rounded-md border-0 bg-transparent p-0 text-caption font-semibold uppercase tracking-wide text-primary transition-colors hover:text-primary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
+                      class="inline-flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-md border-0 bg-transparent p-0 text-caption font-semibold uppercase tracking-wide text-primary transition-colors hover:text-primary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
                       [disabled]="actionsHeaderDisabled"
                       [attr.aria-label]="actionsHeaderLabel || 'Select rows'"
                       (click)="onActionsHeaderClick($event)"
@@ -136,7 +136,11 @@
               }
               @for (column of columns; track column.key; let colIndex = $index; let last = $last) {
                 <td [class]="cellClasses(column, colIndex, last)">
-                  @if (column.variant === 'badge') {
+                  @if (column.variant === 'mapPin') {
+                    <span [class]="mapPinClasses(row)" aria-hidden="true">
+                      {{ mapPinNumber(row, column) }}
+                    </span>
+                  } @else if (column.variant === 'badge') {
                     <span [class]="badgeClasses(formatCell(row[column.key]))">
                       {{ formatCell(row[column.key]) }}
                     </span>
@@ -150,8 +154,29 @@
                         }
                       }
                     </div>
+                  } @else if (column.variant === 'leadDetails') {
+                    <div class="min-w-[550px] text-body-sm text-foreground">
+                      <div class="table w-full min-w-[550px] border-collapse">
+                        @for (item of leadDetailItems(row[column.key]); track $index) {
+                          @if ($even) {
+                            <div class="table-row">
+                              <div class="table-cell min-w-[9rem] align-top py-0.5 pr-6">
+                                <span class="font-semibold whitespace-nowrap">{{ formatLeadDetailKey(item.key) }}:</span>
+                                <span class="ml-1 whitespace-nowrap">{{ formatLeadDetailValue(item.value) }}</span>
+                              </div>
+                              @if (leadDetailItems(row[column.key])[$index + 1]; as nextItem) {
+                                <div class="table-cell min-w-[18rem] align-top py-0.5">
+                                  <span class="font-semibold whitespace-nowrap">{{ formatLeadDetailKey(nextItem.key) }}:</span>
+                                  <span class="ml-1 whitespace-nowrap">{{ formatLeadDetailValue(nextItem.value) }}</span>
+                                </div>
+                              }
+                            </div>
+                          }
+                        }
+                      </div>
+                    </div>
                   } @else if (column.variant === 'actions') {
-                    <div class="relative inline-flex items-center gap-1.5">
+                    <div class="relative inline-flex items-center gap-1">
                       <button
                         type="button"
                         class="inline-flex items-center gap-0.5 rounded-md border-0 bg-transparent p-1 text-primary transition-colors hover:text-primary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
@@ -162,6 +187,16 @@
                       >
                         <i class="pi pi-cog text-base" aria-hidden="true"></i>
                       </button>
+                      @if (showSecondaryRowAction) {
+                        <button
+                          type="button"
+                          class="inline-flex items-center rounded-md border-0 bg-transparent p-1 text-muted transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 opacity-60 group-hover:opacity-100"
+                          [attr.aria-label]="secondaryRowActionLabel + ' for ' + formatCell(row['customAddress'] ?? row['name'] ?? row['id'])"
+                          (click)="onSecondaryRowActionClick($event, row)"
+                        >
+                          <i [class]="secondaryRowActionIcon + ' text-base'" aria-hidden="true"></i>
+                        </button>
+                      }
                       @if (rowStatusIndicator(row); as indicator) {
                         <span class="group/indicator relative inline-flex shrink-0">
                           <span
