@@ -49,6 +49,22 @@ export const routes: Routes = [
         title: 'Saved Farms'
       },
       {
+        path: 'farming/saved-searches',
+        loadComponent: () =>
+          import('./pages/authenticated/farming/saved-searches/saved-searches.component').then(
+            m => m.SavedSearchesComponent
+          ),
+        title: 'Saved Searches'
+      },
+      {
+        path: 'farming/saved-net-sheets',
+        loadComponent: () =>
+          import('./pages/authenticated/farming/saved-net-sheets/saved-net-sheets.component').then(
+            m => m.SavedNetSheetsComponent
+          ),
+        title: 'Saved Net Sheets'
+      },
+      {
         path: 'detail/:source/:sourceId',
         loadComponent: () =>
           import('./pages/authenticated/detail/detail-page.component').then(m => m.DetailPageComponent),

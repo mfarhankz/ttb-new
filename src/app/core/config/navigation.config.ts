@@ -14,9 +14,11 @@ export const MAIN_NAV: NavItem[] = [
     label: 'Farming',
     icon: 'pi pi-sitemap',
     children: [
-      { label: 'Saved Farms', icon: 'pi pi-bookmark', route: '/farming/saved-farms' },
       { label: 'Radius search', icon: 'pi pi-circle', route: '/farming/radius-search' },
-      { label: 'Boundary search', icon: 'pi pi-stop', route: '/farming/boundary-search' }
+      { label: 'Boundary search', icon: 'pi pi-stop', route: '/farming/boundary-search' },
+      { label: 'Saved Farms', icon: 'pi pi-bookmark', route: '/farming/saved-farms' },
+      { label: 'Saved Searches', icon: 'pi pi-search-plus', route: '/farming/saved-searches' },
+      { label: 'Saved Net Sheets', icon: 'pi pi-file-edit', route: '/farming/saved-net-sheets' }
     ]
   },
   { label: 'Statistics', icon: 'pi pi-chart-bar', route: '/statistics' },

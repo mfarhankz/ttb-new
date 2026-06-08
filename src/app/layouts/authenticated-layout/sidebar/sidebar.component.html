@@ -44,7 +44,7 @@
       Main
     </div>
 
-    @for (item of mainNav; track item.label) {
+    @for (item of mainNav(); track item.label) {
       <div
         class="relative mb-1"
         (mouseenter)="onParentMouseEnter(item)"

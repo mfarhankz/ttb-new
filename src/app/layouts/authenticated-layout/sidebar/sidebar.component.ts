@@ -42,7 +42,20 @@ export class SidebarComponent implements OnInit, OnDestroy {
   readonly sidebarShortLogoPath = SIDEBAR_SHORT_LOGO_PATH;
   collapsedChange = output<boolean>();
 
-  mainNav = MAIN_NAV;
+  readonly mainNav = computed((): NavItem[] =>
+    MAIN_NAV.map((item) => {
+      if (item.label !== 'Farming' || !item.children?.length) {
+        return item;
+      }
+
+      const netsheetSupported = this.verticalService.content()?.app_config?.['netsheet_support'] !== false;
+      const children = item.children.filter(
+        (child) => child.route !== '/farming/saved-net-sheets' || netsheetSupported
+      );
+
+      return { ...item, children };
+    })
+  );
   settingsNav = SETTINGS_NAV;
 
   tbUser = this.authService.tbUser;
@@ -150,7 +163,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   private syncExpandedMenusFromRoute(): void {
     this.expandedMenu = null;
-    for (const item of this.mainNav) {
+    for (const item of this.mainNav()) {
       if (this.isParentActive(item)) {
         this.expandedMenu = item.label;
         break;

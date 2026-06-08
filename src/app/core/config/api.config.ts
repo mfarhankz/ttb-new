@@ -47,7 +47,13 @@ export const API_CONFIG = {
     searchParcel: '/search_parcel_number/ttb.json',
     getExtraInfoBrief: '/get_extra_info_brief.json',
     getStates: '/get_states',
-    getCounties: '/get_counties'
+    getCounties: '/get_counties',
+    getSavedQueries: '/get_saved_queries.json',
+    getSavedQueryById: '/get_saved_queries',
+    renameQuery: '/rename_query.json',
+    removeQuery: '/remove_query.json',
+    getNetsheetList: '/get_netsheet_list.json',
+    deleteNetsheet: '/delete_netsheet.json'
   }
 } as const;
 
