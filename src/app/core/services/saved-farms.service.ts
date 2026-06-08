@@ -1,11 +1,18 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { Observable, map } from 'rxjs';
+import { resolveSavedFarmRowActions } from '../config/saved-farms-actions.config';
 import {
   SAVED_FARMS_COLUMNS,
   SAVED_FARM_TABS,
   SavedFarmTabId
 } from '../config/saved-farms.config';
 import { API_CONFIG } from '../config/api.config';
-import { SavedFarmRecord, TtbFarmMetainfoResponse } from '../interfaces/saved-farm.interface';
+import {
+  RemoveFarmPayload,
+  SavedFarmRecord,
+  TtbFarmMetainfoResponse,
+  TtbRemoveFarmResponse
+} from '../interfaces/saved-farm.interface';
 import { ApiService } from './api.service';
 import { VerticalService } from './vertical.service';
 
@@ -112,6 +119,25 @@ export class SavedFarmsService {
   refresh(): void {
     this.loadSucceeded = false;
     this.fetchFarmsList(true);
+  }
+
+  removeFarms(farmIds: Array<number | string>): Observable<string> {
+    const payload: RemoveFarmPayload = {
+      farm_ids: farmIds.map((id) => Number(id)).filter((id) => Number.isFinite(id))
+    };
+
+    return this.apiService.post<TtbRemoveFarmResponse>(API_CONFIG.endpoints.removeFarm, payload).pipe(
+      map((response) => {
+        const envelope = response.response;
+
+        if (envelope.status !== 'OK') {
+          const message = this.coalesceRemoveFarmMessage(envelope.data?.msg);
+          throw new Error(message || 'Failed to delete farm(s).');
+        }
+
+        return this.coalesceRemoveFarmMessage(envelope.data?.msg) || 'Successfully deleted the farm(s).';
+      })
+    );
   }
 
   setActiveTab(tab: SavedFarmTabId): void {
@@ -299,12 +325,25 @@ export class SavedFarmsService {
       propertyCount,
       createdOn,
       geometry: farm.geometry,
+      actions: resolveSavedFarmRowActions(),
       searchableByField: {
         name: name.toLowerCase(),
         propertyCount: String(propertyCount).toLowerCase(),
         createdOn: createdOn.toLowerCase()
       }
     };
+  }
+
+  private coalesceRemoveFarmMessage(msg?: string | string[]): string {
+    if (Array.isArray(msg)) {
+      return msg.filter(Boolean).join(', ').toLowerCase();
+    }
+
+    if (typeof msg === 'string' && msg.trim()) {
+      return msg.trim();
+    }
+
+    return '';
   }
 
   private formatDate(value?: string): string {

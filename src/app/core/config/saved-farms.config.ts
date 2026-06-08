@@ -28,6 +28,7 @@ export const SAVED_FARMS_FILTER_FIELD_OPTIONS: SavedFarmFilterFieldOption[] = [
 ];
 
 export const SAVED_FARMS_COLUMNS: DataTableColumn[] = [
+  { key: 'actions', label: '', variant: 'actions', sortable: false, align: 'center', width: 'w-16 min-w-[4.5rem]' },
   { key: 'name', label: 'Farm Name', sortType: 'text', truncate: true, width: 'min-w-[14rem]' },
   {
     key: 'propertyCount',

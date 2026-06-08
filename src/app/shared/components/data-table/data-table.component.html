@@ -45,6 +45,21 @@
       <table class="data-table w-full min-w-[760px] border-collapse">
         <thead class="sticky top-0 z-10">
           <tr class="border-b-2 border-border">
+            @if (showLeadingSelectionColumn()) {
+              <th
+                class="w-12 bg-sidebar-active px-4 py-3 text-center border-r border-border/60"
+                scope="col"
+              >
+                <input
+                  type="checkbox"
+                  class="h-4 w-4 cursor-pointer rounded border-border text-primary focus:ring-focus"
+                  [checked]="isAllVisibleSelected()"
+                  [indeterminate]="isSomeVisibleSelected() && !isAllVisibleSelected()"
+                  aria-label="Select all rows on this page"
+                  (click)="toggleSelectAllVisible($event)"
+                />
+              </th>
+            }
             @for (column of columns; track column.key; let colIndex = $index; let last = $last) {
               <th [class]="headerClasses(column, colIndex, last)" scope="col">
                 @if (isSortable(column)) {
@@ -58,11 +73,43 @@
                     <i [class]="sortIconClass(column)" aria-hidden="true"></i>
                   </button>
                 } @else if (column.variant === 'actions') {
-                  <span class="sr-only">Actions</span>
+                  @if (showActionsHeaderControl()) {
+                    <button
+                      type="button"
+                      class="inline-flex w-full items-center justify-center gap-1 rounded-md border-0 bg-transparent p-0 text-caption font-semibold uppercase tracking-wide text-primary transition-colors hover:text-primary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
+                      [disabled]="actionsHeaderDisabled"
+                      [attr.aria-label]="actionsHeaderLabel || 'Select rows'"
+                      (click)="onActionsHeaderClick($event)"
+                    >
+                      @if (actionsHeaderIcon) {
+                        <i [class]="actionsHeaderIcon + ' text-sm'" aria-hidden="true"></i>
+                      }
+                      @if (actionsHeaderLabel) {
+                        <span>{{ actionsHeaderLabel }}</span>
+                      }
+                    </button>
+                  } @else {
+                    <span class="sr-only">Actions</span>
+                  }
                 } @else {
                   <span [class]="headerButtonClasses(column, colIndex)">{{ column.label }}</span>
                 }
               </th>
+              @if (showTrailingSelectionAfterActions(column)) {
+                <th
+                  class="w-12 bg-sidebar-active px-4 py-3 text-center border-r border-border/60"
+                  scope="col"
+                >
+                  <input
+                    type="checkbox"
+                    class="h-4 w-4 cursor-pointer rounded border-border text-primary focus:ring-focus"
+                    [checked]="isAllVisibleSelected()"
+                    [indeterminate]="isSomeVisibleSelected() && !isAllVisibleSelected()"
+                    aria-label="Select all rows on this page"
+                    (click)="toggleSelectAllVisible($event)"
+                  />
+                </th>
+              }
             }
           </tr>
         </thead>
@@ -70,11 +117,23 @@
           @for (row of visibleRows(); track trackRow($index, row); let rowIndex = $index; let even = $even) {
             <tr
               class="border-b border-border/70 transition-colors last:border-b-0 hover:bg-sidebar-hover"
-              [class.bg-sidebar-active/25]="even"
+              [class.bg-sidebar-active/25]="even || (showSelectionColumn && isRowSelected(row, rowIndex))"
+              [class.bg-primary/5]="showSelectionColumn && isRowSelected(row, rowIndex)"
               (mouseenter)="rowEnter.emit(row)"
               (mouseleave)="rowLeave.emit(row)"
               (click)="rowClick.emit(row)"
             >
+              @if (showLeadingSelectionColumn()) {
+                <td class="w-12 px-4 py-2 text-center border-r border-border/60">
+                  <input
+                    type="checkbox"
+                    class="h-4 w-4 cursor-pointer rounded border-border text-primary focus:ring-focus"
+                    [checked]="isRowSelected(row, rowIndex)"
+                    [attr.aria-label]="'Select ' + formatCell(row['name'] ?? row['id'])"
+                    (click)="toggleRowSelection($event, row, rowIndex)"
+                  />
+                </td>
+              }
               @for (column of columns; track column.key; let colIndex = $index; let last = $last) {
                 <td [class]="cellClasses(column, colIndex, last)">
                   @if (column.variant === 'badge') {
@@ -117,6 +176,17 @@
                     {{ formatCell(row[column.key]) }}
                   }
                 </td>
+                @if (showTrailingSelectionAfterActions(column)) {
+                  <td class="w-12 px-4 py-2 text-center border-r border-border/60">
+                    <input
+                      type="checkbox"
+                      class="h-4 w-4 cursor-pointer rounded border-border text-primary focus:ring-focus"
+                      [checked]="isRowSelected(row, rowIndex)"
+                      [attr.aria-label]="'Select ' + formatCell(row['name'] ?? row['id'])"
+                      (click)="toggleRowSelection($event, row, rowIndex)"
+                    />
+                  </td>
+                }
               }
             </tr>
           }

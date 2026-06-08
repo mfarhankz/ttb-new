@@ -31,6 +31,8 @@ export const API_CONFIG = {
     searchOffice: '/search_office.json',
     userUsageReport: '/usage_report',
     getFarmMetainfo: '/get_farm_metainfo.json',
+    removeFarm: '/remove_farm.json',
+    renameFarm: '/rename_farm.json',
     loadEditUser: '/load_edit_user.json',
     editUser: '/edit_user.json',
     changePassword: '/change_password.json',

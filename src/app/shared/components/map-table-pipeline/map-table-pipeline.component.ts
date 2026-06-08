@@ -12,7 +12,8 @@ import {
   viewChild
 } from '@angular/core';
 import {
-  DEFAULT_MAP_PIPELINE_CONFIG
+  DEFAULT_MAP_PIPELINE_CONFIG,
+  MAP_PIPELINE_VIEW_OPTIONS
 } from '@app/core/config/map-pipeline.config';
 import { LayoutService } from '@app/core/services/layout.service';
 import { MapPipelineSplitRatio, MapPipelineViewMode, MapTablePipelineConfig } from './map-table-pipeline.types';
@@ -41,8 +42,17 @@ export class MapTablePipelineComponent implements OnInit, OnDestroy {
   private dragStartX = 0;
   private dragStartRatio: MapPipelineSplitRatio | null = null;
 
+  viewOptions(): typeof MAP_PIPELINE_VIEW_OPTIONS {
+    const allowed = new Set(this.resolvedConfig().viewModes);
+    return MAP_PIPELINE_VIEW_OPTIONS.filter((option) => allowed.has(option.mode));
+  }
+
   ngOnInit(): void {
-    this.viewMode.set(this.resolvedConfig().defaultViewMode);
+    const cfg = this.resolvedConfig();
+    const defaultMode = cfg.viewModes.includes(cfg.defaultViewMode)
+      ? cfg.defaultViewMode
+      : cfg.viewModes[0];
+    this.viewMode.set(defaultMode);
     this.splitRatio.set(this.loadStoredSplitRatio());
     this.sidebarResizeSub = this.layoutService.onSidebarResize.subscribe(() => {
       this.scheduleMapResize();
@@ -147,7 +157,8 @@ export class MapTablePipelineComponent implements OnInit, OnDestroy {
       defaultSplit: overrides.defaultSplit ?? DEFAULT_MAP_PIPELINE_CONFIG.defaultSplit,
       minPanelWidthPx: overrides.minPanelWidthPx ?? DEFAULT_MAP_PIPELINE_CONFIG.minPanelWidthPx,
       autoShowTableOnResults: overrides.autoShowTableOnResults ?? DEFAULT_MAP_PIPELINE_CONFIG.autoShowTableOnResults,
-      defaultViewMode: overrides.defaultViewMode ?? DEFAULT_MAP_PIPELINE_CONFIG.defaultViewMode
+      defaultViewMode: overrides.defaultViewMode ?? DEFAULT_MAP_PIPELINE_CONFIG.defaultViewMode,
+      viewModes: overrides.viewModes ?? DEFAULT_MAP_PIPELINE_CONFIG.viewModes
     };
   }
 

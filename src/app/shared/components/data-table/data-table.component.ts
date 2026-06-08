@@ -53,11 +53,25 @@ export class DataTableComponent {
   @Input() pageSizeOptions: number[] = [];
   /** When true, table stretches to parent height with scrollable body and pinned footer. */
   @Input() fillHeight = false;
+  /** When true, shows a checkbox column for bulk row selection. */
+  @Input() showSelectionColumn = false;
+  /** Place selection checkboxes after the actions column instead of before all columns. */
+  @Input() selectionColumnAfterActions = false;
+  /** Optional label for a bulk-select control in the actions column header. */
+  @Input() actionsHeaderLabel: string | null = null;
+  /** Optional icon class for a bulk-select control in the actions column header. */
+  @Input() actionsHeaderIcon: string | null = null;
+  @Input() actionsHeaderDisabled = false;
+  /** Selected row ids (from {@link trackRow}). */
+  readonly selectedRowIds = input<ReadonlySet<string>>(new Set<string>());
 
   readonly pageSizeSignal = signal(10);
   private readonly pageSizeUserOverridden = signal(false);
 
   readonly rowAction = output<{ actionId: string; row: Record<string, unknown> }>();
+  readonly actionsHeaderClick = output<void>();
+  readonly selectionChange = output<{ rowId: string; selected: boolean }>();
+  readonly selectAllChange = output<{ rowIds: string[]; selected: boolean }>();
   readonly rowEnter = output<Record<string, unknown>>();
   readonly rowLeave = output<Record<string, unknown>>();
   readonly rowClick = output<Record<string, unknown>>();
@@ -407,6 +421,63 @@ export class DataTableComponent {
     event.stopPropagation();
     this.openActionsRowId.set(null);
     this.rowAction.emit({ actionId: action.id, row });
+  }
+
+  showActionsHeaderControl(): boolean {
+    return !!(this.actionsHeaderLabel || this.actionsHeaderIcon);
+  }
+
+  onActionsHeaderClick(event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.actionsHeaderDisabled) {
+      return;
+    }
+
+    this.actionsHeaderClick.emit();
+  }
+
+  showLeadingSelectionColumn(): boolean {
+    return this.showSelectionColumn && !this.selectionColumnAfterActions;
+  }
+
+  showTrailingSelectionAfterActions(column: DataTableColumn): boolean {
+    return this.showSelectionColumn && this.selectionColumnAfterActions && column.variant === 'actions';
+  }
+
+  isRowSelected(row: Record<string, unknown>, index: number): boolean {
+    return this.selectedRowIds().has(this.trackRow(index, row));
+  }
+
+  toggleRowSelection(event: Event, row: Record<string, unknown>, index: number): void {
+    event.stopPropagation();
+    const rowId = this.trackRow(index, row);
+    this.selectionChange.emit({ rowId, selected: !this.isRowSelected(row, index) });
+  }
+
+  visibleRowIds(): string[] {
+    return this.visibleRows().map((row, index) => this.trackRow(index, row));
+  }
+
+  isAllVisibleSelected(): boolean {
+    const ids = this.visibleRowIds();
+    if (!ids.length) {
+      return false;
+    }
+
+    const selected = this.selectedRowIds();
+    return ids.every((id) => selected.has(id));
+  }
+
+  isSomeVisibleSelected(): boolean {
+    const selected = this.selectedRowIds();
+    return this.visibleRowIds().some((id) => selected.has(id));
+  }
+
+  toggleSelectAllVisible(event: Event): void {
+    event.stopPropagation();
+    const rowIds = this.visibleRowIds();
+    const selectAll = !this.isAllVisibleSelected();
+    this.selectAllChange.emit({ rowIds, selected: selectAll });
   }
 
   badgeList(value: unknown): DataTableBadgeCell[] {

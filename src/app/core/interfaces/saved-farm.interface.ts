@@ -34,3 +34,16 @@ export interface TtbFarmMetainfoResponse {
     data?: SavedFarmRecord[];
   };
 }
+
+export interface RemoveFarmPayload {
+  farm_ids: number[];
+}
+
+export interface TtbRemoveFarmResponse {
+  response: {
+    status: string;
+    data?: {
+      msg?: string | string[];
+    };
+  };
+}

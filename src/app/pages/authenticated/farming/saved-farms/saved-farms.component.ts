@@ -5,8 +5,10 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { ButtonComponent } from '@app/shared/components';
+import { ModalComponent } from '@app/shared/components/modal/modal.component';
 import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
 import { MapTablePipelineComponent } from '@app/shared/components/map-table-pipeline/map-table-pipeline.component';
+import { MapPipelineViewMode } from '@app/shared/components/map-table-pipeline/map-table-pipeline.types';
 import { TabNavComponent } from '@app/shared/components/tab-nav/tab-nav.component';
 import { TabNavItem } from '@app/shared/components/tab-nav/tab-nav.types';
 import { OlMapComponent } from '@app/shared/components/ol-map/ol-map.component';
@@ -34,6 +36,7 @@ import { VerticalService } from '@app/core/services/vertical.service';
     OlMapComponent,
     DataTableComponent,
     ButtonComponent,
+    ModalComponent,
     FormsModule,
     IconField,
     InputIcon,
@@ -43,7 +46,7 @@ import { VerticalService } from '@app/core/services/vertical.service';
   templateUrl: './saved-farms.component.html'
 })
 export class SavedFarmsComponent implements OnInit {
-  @ViewChild(MapTablePipelineComponent) private mapPipeline?: MapTablePipelineComponent;
+  @ViewChild('deleteConfirmModal') private deleteConfirmModal?: ModalComponent;
 
   private readonly authService = inject(AuthService);
   private readonly savedFarmsService = inject(SavedFarmsService);
@@ -64,7 +67,11 @@ export class SavedFarmsComponent implements OnInit {
   readonly searchField = this.savedFarmsService.searchField;
   readonly filterFieldOptions = SAVED_FARMS_FILTER_FIELD_OPTIONS;
 
-  readonly pipelineConfig = { defaultViewMode: 'list' as const };
+  readonly pipelineConfig = {
+    defaultViewMode: 'list' as const,
+    viewModes: ['list', 'both'] as MapPipelineViewMode[]
+  };
+  readonly pipelineViewMode = signal<MapPipelineViewMode>('list');
   readonly pageSize = SAVED_FARMS_DEFAULT_PAGE_SIZE;
   readonly pageSizeOptions = SAVED_FARMS_PAGE_SIZE_OPTIONS;
 
@@ -93,6 +100,19 @@ export class SavedFarmsComponent implements OnInit {
   });
 
   readonly filtersOpen = signal(false);
+  readonly selectionMode = signal(false);
+  readonly selectedFarmIds = signal<Set<string>>(new Set());
+  readonly deleting = signal(false);
+  readonly deleteError = signal<string | null>(null);
+  readonly pendingDeleteIds = signal<string[]>([]);
+  readonly actionNotice = signal<string | null>(null);
+
+  readonly selectedCount = computed(() => this.selectedFarmIds().size);
+  readonly hasSelection = computed(() => this.selectedCount() > 0);
+  readonly pendingDeleteCount = computed(() => this.pendingDeleteIds().length);
+  readonly deleteConfirmTitle = computed(() =>
+    this.pendingDeleteCount() === 1 ? 'Delete farm?' : `Delete ${this.pendingDeleteCount()} farms?`
+  );
 
   mapObject: MapObjectRefs = {
     hovers: { hoverOnFarm: false }
@@ -129,6 +149,7 @@ export class SavedFarmsComponent implements OnInit {
 
   onTabChange(tabId: string): void {
     this.onFarmHoverEnd();
+    this.exitSelectionMode();
     this.savedFarmsService.setActiveTab(tabId as SavedFarmTabId);
   }
 
@@ -157,9 +178,17 @@ export class SavedFarmsComponent implements OnInit {
     this.mapTableSync.scheduleMapResize(this.mapObject);
   }
 
+  onPipelineViewModeChange(mode: MapPipelineViewMode): void {
+    this.pipelineViewMode.set(mode);
+
+    if (mode === 'list') {
+      this.onFarmHoverEnd();
+    }
+  }
+
   onFarmHover(row: Record<string, unknown>): void {
     const geometry = row['geometry'];
-    if (!geometry) {
+    if (!geometry || this.pipelineViewMode() === 'list') {
       return;
     }
 
@@ -168,7 +197,6 @@ export class SavedFarmsComponent implements OnInit {
       this.mapObject.hovers.hoverOnFarm = true;
     }
 
-    this.mapPipeline?.ensureMapVisibleForPreview();
     this.drawFarmGeometryWhenReady(geometry);
   }
 
@@ -195,5 +223,121 @@ export class SavedFarmsComponent implements OnInit {
     }
 
     this.mapTableSync.clearFarmGeometry(this.mapObject);
+  }
+
+  onRowAction(event: { actionId: string; row: Record<string, unknown> }): void {
+    const farmId = this.resolveFarmId(event.row);
+    if (!farmId) {
+      return;
+    }
+
+    switch (event.actionId) {
+      case 'select':
+        this.showActionNotice('Opening farm properties will be available in a future update.');
+        break;
+      case 'rename':
+        this.showActionNotice('Rename farm will be available in a future update.');
+        break;
+      case 'delete':
+        this.openDeleteConfirm([farmId]);
+        break;
+      case 'dynamic-stats':
+        this.showActionNotice('Dynamic Stats will be available in a future update.');
+        break;
+    }
+  }
+
+  onSelectionChange(event: { rowId: string; selected: boolean }): void {
+    this.selectedFarmIds.update((current) => {
+      const next = new Set(current);
+      if (event.selected) {
+        next.add(event.rowId);
+      } else {
+        next.delete(event.rowId);
+      }
+      return next;
+    });
+  }
+
+  onSelectAllChange(event: { rowIds: string[]; selected: boolean }): void {
+    this.selectedFarmIds.update((current) => {
+      const next = new Set(current);
+      event.rowIds.forEach((rowId) => {
+        if (event.selected) {
+          next.add(rowId);
+        } else {
+          next.delete(rowId);
+        }
+      });
+      return next;
+    });
+  }
+
+  enterSelectionMode(): void {
+    this.selectionMode.set(true);
+    this.selectedFarmIds.set(new Set());
+  }
+
+  exitSelectionMode(): void {
+    this.selectionMode.set(false);
+    this.selectedFarmIds.set(new Set());
+  }
+
+  deleteSelectedFarms(): void {
+    const ids = [...this.selectedFarmIds()];
+    if (!ids.length) {
+      return;
+    }
+
+    this.openDeleteConfirm(ids);
+  }
+
+  openDeleteConfirm(farmIds: string[]): void {
+    this.deleteError.set(null);
+    this.pendingDeleteIds.set(farmIds);
+    this.deleteConfirmModal?.open();
+  }
+
+  closeDeleteConfirm(): void {
+    this.pendingDeleteIds.set([]);
+    this.deleteError.set(null);
+    this.deleteConfirmModal?.close();
+  }
+
+  confirmDeleteFarms(): void {
+    const farmIds = this.pendingDeleteIds();
+    if (!farmIds.length || this.deleting()) {
+      return;
+    }
+
+    this.deleting.set(true);
+    this.deleteError.set(null);
+
+    this.savedFarmsService.removeFarms(farmIds).subscribe({
+      next: () => {
+        this.deleting.set(false);
+        this.closeDeleteConfirm();
+        this.exitSelectionMode();
+        this.savedFarmsService.refresh();
+      },
+      error: (err: Error) => {
+        this.deleting.set(false);
+        this.deleteError.set(err.message ?? 'Failed to delete farm(s).');
+      }
+    });
+  }
+
+  private resolveFarmId(row: Record<string, unknown>): string | null {
+    const id = row['farmId'] ?? row['id'];
+    return id != null && id !== '' ? String(id) : null;
+  }
+
+  private showActionNotice(message: string): void {
+    this.actionNotice.set(message);
+    setTimeout(() => {
+      if (this.actionNotice() === message) {
+        this.actionNotice.set(null);
+      }
+    }, 4000);
   }
 }

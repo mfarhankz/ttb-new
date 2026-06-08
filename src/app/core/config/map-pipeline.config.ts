@@ -1,17 +1,26 @@
-import { MapPipelineViewMode, MapTablePipelineConfig } from '@app/shared/components/map-table-pipeline/map-table-pipeline.types';
+import {
+  MapPipelineViewMode,
+  MapPipelineViewOption,
+  MapTablePipelineConfig
+} from '@app/shared/components/map-table-pipeline/map-table-pipeline.types';
 
 export const MAP_PIPELINE_STORAGE_KEY = 'VRrecentDragRatio';
 
-export const DEFAULT_MAP_PIPELINE_CONFIG: Required<MapTablePipelineConfig> = {
+export const MAP_PIPELINE_ALL_VIEW_MODES: MapPipelineViewMode[] = ['map', 'list', 'both'];
+
+export const DEFAULT_MAP_PIPELINE_CONFIG: Required<Omit<MapTablePipelineConfig, 'viewModes'>> & {
+  viewModes: MapPipelineViewMode[];
+} = {
   storageKey: MAP_PIPELINE_STORAGE_KEY,
   defaultSplit: { first: 50, last: 50 },
   minPanelWidthPx: 150,
   autoShowTableOnResults: false,
-  defaultViewMode: 'list'
+  defaultViewMode: 'list',
+  viewModes: MAP_PIPELINE_ALL_VIEW_MODES
 };
 
-export const MAP_PIPELINE_VIEW_OPTIONS: { mode: MapPipelineViewMode; label: string; icon: string }[] = [
+export const MAP_PIPELINE_VIEW_OPTIONS: MapPipelineViewOption[] = [
   { mode: 'map', label: 'Map', icon: 'pi pi-map' },
   { mode: 'list', label: 'List', icon: 'pi pi-list' },
-  { mode: 'both', label: 'Both', icon: 'pi pi-table' }
+  { mode: 'both', label: 'Split', icon: 'pi pi-table' }
 ];
