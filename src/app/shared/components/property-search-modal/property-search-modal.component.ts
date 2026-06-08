@@ -34,6 +34,7 @@ import { TabNavItem } from '@app/shared/components/tab-nav/tab-nav.types';
 import { ModalComponent } from '@app/shared/components/modal/modal.component';
 
 type SearchStatus = { type: 'success' | 'error'; message: string } | null;
+type PropertySearchAccordionSection = 'manual' | 'history' | 'map';
 
 @Component({
   selector: 'app-property-search-modal',
@@ -85,9 +86,7 @@ export class PropertySearchModalComponent {
   readonly fetchingParcelCounties = signal(false);
 
   readonly addressHistory = signal<AddressSearchHistoryEntry[]>([]);
-  readonly manualAddressOpen = signal(true);
-  readonly historyOpen = signal(false);
-  readonly mapAccordionOpen = signal(false);
+  readonly openAccordion = signal<PropertySearchAccordionSection | null>(null);
 
   readonly addressStatus = signal<SearchStatus>(null);
   readonly ownerStatus = signal<SearchStatus>(null);
@@ -125,6 +124,18 @@ export class PropertySearchModalComponent {
 
   setActiveTab(tabId: string): void {
     this.activeTab.set(tabId as PropertySearchTab);
+  }
+
+  toggleAccordion(section: PropertySearchAccordionSection): void {
+    this.openAccordion.update((current) => (current === section ? null : section));
+  }
+
+  isAccordionOpen(section: PropertySearchAccordionSection): boolean {
+    return this.openAccordion() === section;
+  }
+
+  private openAccordionSection(section: PropertySearchAccordionSection): void {
+    this.openAccordion.set(section);
   }
 
   onAddressStateChange(stateAbbrev: string | null): void {
@@ -197,7 +208,7 @@ export class PropertySearchModalComponent {
 
     if (validationError) {
       this.addressStatus.set({ type: 'error', message: validationError });
-      this.manualAddressOpen.set(true);
+      this.openAccordionSection('manual');
       return;
     }
 
@@ -230,7 +241,7 @@ export class PropertySearchModalComponent {
             type: 'error',
             message: error.message || 'Could not find the property.'
           });
-          this.manualAddressOpen.set(true);
+          this.openAccordionSection('manual');
         }
       });
   }
@@ -301,7 +312,7 @@ export class PropertySearchModalComponent {
     this.addressCounties.set([]);
     this.addressStateFips.set(null);
     this.addressStatus.set(null);
-    this.manualAddressOpen.set(true);
+    this.openAccordionSection('manual');
   }
 
   resetOwnerForm(): void {
@@ -339,7 +350,7 @@ export class PropertySearchModalComponent {
       this.onAddressStateChange(entry.site_state);
     }
 
-    this.manualAddressOpen.set(true);
+    this.openAccordionSection('manual');
     this.activeTab.set('address');
   }
 
@@ -369,7 +380,7 @@ export class PropertySearchModalComponent {
     }
 
     if (event.unit) {
-      this.manualAddressOpen.set(true);
+      this.openAccordionSection('manual');
       this.patchAddressForm({ site_unit: event.unit });
     }
   }
@@ -402,7 +413,7 @@ export class PropertySearchModalComponent {
       this.loadAddressCounties(nextForm.site_state, county);
     }
 
-    this.manualAddressOpen.set(true);
+    this.openAccordionSection('manual');
   }
 
   smartyVerificationEnabled(): boolean {
@@ -433,7 +444,7 @@ export class PropertySearchModalComponent {
   private initializeModal(): void {
     const history = loadAddressSearchHistory();
     this.addressHistory.set(history);
-    this.historyOpen.set(history.length > 0);
+    this.openAccordion.set(null);
     this.activeTab.set('address');
     this.addressStatus.set(null);
     this.ownerStatus.set(null);
