@@ -376,6 +376,16 @@ export class DataTableComponent {
     this.actionsMenuPosition.set(null);
   }
 
+  rowStatusIndicator(row: Record<string, unknown>): { tooltip: string } | null {
+    const indicator = row['statusIndicator'];
+    if (!indicator || typeof indicator !== 'object' || !('tooltip' in indicator)) {
+      return null;
+    }
+
+    const tooltip = (indicator as { tooltip?: unknown }).tooltip;
+    return typeof tooltip === 'string' && tooltip.trim() ? { tooltip: tooltip.trim() } : null;
+  }
+
   actionList(value: unknown): DataTableRowAction[] {
     if (!Array.isArray(value)) {
       return [];

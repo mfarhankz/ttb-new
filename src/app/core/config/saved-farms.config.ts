@@ -47,6 +47,8 @@ export const SAVED_FARMS_DEFAULT_PAGE_SIZE = 100;
 
 export const SAVED_FARMS_PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
+export const SELL_REFI_SCORE_ACTIVE_TOOLTIP = 'Sell/Refi score is active for this farm.';
+
 export const SAVED_FARM_EMPTY_COPY: Record<SavedFarmTabId, { title: string; description: string }> = {
   main: {
     title: 'No main farms yet',

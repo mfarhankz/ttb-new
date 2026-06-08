@@ -4,6 +4,7 @@ import { resolveSavedFarmRowActions } from '../config/saved-farms-actions.config
 import {
   SAVED_FARMS_COLUMNS,
   SAVED_FARM_TABS,
+  SELL_REFI_SCORE_ACTIVE_TOOLTIP,
   SavedFarmTabId
 } from '../config/saved-farms.config';
 import { API_CONFIG } from '../config/api.config';
@@ -325,6 +326,10 @@ export class SavedFarmsService {
       propertyCount,
       createdOn,
       geometry: farm.geometry,
+      recType: farm.rec_type,
+      statusIndicator: this.hasSellRefiScoreRecType(farm.rec_type)
+        ? { tooltip: SELL_REFI_SCORE_ACTIVE_TOOLTIP }
+        : null,
       actions: resolveSavedFarmRowActions(),
       searchableByField: {
         name: name.toLowerCase(),
@@ -332,6 +337,14 @@ export class SavedFarmsService {
         createdOn: createdOn.toLowerCase()
       }
     };
+  }
+
+  private hasSellRefiScoreRecType(recType: unknown): boolean {
+    if (recType == null || recType === '') {
+      return false;
+    }
+
+    return String(recType).includes('sell_refi_score');
   }
 
   private coalesceRemoveFarmMessage(msg?: string | string[]): string {
