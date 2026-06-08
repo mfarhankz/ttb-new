@@ -29,14 +29,87 @@
       ></div>
     </div>
 
-    <div mapTablePipelineTable>
+    <div mapTablePipelineTable class="flex h-full min-h-0 flex-1 flex-col gap-3">
+      <div class="flex w-full shrink-0 items-end gap-4 border-b border-border">
+        <app-tab-nav
+          class="min-w-0 flex-1"
+          ariaLabel="Saved farm categories"
+          [items]="tabNavItems()"
+          [activeId]="activeTab()"
+          (activeIdChange)="onTabChange($event)"
+        />
+
+        <div class="flex shrink-0 items-center gap-2 pb-2">
+          <button
+            type="button"
+            class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border px-3 text-sm font-medium transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus"
+            [class.border-primary]="filtersOpen() || hasActiveFilters()"
+            [class.bg-primary/10]="hasActiveFilters()"
+            [class.text-primary]="filtersOpen() || hasActiveFilters()"
+            [class.border-border]="!filtersOpen() && !hasActiveFilters()"
+            [class.bg-transparent]="!hasActiveFilters()"
+            [class.text-muted]="!filtersOpen() && !hasActiveFilters()"
+            (click)="toggleFilters($event)"
+          >
+            <i class="pi pi-filter text-xs" aria-hidden="true"></i>
+            Filters
+          </button>
+        </div>
+      </div>
+
+      @if (filtersOpen()) {
+        <div class="shrink-0 rounded-lg border border-border bg-surface px-2.5 py-1.5">
+          <div class="flex flex-wrap items-center gap-2">
+            <p-iconfield class="w-full min-w-0 sm:w-64">
+              <p-inputicon class="pi pi-search" />
+              <input
+                id="saved-farms-search"
+                pInputText
+                type="text"
+                class="w-full h-[42px]"
+                pSize="small"
+                placeholder="Search farms"
+                [value]="searchText()"
+                (input)="onSearchInput($event)"
+              />
+              @if (searchText()) {
+                <p-inputicon
+                  class="pi pi-times cursor-pointer"
+                  role="button"
+                  tabindex="0"
+                  aria-label="Clear search"
+                  (click)="clearSearch()"
+                  (keydown.enter)="clearSearch()"
+                />
+              }
+            </p-iconfield>
+
+            <p-select
+              inputId="saved-farms-search-field"
+              size="small"
+              class="w-full shrink-0 sm:min-w-64 sm:w-auto"
+              [options]="filterFieldOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Filter by"
+              [ngModel]="searchField()"
+              (ngModelChange)="onSearchFieldChange($event)"
+            />
+          </div>
+        </div>
+      }
+
       <app-data-table
+        class="min-h-0 flex-1"
+        [fillHeight]="true"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
         [columns]="columns"
         [rows]="rows()"
         [loading]="loading()"
         [error]="error()"
-        [emptyTitle]="'No saved farms yet'"
-        [emptyDescription]="'Saved farms from your property searches will appear here.'"
+        [emptyTitle]="emptyTitle()"
+        [emptyDescription]="emptyDescription()"
         (rowEnter)="onFarmHover($event)"
         (rowLeave)="onFarmHoverEnd()"
       />

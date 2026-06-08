@@ -7,7 +7,7 @@
   </div>
 
   <div #container class="flex min-h-0 flex-1 flex-row">
-    <div class="relative min-h-0 overflow-hidden" [ngStyle]="mapPanelStyle()">
+    <div class="relative h-full min-h-0 overflow-hidden" [ngStyle]="mapPanelStyle()">
       <ng-content select="[mapTablePipelineMap]" />
     </div>
 
@@ -23,8 +23,10 @@
       </div>
     }
 
-    <div class="min-h-0 overflow-auto p-4" [ngStyle]="tablePanelStyle()">
-      <ng-content select="[mapTablePipelineTable]" />
+    <div class="flex h-full min-h-0 flex-col p-4" [ngStyle]="tablePanelStyle()">
+      <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <ng-content select="[mapTablePipelineTable]" />
+      </div>
     </div>
   </div>
 </div>

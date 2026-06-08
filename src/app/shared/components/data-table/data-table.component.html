@@ -1,16 +1,31 @@
-<div class="overflow-hidden border border-border bg-surface rounded-lg shadow-sm">
+<div
+  class="overflow-hidden border border-border bg-surface rounded-lg shadow-sm"
+  [class.flex]="fillHeight"
+  [class.flex-col]="fillHeight"
+  [class.h-full]="fillHeight"
+  [class.min-h-0]="fillHeight"
+>
   @if (loading) {
-    <div class="flex flex-col items-center justify-center gap-3 px-6 py-16 text-body-sm text-muted">
+    <div
+      class="flex flex-col items-center justify-center gap-3 px-6 py-16 text-body-sm text-muted"
+      [class.flex-1]="fillHeight"
+    >
       <i class="pi pi-spin pi-spinner text-2xl text-primary" aria-hidden="true"></i>
       <span>Loading records…</span>
     </div>
   } @else if (error) {
-    <div class="flex items-start gap-3 px-6 py-8 text-body-sm text-danger">
+    <div
+      class="flex items-start gap-3 px-6 py-8 text-body-sm text-danger"
+      [class.flex-1]="fillHeight"
+    >
       <i class="pi pi-exclamation-circle mt-0.5 shrink-0" aria-hidden="true"></i>
       <span>{{ error }}</span>
     </div>
   } @else if (!rows().length) {
-    <div class="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
+    <div
+      class="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center"
+      [class.flex-1]="fillHeight"
+    >
       <i class="pi pi-inbox text-3xl text-subtle" aria-hidden="true"></i>
       <div class="max-w-md space-y-1">
         <p class="text-body font-medium text-foreground">{{ resolvedEmptyTitle() }}</p>
@@ -18,7 +33,15 @@
       </div>
     </div>
   } @else {
-    <div class="overflow-x-auto">
+    <div
+      class="overflow-x-auto"
+      [class.flex]="fillHeight"
+      [class.min-h-0]="fillHeight"
+      [class.flex-1]="fillHeight"
+      [class.flex-col]="fillHeight"
+      [class.overflow-hidden]="fillHeight"
+    >
+      <div [class.min-h-0]="fillHeight" [class.flex-1]="fillHeight" [class.overflow-auto]="fillHeight">
       <table class="data-table w-full min-w-[760px] border-collapse">
         <thead class="sticky top-0 z-10">
           <tr class="border-b-2 border-border">
@@ -99,6 +122,7 @@
           }
         </tbody>
       </table>
+      </div>
     </div>
 
     @if (openActionsRowId() && actionsMenuPosition(); as menuPosition) {
@@ -124,14 +148,30 @@
 
     @if (paginated) {
       <div
-        class="flex flex-col gap-3 border-t border-border bg-sidebar-active/20 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+        class="flex shrink-0 flex-col gap-3 border-t border-border bg-sidebar-active/20 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
       >
         <p class="text-caption text-muted">
           Showing <span class="font-medium text-foreground">{{ pageStart() }}–{{ pageEnd() }}</span>
           of <span class="font-medium text-foreground">{{ sortedRows().length }}</span>
         </p>
 
-        @if (totalPages() > 1) {
+        <div class="flex flex-wrap items-center gap-3 sm:ml-auto">
+          @if (showPageSizeSelector()) {
+            <label class="inline-flex items-center gap-2 text-caption text-muted">
+              <span>Rows per page</span>
+              <select
+                class="h-8 rounded-md border border-border bg-surface px-2 text-body-sm text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+                [ngModel]="pageSizeSignal()"
+                (ngModelChange)="onPageSizeChange($event)"
+              >
+                @for (option of pageSizeOptions; track option) {
+                  <option [ngValue]="option">{{ option }}</option>
+                }
+              </select>
+            </label>
+          }
+
+          @if (totalPages() > 1) {
           <div class="flex items-center gap-1.5">
             <button
               type="button"
@@ -158,7 +198,8 @@
               <i class="pi pi-chevron-right text-xs" aria-hidden="true"></i>
             </button>
           </div>
-        }
+          }
+        </div>
       </div>
     }
   }

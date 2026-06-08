@@ -1,9 +1,23 @@
-import { Component, effect, inject, OnInit, untracked } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal, untracked } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
+import { Select } from 'primeng/select';
 import { ButtonComponent } from '@app/shared/components';
 import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
 import { MapTablePipelineComponent } from '@app/shared/components/map-table-pipeline/map-table-pipeline.component';
+import { TabNavComponent } from '@app/shared/components/tab-nav/tab-nav.component';
+import { TabNavItem } from '@app/shared/components/tab-nav/tab-nav.types';
 import { OlMapComponent } from '@app/shared/components/ol-map/ol-map.component';
 import { MAP_DEFAULTS } from '@app/core/config/map.config';
+import {
+  SAVED_FARM_EMPTY_COPY,
+  SAVED_FARMS_DEFAULT_PAGE_SIZE,
+  SAVED_FARMS_FILTER_FIELD_OPTIONS,
+  SAVED_FARMS_PAGE_SIZE_OPTIONS,
+  SavedFarmTabId
+} from '@app/core/config/saved-farms.config';
 import { AuthService } from '@app/core/services/auth.service';
 import { MapTableSyncService } from '@app/core/services/map-table-sync.service';
 import { OlMapService, type MapObjectRefs } from '@app/core/services/ol-map.service';
@@ -13,7 +27,18 @@ import { SessionExpiredService } from '@app/core/services/session-expired.servic
 @Component({
   selector: 'app-saved-farms',
   standalone: true,
-  imports: [MapTablePipelineComponent, OlMapComponent, DataTableComponent, ButtonComponent],
+  imports: [
+    MapTablePipelineComponent,
+    TabNavComponent,
+    OlMapComponent,
+    DataTableComponent,
+    ButtonComponent,
+    FormsModule,
+    IconField,
+    InputIcon,
+    InputText,
+    Select
+  ],
   templateUrl: './saved-farms.component.html'
 })
 export class SavedFarmsComponent implements OnInit {
@@ -28,8 +53,42 @@ export class SavedFarmsComponent implements OnInit {
   readonly loading = this.savedFarmsService.loading;
   readonly error = this.savedFarmsService.error;
   readonly totalCount = this.savedFarmsService.totalCount;
+  readonly tabs = this.savedFarmsService.tabs;
+  readonly tabCounts = this.savedFarmsService.tabCounts;
+  readonly activeTab = this.savedFarmsService.activeTab;
+  readonly searchText = this.savedFarmsService.searchText;
+  readonly searchField = this.savedFarmsService.searchField;
+  readonly filterFieldOptions = SAVED_FARMS_FILTER_FIELD_OPTIONS;
 
   readonly pipelineConfig = { defaultViewMode: 'list' as const };
+  readonly pageSize = SAVED_FARMS_DEFAULT_PAGE_SIZE;
+  readonly pageSizeOptions = SAVED_FARMS_PAGE_SIZE_OPTIONS;
+
+  readonly emptyTitle = computed(() => SAVED_FARM_EMPTY_COPY[this.activeTab()].title);
+  readonly emptyDescription = computed(() => {
+    if (this.savedFarmsService.hasActiveFilters()) {
+      return 'No farms match your current filters. Try a different search or clear filters.';
+    }
+
+    return SAVED_FARM_EMPTY_COPY[this.activeTab()].description;
+  });
+
+  readonly tabNavItems = computed((): TabNavItem[] =>
+    this.tabs.map((tab) => ({
+      id: tab.id,
+      label: tab.label,
+      icon: tab.icon,
+      badge: this.tabCounts()[tab.id]
+    }))
+  );
+
+  readonly hasActiveFilters = computed(() => {
+    this.searchText();
+    this.searchField();
+    return this.savedFarmsService.hasActiveFilters();
+  });
+
+  readonly filtersOpen = signal(false);
 
   mapObject: MapObjectRefs = {
     hovers: { hoverOnFarm: false }
@@ -59,8 +118,30 @@ export class SavedFarmsComponent implements OnInit {
     };
   }
 
+  onTabChange(tabId: string): void {
+    this.onFarmHoverEnd();
+    this.savedFarmsService.setActiveTab(tabId as SavedFarmTabId);
+  }
+
   refreshFarms(): void {
     this.savedFarmsService.refresh();
+  }
+
+  onSearchInput(event: Event): void {
+    this.savedFarmsService.setSearchText((event.target as HTMLInputElement).value);
+  }
+
+  onSearchFieldChange(value: string): void {
+    this.savedFarmsService.setSearchField(value);
+  }
+
+  clearSearch(): void {
+    this.savedFarmsService.clearSearch();
+  }
+
+  toggleFilters(event: Event): void {
+    this.filtersOpen.update((open) => !open);
+    (event.currentTarget as HTMLButtonElement).blur();
   }
 
   onMapResize(): void {

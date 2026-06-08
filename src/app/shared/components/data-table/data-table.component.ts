@@ -1,3 +1,4 @@
+import { FormsModule } from '@angular/forms';
 import {
   Component,
   HostListener,
@@ -21,7 +22,15 @@ import {
 @Component({
   selector: 'app-data-table',
   standalone: true,
-  templateUrl: './data-table.component.html'
+  imports: [FormsModule],
+  templateUrl: './data-table.component.html',
+  host: {
+    class: 'block',
+    '[class.flex]': 'fillHeight',
+    '[class.flex-col]': 'fillHeight',
+    '[class.h-full]': 'fillHeight',
+    '[class.min-h-0]': 'fillHeight'
+  }
 })
 export class DataTableComponent {
   @Input({ required: true }) columns: DataTableColumn[] = [];
@@ -33,7 +42,20 @@ export class DataTableComponent {
   /** @deprecated Use emptyTitle and emptyDescription instead. */
   @Input() emptyMessage = '';
   @Input() paginated = true;
-  @Input() pageSize = 10;
+  @Input() set pageSize(value: number) {
+    if (this.pageSizeUserOverridden()) {
+      return;
+    }
+
+    this.pageSizeSignal.set(value > 0 ? value : 10);
+  }
+  /** When set, shows a rows-per-page selector in the footer. */
+  @Input() pageSizeOptions: number[] = [];
+  /** When true, table stretches to parent height with scrollable body and pinned footer. */
+  @Input() fillHeight = false;
+
+  readonly pageSizeSignal = signal(10);
+  private readonly pageSizeUserOverridden = signal(false);
 
   readonly rowAction = output<{ actionId: string; row: Record<string, unknown> }>();
   readonly rowEnter = output<Record<string, unknown>>();
@@ -98,7 +120,9 @@ export class DataTableComponent {
     return sorted;
   });
 
-  readonly totalPages = computed(() => Math.max(1, Math.ceil(this.sortedRows().length / this.pageSize)));
+  readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.sortedRows().length / this.pageSizeSignal()))
+  );
 
   readonly visibleRows = computed(() => {
     const data = this.sortedRows();
@@ -107,8 +131,8 @@ export class DataTableComponent {
       return data;
     }
 
-    const start = (this.currentPage() - 1) * this.pageSize;
-    return data.slice(start, start + this.pageSize);
+    const start = (this.currentPage() - 1) * this.pageSizeSignal();
+    return data.slice(start, start + this.pageSizeSignal());
   });
 
   pageStart(): number {
@@ -117,16 +141,31 @@ export class DataTableComponent {
       return 0;
     }
 
-    return (this.currentPage() - 1) * this.pageSize + 1;
+    return (this.currentPage() - 1) * this.pageSizeSignal() + 1;
   }
 
   pageEnd(): number {
-    return Math.min(this.currentPage() * this.pageSize, this.sortedRows().length);
+    return Math.min(this.currentPage() * this.pageSizeSignal(), this.sortedRows().length);
   }
 
   goToPage(page: number): void {
     const next = Math.min(Math.max(page, 1), this.totalPages());
     this.currentPage.set(next);
+  }
+
+  onPageSizeChange(value: number | string): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      return;
+    }
+
+    this.pageSizeUserOverridden.set(true);
+    this.pageSizeSignal.set(parsed);
+    this.currentPage.set(1);
+  }
+
+  showPageSizeSelector(): boolean {
+    return this.pageSizeOptions.length > 0;
   }
 
   toggleSort(column: DataTableColumn): void {

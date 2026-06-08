@@ -30,6 +30,8 @@ export { FormFieldComponent } from './form-field/form-field.component';
 // Data Display Components
 export { DataTableComponent } from './data-table/data-table.component';
 export { type DataTableColumn } from './data-table/data-table.types';
+export { TabNavComponent } from './tab-nav/tab-nav.component';
+export { type TabNavItem } from './tab-nav/tab-nav.types';
 export { MapTablePipelineComponent } from './map-table-pipeline/map-table-pipeline.component';
 export { MapPipelineViewToggleComponent } from './map-table-pipeline/map-pipeline-view-toggle.component';
 export {

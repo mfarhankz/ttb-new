@@ -12,12 +12,17 @@ export interface SavedFarmGeometry {
 
 export interface SavedFarmRecord {
   farm_id: number | string;
-  name: string;
+  name?: string;
+  alias?: string;
+  farm_name?: string;
   farm_record_count?: number | string;
   created?: string;
   modified?: string;
   geometry?: SavedFarmGeometry | SavedFarmGeometry[];
   rec_type?: string;
+  notification_config?: unknown;
+  live_farm_status?: string | number | boolean | null;
+  risk_score_billing_id?: string | number | null;
   [key: string]: unknown;
 }
 

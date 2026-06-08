@@ -1,0 +1,50 @@
+<nav
+  #tabNav
+  class="relative flex min-w-0 flex-1 items-stretch gap-6 overflow-x-auto"
+  role="tablist"
+  [attr.aria-label]="ariaLabel()"
+>
+  <span
+    class="dashboard-tabs-slider absolute bottom-0 left-0 h-0.5 rounded-t-sm bg-primary pointer-events-none"
+    aria-hidden="true"
+    [style.transform]="tabSliderStyle().transform"
+    [style.width]="tabSliderStyle().width"
+    [style.opacity]="tabSliderStyle().opacity"
+  ></span>
+
+  @for (item of items(); track item.id) {
+    <button
+      #tabButton
+      type="button"
+      role="tab"
+      class="dashboard-tab inline-flex shrink-0 cursor-pointer items-center gap-2 border-0 bg-transparent py-3 text-body-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+      [class.!text-primary]="isActive(item)"
+      [class.text-muted]="!isActive(item)"
+      [class.hover:!text-primary]="isActive(item)"
+      [class.hover:text-foreground]="!isActive(item)"
+      [class.font-semibold]="isActive(item)"
+      [attr.aria-selected]="isActive(item)"
+      (click)="selectTab(item)"
+    >
+      @if (item.icon) {
+        <i
+          [class]="item.icon"
+          class="text-sm transition-colors"
+          [class.!text-primary]="isActive(item)"
+          [class.text-muted]="!isActive(item)"
+          aria-hidden="true"
+        ></i>
+      }
+      <span>{{ item.label }}</span>
+      @if (item.badge != null) {
+        <span
+          class="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-muted/20 px-1.5 py-0.5 text-caption font-medium text-muted"
+          [class.!bg-primary/10]="isActive(item)"
+          [class.!text-primary]="isActive(item)"
+        >
+          {{ item.badge }}
+        </span>
+      }
+    </button>
+  }
+</nav>
