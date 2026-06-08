@@ -41,7 +41,7 @@ export const DETAIL_SEARCH_FIELD_OPTIONS: DetailSearchFieldOption[] = [
   { value: 'emailaddr', label: 'Email' }
 ];
 
-type ColumnVisibility = 'always' | 'any' | 'first' | 'phone';
+type ColumnVisibility = 'always' | 'any' | 'first' | 'phone' | 'score';
 
 interface DetailColumnDefinition extends DataTableColumn {
   rawField?: string;
@@ -80,8 +80,26 @@ const DETAIL_COLUMN_DEFINITIONS: DetailColumnDefinition[] = [
   { key: 'sa_nbr_bedrms', label: 'Bd', sortType: 'number', variant: 'numeric', align: 'right', width: 'w-16', nowrap: true, visibility: 'always' },
   { key: 'sa_nbr_bath', label: 'Ba', sortType: 'number', variant: 'numeric', align: 'right', width: 'w-16', nowrap: true, visibility: 'always' },
   { key: 'customOccupiedBy', label: 'Occupied By', sortType: 'text', width: 'min-w-[8rem]', nowrap: true, visibility: 'always' },
-  { key: 'sell_score_display', label: 'Sell Score', sortType: 'text', width: 'w-28', nowrap: true, rawField: 'sell_score', visibility: 'any' },
-  { key: 'refi_score_display', label: 'Refi Score', sortType: 'text', width: 'w-28', nowrap: true, rawField: 'refi_score', visibility: 'any' },
+  {
+    key: 'sell_score_display',
+    label: 'Sell Score',
+    variant: 'score',
+    sortType: 'number',
+    width: 'min-w-[8.5rem]',
+    nowrap: true,
+    rawField: 'sell_score',
+    visibility: 'score'
+  },
+  {
+    key: 'refi_score_display',
+    label: 'Refi Score',
+    variant: 'score',
+    sortType: 'number',
+    width: 'min-w-[8.5rem]',
+    nowrap: true,
+    rawField: 'refi_score',
+    visibility: 'score'
+  },
   { key: 'first_position_lender_type', label: 'First Position Lender Type', sortType: 'text', truncate: true, width: 'min-w-[12rem]', rawField: 'first_position_lender_type', visibility: 'first' },
   { key: 'first_position_lndr_first_name', label: 'First Position Lndr First Name', sortType: 'text', truncate: true, width: 'min-w-[12rem]', rawField: 'first_position_lndr_first_name', visibility: 'first' },
   { key: 'first_position_estimated_interest_rate', label: 'First Position Estimated Interest Rate', sortType: 'text', width: 'min-w-[12rem]', nowrap: true, rawField: 'first_position_estimated_interest_rate', visibility: 'first' },
@@ -119,6 +137,46 @@ function recordHasField(record: Record<string, unknown>, field: string): boolean
   return field in record && record[field] !== undefined;
 }
 
+function hasNumericScoreValue(value: unknown): boolean {
+  if (value === null || value === undefined || value === '') {
+    return false;
+  }
+
+  if (typeof value === 'number' && !Number.isNaN(value)) {
+    return true;
+  }
+
+  if (typeof value === 'string' && !Number.isNaN(Number(value))) {
+    return true;
+  }
+
+  return false;
+}
+
+/** Legacy shouldHideFarmForecastButton — scores are active or pending once fields exist. */
+function isNullOrNumericScoreValue(value: unknown): boolean {
+  return value === null || hasNumericScoreValue(value);
+}
+
+export function shouldHideSellRefiScoresMenuAction(rows: Record<string, unknown>[]): boolean {
+  if (!rows.length) {
+    return false;
+  }
+
+  const record = rows[0];
+  return isNullOrNumericScoreValue(record['sell_score']) || isNullOrNumericScoreValue(record['refi_score']);
+}
+
+/** Legacy isFarmForecastPending — score fields exist but values are still null (table shows "—"). */
+export function isSellRefiScoresPending(rows: Record<string, unknown>[]): boolean {
+  if (!rows.length) {
+    return false;
+  }
+
+  const record = rows[0];
+  return record['sell_score'] === null || record['refi_score'] === null;
+}
+
 function recordHasPhoneField(record: Record<string, unknown>): boolean {
   return (
     recordHasField(record, 'phone') ||
@@ -142,6 +200,8 @@ function isColumnVisible(definition: DetailColumnDefinition, rows: Record<string
       return rows.some((row) => recordHasPhoneField(row));
     case 'any':
       return rows.some((row) => recordHasField(row, rawField));
+    case 'score':
+      return rows.some((row) => hasNumericScoreValue(row[rawField]));
     default:
       return true;
   }
@@ -152,7 +212,10 @@ export function resolveVisibleDetailColumns(
   leadsTypes: string[] = []
 ): DataTableColumn[] {
   const staticColumns = DETAIL_COLUMN_DEFINITIONS.filter((definition) => isColumnVisible(definition, rows)).map(
-    ({ rawField: _raw, visibility: _visibility, ...column }) => column
+    ({ rawField, visibility: _visibility, ...column }) => ({
+      ...column,
+      ...(rawField ? { scoreField: rawField } : {})
+    })
   );
 
   return [...staticColumns, ...buildLeadDetailColumns(leadsTypes)];

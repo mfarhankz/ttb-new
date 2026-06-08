@@ -8,7 +8,8 @@ export type DataTableColumnVariant =
   | 'actions'
   | 'muted'
   | 'leadDetails'
-  | 'mapPin';
+  | 'mapPin'
+  | 'score';
 
 export interface DataTableLeadDetailItem {
   key: string;
@@ -42,6 +43,8 @@ export interface DataTableColumn {
   sortType?: DataTableSortType;
   /** Tailwind width utility, e.g. `w-28`, `min-w-[10rem]`, `max-w-xs` */
   width?: string;
+  /** Raw numeric field used by the score column variant for pills and sorting. */
+  scoreField?: string;
   truncate?: boolean;
   nowrap?: boolean;
 }

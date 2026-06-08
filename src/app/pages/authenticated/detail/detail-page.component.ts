@@ -7,6 +7,7 @@ import {
   OnInit,
   signal,
   untracked,
+  viewChild,
   ViewChild
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -15,8 +16,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
+import { Menu } from 'primeng/menu';
 import { Select } from 'primeng/select';
-import { ButtonComponent } from '@app/shared/components';
+import {
+  buildDetailExportMenuItems,
+  buildDetailOverflowMenuItems,
+  DETAIL_FARM_OVERFLOW_MENU_ACTIONS,
+  DetailToolbarActionId
+} from '@app/core/config/detail-page-toolbar.config';
+import { AlertComponent, ButtonComponent } from '@app/shared/components';
 import { ModalComponent } from '@app/shared/components/modal/modal.component';
 import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
 import { DataTableColumn } from '@app/shared/components/data-table/data-table.types';
@@ -27,7 +35,9 @@ import {
   DETAIL_PAGE_DEFAULT_PAGE_SIZE,
   DETAIL_PAGE_EMPTY_COPY,
   DETAIL_PAGE_SIZE_OPTIONS,
-  DETAIL_SEARCH_FIELD_OPTIONS
+  DETAIL_SEARCH_FIELD_OPTIONS,
+  isSellRefiScoresPending,
+  shouldHideSellRefiScoresMenuAction
 } from '@app/core/config/detail-page.config';
 import { MAP_DEFAULTS } from '@app/core/config/map.config';
 import { DetailPageRouterState } from '@app/core/interfaces/property-record.interface';
@@ -52,18 +62,46 @@ const DETAIL_ACTIONS_COLUMN: DataTableColumn = {
     MapTablePipelineComponent,
     OlMapComponent,
     DataTableComponent,
+    AlertComponent,
     ButtonComponent,
     ModalComponent,
     FormsModule,
     Select,
+    Menu,
     IconField,
     InputIcon,
     InputText
   ],
-  templateUrl: './detail-page.component.html'
+  templateUrl: './detail-page.component.html',
+  styles: [
+    `
+      :host .detail-toolbar .detail-toolbar-select {
+        height: 2.25rem;
+        min-height: 2.25rem;
+      }
+
+      :host .detail-toolbar .detail-toolbar-select .p-select-label {
+        display: flex;
+        min-height: 2.25rem;
+        align-items: center;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+    `
+  ]
 })
 export class DetailPageComponent implements OnInit, OnDestroy {
+  readonly toolbarBtnClass =
+    'inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-border bg-transparent px-3 text-sm font-medium text-muted transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus disabled:pointer-events-none disabled:opacity-40';
+
+  readonly toolbarBtnPrimaryClass =
+    'inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus disabled:pointer-events-none disabled:opacity-40';
+
+  readonly toolbarBtnIconClass =
+    'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-transparent text-muted transition-colors hover:bg-sidebar-active hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus disabled:pointer-events-none disabled:opacity-40';
   @ViewChild('deleteConfirmModal') private deleteConfirmModal?: ModalComponent;
+  readonly exportMenu = viewChild<Menu>('exportMenu');
+  readonly overflowMenu = viewChild<Menu>('overflowMenu');
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -85,6 +123,24 @@ export class DetailPageComponent implements OnInit, OnDestroy {
   readonly searchText = this.detailPageService.searchText;
   readonly searchField = this.detailPageService.searchField;
   readonly searchFieldOptions = DETAIL_SEARCH_FIELD_OPTIONS;
+
+  readonly isFarmDetail = computed(() => this.detailPageService.source() === 'farm');
+  readonly toolbarDisabled = computed(() => this.loading() || this.selectionMode());
+  readonly exportMenuItems = computed(() =>
+    buildDetailExportMenuItems((actionId) => this.onToolbarAction(actionId))
+  );
+  readonly overflowMenuItems = computed(() => {
+    const hideSellRefiScores = shouldHideSellRefiScoresMenuAction(this.detailPageService.allRows());
+    const actions = DETAIL_FARM_OVERFLOW_MENU_ACTIONS.filter(
+      (action) => action.id !== 'sell-refi-scores' || !hideSellRefiScores
+    );
+
+    return buildDetailOverflowMenuItems(actions, (actionId) => this.onToolbarAction(actionId));
+  });
+
+  readonly sellRefiScoresPending = computed(() =>
+    this.isFarmDetail() && isSellRefiScoresPending(this.detailPageService.allRows())
+  );
 
   readonly displayColumns = computed(() => [DETAIL_ACTIONS_COLUMN, ...this.detailPageService.columns()]);
 
@@ -316,6 +372,18 @@ export class DetailPageComponent implements OnInit, OnDestroy {
   onRowAction(_event: { actionId: string; row: Record<string, unknown> }): void {}
 
   onPropertyNotesClick(_event: { row: Record<string, unknown> }): void {}
+
+  toggleExportMenu(event: Event): void {
+    this.exportMenu()?.toggle(event);
+    (event.currentTarget as HTMLButtonElement).blur();
+  }
+
+  toggleOverflowMenu(event: Event): void {
+    this.overflowMenu()?.toggle(event);
+    (event.currentTarget as HTMLButtonElement).blur();
+  }
+
+  onToolbarAction(_actionId: DetailToolbarActionId): void {}
 
   goBack(): void {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');

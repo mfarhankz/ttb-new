@@ -5,12 +5,8 @@
     (mapResize)="onMapResize()"
     (viewModeChange)="onPipelineViewModeChange($event)"
   >
-    <div mapTablePipelineToolbar class="flex flex-wrap items-center gap-2">
-      <button
-        type="button"
-        class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-border bg-transparent px-3 text-sm font-medium text-muted transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus"
-        (click)="goBack()"
-      >
+    <div mapTablePipelineToolbar class="detail-toolbar flex flex-wrap items-center gap-2">
+      <button type="button" [class]="toolbarBtnClass" (click)="goBack()">
         <i class="pi pi-arrow-left text-xs" aria-hidden="true"></i>
         Back
       </button>
@@ -19,7 +15,7 @@
         <p-select
           inputId="detail-page-list-filter"
           size="small"
-          class="w-full shrink-0 sm:min-w-52 sm:w-auto"
+          class="detail-toolbar-select w-full shrink-0 sm:min-w-45 sm:w-auto"
           [options]="filterOptions()"
           optionLabel="label"
           optionValue="value"
@@ -30,9 +26,31 @@
         />
       }
 
+      @if (isFarmDetail()) {
+        <button
+          type="button"
+          [class]="toolbarBtnPrimaryClass"
+          [disabled]="toolbarDisabled()"
+          (click)="toggleExportMenu($event)"
+        >
+          Export
+          <i class="pi pi-chevron-down text-xs" aria-hidden="true"></i>
+        </button>
+
+        <button
+          type="button"
+          [class]="toolbarBtnIconClass"
+          aria-label="More farm actions"
+          [disabled]="toolbarDisabled()"
+          (click)="toggleOverflowMenu($event)"
+        >
+          <i class="pi pi-ellipsis-v text-sm" aria-hidden="true"></i>
+        </button>
+      }
+
       <button
         type="button"
-        class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-border bg-transparent px-3 text-sm font-medium text-muted transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus disabled:pointer-events-none disabled:opacity-40"
+        [class]="toolbarBtnClass"
         [disabled]="loading()"
         (click)="refreshDetail()"
       >
@@ -42,18 +60,36 @@
 
       <button
         type="button"
-        class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border px-3 text-sm font-medium transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus"
-        [class.border-primary]="filtersOpen() || hasActiveFilters()"
-        [class.bg-primary/10]="hasActiveFilters()"
-        [class.text-primary]="filtersOpen() || hasActiveFilters()"
-        [class.border-border]="!filtersOpen() && !hasActiveFilters()"
-        [class.bg-transparent]="!hasActiveFilters()"
-        [class.text-muted]="!filtersOpen() && !hasActiveFilters()"
+        [class]="
+          toolbarBtnClass +
+          (filtersOpen() || hasActiveFilters()
+            ? ' border-primary bg-primary/10 text-primary'
+            : '')
+        "
         (click)="toggleFilters($event)"
       >
         <i class="pi pi-filter text-xs" aria-hidden="true"></i>
         Filters
       </button>
+
+      @if (isFarmDetail()) {
+        <div class="hidden">
+          <p-menu
+            #exportMenu
+            styleClass="detail-export-menu"
+            [model]="exportMenuItems()"
+            [popup]="true"
+            appendTo="body"
+          />
+          <p-menu
+            #overflowMenu
+            styleClass="detail-overflow-menu"
+            [model]="overflowMenuItems()"
+            [popup]="true"
+            appendTo="body"
+          />
+        </div>
+      }
     </div>
 
     <div mapTablePipelineMap class="h-full w-full">
@@ -113,6 +149,21 @@
             />
           </div>
         </div>
+      }
+
+      @if (sellRefiScoresPending()) {
+        <app-alert type="success" title="Sell & Refi Scores are being generated." [compact]="true">
+          It can take a few minutes to populate. Please click
+          <button
+            type="button"
+            class="font-medium underline underline-offset-2 hover:no-underline"
+            [disabled]="loading()"
+            (click)="refreshDetail()"
+          >
+            Refresh
+          </button>
+          (or wait a bit and refresh again).
+        </app-alert>
       }
 
       @if (selectionMode()) {

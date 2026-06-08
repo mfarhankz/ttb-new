@@ -154,6 +154,19 @@
                         }
                       }
                     </div>
+                  } @else if (column.variant === 'score') {
+                    @if (scorePercent(row, column); as score) {
+                      <div class="pipeline-score__content">
+                        <span class="pipeline-score__bar" aria-hidden="true">
+                          @for (step of scoreSteps; track step) {
+                            <span [class]="scorePillClasses(score, step)"></span>
+                          }
+                        </span>
+                        <span class="pipeline-score__value">{{ formatCell(row[column.key]) }}</span>
+                      </div>
+                    } @else {
+                      —
+                    }
                   } @else if (column.variant === 'leadDetails') {
                     <div class="min-w-[550px] text-body-sm text-foreground">
                       <div class="table w-full min-w-[550px] border-collapse">

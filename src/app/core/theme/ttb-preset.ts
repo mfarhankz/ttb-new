@@ -11,6 +11,9 @@ import { TTB_COLOR, TTB_FONT, TTB_FORM, TTB_RADIUS, ttbColorScheme } from './ttb
 
 const scheme = ttbColorScheme();
 
+/** Compact padding for overlay list/select options site-wide. */
+const SELECT_OPTION_PADDING = '0.25rem 0.625rem';
+
 export const TTBPreset = definePreset(Aura, {
   primitive: {
     borderRadius: {
@@ -45,7 +48,7 @@ export const TTBPreset = definePreset(Aura, {
     },
     list: {
       option: {
-        padding: `${TTB_FORM.paddingYSm} ${TTB_FORM.paddingX}`,
+        padding: SELECT_OPTION_PADDING,
         borderRadius: TTB_RADIUS.sm
       }
     },
@@ -69,12 +72,25 @@ export const TTBPreset = definePreset(Aura, {
           paddingY: TTB_FORM.paddingYSm
         }
       },
+      list: {
+        padding: '0.25rem',
+        gap: '0.125rem'
+      },
       option: {
-        padding: `${TTB_FORM.paddingYSm} ${TTB_FORM.paddingX}`
+        padding: SELECT_OPTION_PADDING
       },
       css: `
         .p-select-overlay {
           font-size: ${TTB_FONT.sizeBodySm};
+        }
+        .p-select-list {
+          gap: 0.125rem;
+          padding: 0.25rem;
+        }
+        .p-select-option {
+          padding: ${SELECT_OPTION_PADDING};
+          line-height: 1.25;
+          min-height: 0;
         }
       `
     },

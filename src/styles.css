@@ -162,4 +162,93 @@
   .map-pin--owner {
     background-image: url('/assets/images/_map-pin-green.png');
   }
+
+  .pipeline-score__content {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3125rem;
+    min-width: 8.125rem;
+  }
+
+  .pipeline-score__bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.1875rem;
+  }
+
+  .pipeline-score__pill {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 0.625rem;
+    height: 0.4375rem;
+    border-radius: 0.25rem;
+    opacity: 0.2;
+  }
+
+  .pipeline-score__pill.is-filled {
+    opacity: 1;
+  }
+
+  .pipeline-score__pill--tier-1 {
+    background-color: #e83030;
+  }
+
+  .pipeline-score__pill--tier-2 {
+    background-color: #f9851f;
+  }
+
+  .pipeline-score__pill--tier-3 {
+    background-color: #ffd500;
+  }
+
+  .pipeline-score__pill--tier-4 {
+    background-color: #afdf20;
+  }
+
+  .pipeline-score__pill--tier-5 {
+    background-color: #21c45d;
+  }
+
+  .pipeline-score__value {
+    min-width: 2.5rem;
+    text-align: right;
+    font-weight: 600;
+  }
+}
+
+/* Compact PrimeNG select dropdown options site-wide. */
+.p-select-overlay .p-select-list {
+  gap: 0.125rem;
+  padding: 0.25rem;
+}
+
+.p-select-overlay .p-select-option {
+  padding: 0.25rem 0.625rem;
+  line-height: 1.25;
+  min-height: 0;
+}
+
+/* Outside @layer so these beat PrimeNG menu item hover/focus (unlayered theme CSS). */
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--success-light:not(.p-disabled) > .p-menu-item-content {
+  background-color: rgb(220 252 231);
+  color: rgb(22 101 52);
+  font-weight: 500;
+}
+
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--success-light:not(.p-disabled) > .p-menu-item-content:hover,
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--success-light.p-focus > .p-menu-item-content {
+  background-color: rgb(74 222 128);
+  color: rgb(20 83 45);
+}
+
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--success-dark:not(.p-disabled) > .p-menu-item-content {
+  background-color: #1b8333;
+  color: #fff;
+  font-weight: 500;
+}
+
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--success-dark:not(.p-disabled) > .p-menu-item-content:hover,
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--success-dark.p-focus > .p-menu-item-content {
+  background-color: #0f5421;
+  color: #fff;
 }

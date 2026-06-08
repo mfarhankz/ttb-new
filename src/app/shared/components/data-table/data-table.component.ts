@@ -25,6 +25,61 @@ import {
   standalone: true,
   imports: [FormsModule],
   templateUrl: './data-table.component.html',
+  styles: [
+    `
+      .pipeline-score__content {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3125rem;
+        min-width: 8.125rem;
+      }
+
+      .pipeline-score__bar {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.1875rem;
+      }
+
+      .pipeline-score__pill {
+        display: inline-block;
+        flex-shrink: 0;
+        width: 0.625rem;
+        height: 0.4375rem;
+        border-radius: 0.25rem;
+        opacity: 0.2;
+      }
+
+      .pipeline-score__pill.is-filled {
+        opacity: 1;
+      }
+
+      .pipeline-score__pill--tier-1 {
+        background-color: #e83030;
+      }
+
+      .pipeline-score__pill--tier-2 {
+        background-color: #f9851f;
+      }
+
+      .pipeline-score__pill--tier-3 {
+        background-color: #ffd500;
+      }
+
+      .pipeline-score__pill--tier-4 {
+        background-color: #afdf20;
+      }
+
+      .pipeline-score__pill--tier-5 {
+        background-color: #21c45d;
+      }
+
+      .pipeline-score__value {
+        min-width: 2.5rem;
+        text-align: right;
+        font-weight: 600;
+      }
+    `
+  ],
   host: {
     class: 'block',
     '[class.flex]': 'fillHeight',
@@ -132,8 +187,10 @@ export class DataTableComponent {
     const direction = this.sortDirection();
     const sorted = [...rows];
 
+    const sortField = column?.scoreField ?? key;
+
     sorted.sort((left, right) => {
-      const result = this.compareValues(left[key], right[key], column);
+      const result = this.compareValues(left[sortField], right[sortField], column);
       return direction === 'asc' ? result : -result;
     });
 
@@ -370,6 +427,10 @@ export class DataTableComponent {
       classes.push('text-center');
     }
 
+    if (column.variant === 'score') {
+      classes.push('whitespace-nowrap');
+    }
+
     if (!isLast) {
       classes.push('border-r border-border/60');
     }
@@ -535,6 +596,57 @@ export class DataTableComponent {
     return row['sa_site_mail_same'] === 'Y' ? 'map-pin map-pin--owner' : 'map-pin';
   }
 
+  readonly scoreSteps = [0, 1, 2, 3, 4] as const;
+
+  scorePercent(row: Record<string, unknown>, column: DataTableColumn): number | null {
+    const field = column.scoreField ?? column.key;
+    const raw = row[field];
+
+    if (raw === null || raw === undefined || raw === '') {
+      return null;
+    }
+
+    const score = Number(raw);
+    if (!Number.isFinite(score)) {
+      return null;
+    }
+
+    return Math.max(0, Math.min(100, score));
+  }
+
+  scoreBand(score: number): 1 | 2 | 3 | 4 | 5 {
+    if (score >= 80) {
+      return 5;
+    }
+
+    if (score >= 60) {
+      return 4;
+    }
+
+    if (score >= 40) {
+      return 3;
+    }
+
+    if (score >= 20) {
+      return 2;
+    }
+
+    return 1;
+  }
+
+  scoreFilledPills(score: number): number {
+    return this.scoreBand(score);
+  }
+
+  scorePillClasses(score: number, index: number): string {
+    const band = this.scoreBand(score);
+    const filled = index < this.scoreFilledPills(score);
+
+    return ['pipeline-score__pill', `pipeline-score__pill--tier-${band}`, filled ? 'is-filled' : '']
+      .filter(Boolean)
+      .join(' ');
+  }
+
   leadDetailItems(value: unknown): DataTableLeadDetailItem[] {
     if (!Array.isArray(value)) {
       return [];
@@ -631,7 +743,7 @@ export class DataTableComponent {
   }
 
   private inferSortType(column?: DataTableColumn): DataTableSortType {
-    if (column?.variant === 'numeric') {
+    if (column?.variant === 'numeric' || column?.variant === 'score') {
       return 'number';
     }
 
