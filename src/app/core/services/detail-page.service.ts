@@ -5,6 +5,7 @@ import {
   FarmDetailContext,
   isUnsupportedDetailSource
 } from '../detail-contexts/farm-detail.context';
+import { SearchDetailContext } from '../detail-contexts/search-detail.context';
 import {
   DETAIL_PAGE_DEFAULT_FILTER,
   resolveVisibleDetailColumns
@@ -16,6 +17,7 @@ const SEARCH_DEBOUNCE_MS = 320;
 @Injectable({ providedIn: 'root' })
 export class DetailPageService {
   private readonly farmDetailContext = inject(FarmDetailContext);
+  private readonly searchDetailContext = inject(SearchDetailContext);
 
   private readonly _source = signal<string | null>(null);
   private readonly _sourceId = signal<string | null>(null);
@@ -221,6 +223,10 @@ export class DetailPageService {
   private resolveContext(source: string): DetailContext {
     if (source === 'farm') {
       return this.farmDetailContext;
+    }
+
+    if (source === 'search') {
+      return this.searchDetailContext;
     }
 
     throw new Error(`Unsupported detail source: ${source}`);

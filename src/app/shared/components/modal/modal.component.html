@@ -1,57 +1,56 @@
 @if (isOpen()) {
-  <div
-    class="fixed inset-0 z-50 overflow-y-auto"
-    (click)="onBackdropClick()"
-    [class.pointer-events-none]="!backdropClickable"
-  >
-    <!-- Backdrop -->
-    <div class="fixed inset-0 bg-overlay/50 transition-opacity"></div>
+  <!-- pointer-events-none on shell so clicks inside the panel bubble to document (PrimeNG overlay dismiss). -->
+  <div class="pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4">
+    <!-- Backdrop — only this layer closes the modal on click -->
+    <div
+      class="fixed inset-0 bg-overlay/50 transition-opacity"
+      [class.pointer-events-auto]="backdropClickable"
+      [class.pointer-events-none]="!backdropClickable"
+      aria-hidden="true"
+      (click)="onBackdropClick()"
+    ></div>
 
-    <!-- Modal Container -->
-    <div class="flex min-h-full items-center justify-center p-4">
-      <div
-        [class]="getModalClasses()"
-        (click)="$event.stopPropagation()"
-        role="dialog"
-        aria-modal="true"
-        [attr.aria-labelledby]="title ? id + '-title' : null"
-      >
-        <!-- Header -->
-        @if (title || showCloseButton) {
-          <div class="flex items-center justify-between px-6 py-4 border-b border-border">
-            @if (title) {
-              <h3 [id]="id + '-title'" class="text-h3 font-semibold text-foreground">
-                {{ title }}
-              </h3>
-            }
-            @if (showCloseButton) {
-              <button
-                type="button"
-                (click)="close()"
-                class="text-subtle hover:text-muted focus:outline-none focus:ring-2 focus:ring-focus rounded-md p-1"
-              >
-                <i class="pi pi-times text-xl"></i>
-              </button>
-            }
-          </div>
-        }
-
-        <!-- Body -->
-        <div [class]="getBodyClasses()">
-          <ng-content></ng-content>
+    <div
+      [class]="getModalClasses()"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="title ? id + '-title' : null"
+    >
+      <!-- Header -->
+      @if (title || showCloseButton) {
+        <div class="flex shrink-0 items-center justify-between border-b border-border px-6 py-4">
+          @if (title) {
+            <h3 [id]="id + '-title'" class="text-h3 font-semibold text-foreground">
+              {{ title }}
+            </h3>
+          }
+          @if (showCloseButton) {
+            <button
+              type="button"
+              (click)="close()"
+              class="rounded-md p-1 text-subtle hover:text-muted focus:outline-none focus:ring-2 focus:ring-focus"
+            >
+              <i class="pi pi-times text-xl"></i>
+            </button>
+          }
         </div>
+      }
 
-        <!-- Footer -->
-        @if (showFooter) {
-          <div class="flex items-center justify-end space-x-3 px-6 py-4 border-t border-border bg-background">
-            <ng-content select="[footer]"></ng-content>
-            @if (!hasFooterContent) {
-              <app-button variant="outline" (onClick)="close()">Cancel</app-button>
-              <app-button variant="primary" (onClick)="onConfirm.emit()">Confirm</app-button>
-            }
-          </div>
-        }
+      <!-- Body -->
+      <div [class]="getBodyClasses()">
+        <ng-content></ng-content>
       </div>
+
+      <!-- Footer -->
+      @if (showFooter) {
+        <div class="flex shrink-0 items-center justify-end space-x-3 border-t border-border bg-background px-6 py-4">
+          <ng-content select="[footer]"></ng-content>
+          @if (!hasFooterContent) {
+            <app-button variant="outline" (onClick)="close()">Cancel</app-button>
+            <app-button variant="primary" (onClick)="onConfirm.emit()">Confirm</app-button>
+          }
+        </div>
+      }
     </div>
   </div>
 }

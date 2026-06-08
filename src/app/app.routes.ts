@@ -34,8 +34,8 @@ export const routes: Routes = [
       },
       {
         path: 'property-search',
-        loadComponent: () => import('./pages/authenticated/placeholder/placeholder.component').then(m => m.PlaceholderComponent),
-        title: 'Property Search'
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
       },
       {
         path: 'farming',

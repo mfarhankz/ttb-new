@@ -345,10 +345,8 @@ export class OlMapService {
     });
   }
 
-  /** Fill address from Google Place (geocoding) – stub; wire to Google Geocoder when needed. */
-  fillInAddress(_place: any, _details: any): void {
-    // Use Google Geocoder / Places to fill address
-  }
+  /** Fill address from geocoder result – reserved for map pin / reverse geocode. */
+  fillInAddress(_place: unknown, _details: Record<string, unknown>): void {}
 
   activatedHighlight(_status?: boolean): void {}
   deactivatedHighlight(_status?: boolean): void {}

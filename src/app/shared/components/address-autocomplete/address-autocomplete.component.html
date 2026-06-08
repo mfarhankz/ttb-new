@@ -1,0 +1,21 @@
+<div class="space-y-0.5">
+  @if (label()) {
+    <label class="block text-body-sm font-medium text-foreground" [for]="inputId()">
+      {{ label() }}
+    </label>
+  }
+
+  <app-autocomplete
+    [inputId]="inputId()"
+    [placeholder]="placeholder()"
+    [size]="size()"
+    [disabled]="disabled()"
+    [items]="items()"
+    [loading]="loading()"
+    [error]="error()"
+    [noMatch]="noMatch()"
+    [appendTo]="appendTo()"
+    (queryChange)="onQueryChange($event)"
+    (itemSelect)="onItemSelect($event)"
+  />
+</div>

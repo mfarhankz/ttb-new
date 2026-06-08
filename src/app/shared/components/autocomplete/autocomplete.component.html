@@ -1,0 +1,59 @@
+<div class="relative">
+  <form autocomplete="off" (submit)="$event.preventDefault()">
+    <input type="text" autocomplete="off" name="hidden" class="hidden" tabindex="-1" aria-hidden="true" />
+    <input
+      #inputEl
+      pInputText
+      type="text"
+      class="w-full"
+      name="autocomplete"
+      autocomplete="off"
+      [id]="inputId()"
+      [pSize]="size()"
+      [placeholder]="placeholder()"
+      [disabled]="disabled()"
+      [ngModel]="query()"
+      (ngModelChange)="onInputChange($event)"
+      (keydown)="onKeydown($event)"
+      (blur)="onBlur()"
+      (focus)="onFocus()"
+    />
+  </form>
+
+  @if (panelOpen() && showPanel()) {
+    <ul
+      #panelEl
+      class="z-[10050] max-h-56 overflow-y-auto rounded-md border border-border bg-surface py-1 shadow-lg"
+      [class.fixed]="appendTo() === 'body'"
+      [class.absolute]="appendTo() === 'self'"
+      role="listbox"
+      [style.top.px]="panelStyle()?.top"
+      [style.left.px]="panelStyle()?.left"
+      [style.width.px]="panelStyle()?.width"
+    >
+      @if (error()) {
+        <li class="px-3 py-2 text-body-sm text-danger">Error fetching results</li>
+      }
+
+      @if (noMatch()) {
+        <li class="px-3 py-2 text-body-sm text-danger">No match found.</li>
+      }
+
+      @for (item of items(); track item.id; let index = $index) {
+        <li>
+          <button
+            type="button"
+            class="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-body-sm transition-colors hover:bg-muted/60"
+            [class.bg-muted/60]="index === selectedIndex()"
+            (mousedown)="onItemSelect(item)"
+          >
+            <span class="text-foreground">{{ item.label }}</span>
+            @if (item.hint) {
+              <span class="shrink-0 text-info">{{ item.hint }}</span>
+            }
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

@@ -97,7 +97,9 @@ export const TTBPreset = definePreset(Aura, {
     inputtext: {
       root: {
         sm: {
-          fontSize: TTB_FONT.sizeBodySm
+          fontSize: TTB_FONT.sizeBodySm,
+          paddingX: TTB_FORM.paddingXSm,
+          paddingY: TTB_FORM.paddingYSm
         }
       }
     },

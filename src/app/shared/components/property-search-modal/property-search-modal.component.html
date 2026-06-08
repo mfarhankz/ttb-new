@@ -1,0 +1,420 @@
+<app-modal
+  #modal
+  id="property-search-modal"
+  title="Property Search"
+  size="xl"
+  [showFooter]="false"
+  (onClose)="onModalClose()"
+>
+  @if (activeTab() === 'address') {
+    <p class="mb-3 text-body-sm text-muted">
+      <span class="font-semibold text-foreground">You can search in three different ways</span>
+      <br />
+      <span class="text-caption">
+        HINT: Enter the full address if you know it, use the search box if you're not sure, or find the property on the
+        map and click on it.
+      </span>
+    </p>
+  } @else if (activeTab() === 'owner') {
+    <p class="mb-3 text-body-sm text-muted">
+      <span class="font-semibold text-foreground">Please enter as much information as you know.</span>
+      <br />
+      <span class="text-caption">
+        We will try to find up to 100 properties owned by someone with that name. This may take some time,
+        particularly if it is a common name. You can use partial names.
+      </span>
+    </p>
+  } @else {
+    <p class="mb-3 text-body-sm text-muted">
+      <span class="font-semibold text-foreground">Lookup a property by parcel number.</span>
+      <br />
+      <span class="text-caption">
+        After you have completed all required fields, and if it matches any profile you will get a link to download.
+      </span>
+    </p>
+  }
+
+  <div class="mb-3 flex w-full items-end border-b border-border">
+    <app-tab-nav
+      class="min-w-0 flex-1"
+      ariaLabel="Property search type"
+      [items]="tabNavItems"
+      [activeId]="activeTab()"
+      (activeIdChange)="setActiveTab($event)"
+    />
+  </div>
+
+  @if (activeTab() === 'address') {
+    <div class="space-y-3">
+      <div class="space-y-2">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <span class="shrink-0 text-body-sm font-medium text-foreground">Select Address type:</span>
+          <label class="inline-flex shrink-0 cursor-pointer items-center gap-1.5 text-body-sm text-foreground">
+            <input
+              type="radio"
+              name="address_type"
+              class="h-4 w-4 shrink-0 border-border text-primary focus:ring-focus"
+              value="site_address"
+              [checked]="addressType() === 'site_address'"
+              (change)="addressType.set('site_address')"
+            />
+            Site Address
+          </label>
+          <label class="inline-flex shrink-0 cursor-pointer items-center gap-1.5 text-body-sm text-foreground">
+            <input
+              type="radio"
+              name="address_type"
+              class="h-4 w-4 shrink-0 border-border text-primary focus:ring-focus"
+              value="mailing_address"
+              [checked]="addressType() === 'mailing_address'"
+              (change)="addressType.set('mailing_address')"
+            />
+            Mailing Address
+          </label>
+        </div>
+
+        @if (addressType() === 'mailing_address') {
+          <div class="max-w-xs space-y-0.5">
+            <label class="block text-body-sm font-medium text-foreground" for="site-state-mailing">Site State</label>
+            <p-select
+              inputId="site-state-mailing"
+              size="small"
+              class="w-full"
+              appendTo="body"
+              [options]="stateOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="State"
+              [filter]="true"
+              [autofocusFilter]="true"
+              filterPlaceholder="Search state"
+              [ngModel]="siteStateForMailing()"
+              (ngModelChange)="siteStateForMailing.set($event)"
+            />
+          </div>
+        }
+
+        <app-address-autocomplete
+          inputId="property-search-autocomplete"
+          label="Address autocomplete"
+          [disabled]="addressSearching()"
+          [enableVerification]="smartyVerificationEnabled()"
+          [resetToken]="smartyResetToken()"
+          (placeChanged)="onSmartyPlaceChanged($event)"
+          (addressStringChange)="onAddressStringChange($event)"
+        />
+      </div>
+
+      <div class="property-search-accordion space-y-1.5">
+        <div class="rounded-lg border border-border">
+          <button
+            type="button"
+            class="w-full cursor-pointer px-4 py-2 text-center text-body-sm font-semibold text-foreground"
+            (click)="manualAddressOpen.set(!manualAddressOpen())"
+          >
+            Manually Enter Address
+          </button>
+          @if (manualAddressOpen()) {
+          <div class="space-y-2 border-t border-border px-4 py-3">
+            <div class="grid gap-2 md:grid-cols-2">
+              <div class="space-y-0.5">
+                <label class="block text-body-sm font-medium text-foreground" for="site-street-number">
+                  Street Number
+                </label>
+                <input
+                  pInputText
+                  pSize="small"
+                  id="site-street-number"
+                  class="w-full"
+                  [ngModel]="addressForm().site_street_number"
+                  (ngModelChange)="patchAddressForm({ site_street_number: $event })"
+                  [disabled]="addressSearching()"
+                />
+              </div>
+              <div class="space-y-0.5">
+                <label class="block text-body-sm font-medium text-foreground" for="site-route">Street Name</label>
+                <input
+                  pInputText
+                  pSize="small"
+                  id="site-route"
+                  class="w-full"
+                  [ngModel]="addressForm().site_route"
+                  (ngModelChange)="patchAddressForm({ site_route: $event })"
+                  [disabled]="addressSearching()"
+                />
+              </div>
+              <div class="space-y-0.5">
+                <label class="block text-body-sm font-medium text-foreground" for="site-city">City</label>
+                <input
+                  pInputText
+                  pSize="small"
+                  id="site-city"
+                  class="w-full"
+                  [ngModel]="addressForm().site_city"
+                  (ngModelChange)="patchAddressForm({ site_city: $event })"
+                  [disabled]="addressSearching()"
+                />
+              </div>
+              <div class="space-y-0.5">
+                <label class="block text-body-sm font-medium text-foreground" for="site-state">State</label>
+                <p-select
+                  inputId="site-state"
+                  size="small"
+                  class="w-full"
+                  appendTo="body"
+                  [options]="stateOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="State"
+                  [filter]="true"
+                  [autofocusFilter]="true"
+                  filterPlaceholder="Search state"
+                  [disabled]="addressSearching()"
+                  [ngModel]="addressForm().site_state"
+                  (ngModelChange)="onAddressStateChange($event)"
+                />
+              </div>
+              <div class="space-y-0.5">
+                <label class="block text-body-sm font-medium text-foreground" for="site-zip">Zip</label>
+                <input
+                  pInputText
+                  pSize="small"
+                  id="site-zip"
+                  class="w-full"
+                  [ngModel]="addressForm().site_zip"
+                  (ngModelChange)="patchAddressForm({ site_zip: $event })"
+                  [disabled]="addressSearching()"
+                />
+              </div>
+              <div class="space-y-0.5">
+                <label class="block text-body-sm font-medium text-foreground" for="site-unit">Unit or APT</label>
+                <input
+                  pInputText
+                  pSize="small"
+                  id="site-unit"
+                  class="w-full"
+                  [class.ring-2]="highlightUnitField()"
+                  [class.ring-warning]="highlightUnitField()"
+                  [ngModel]="addressForm().site_unit"
+                  (ngModelChange)="patchAddressForm({ site_unit: $event })"
+                  [disabled]="addressSearching()"
+                />
+              </div>
+              <div class="space-y-0.5">
+                <label class="block text-body-sm font-medium text-foreground" for="site-county">County</label>
+                <p-select
+                  inputId="site-county"
+                  size="small"
+                  class="w-full"
+                  appendTo="body"
+                  [options]="addressCounties()"
+                  optionLabel="value"
+                  optionValue="value"
+                  placeholder="County"
+                  [filter]="true"
+                  [autofocusFilter]="true"
+                  [resetFilterOnHide]="true"
+                  filterPlaceholder="Search county"
+                  [disabled]="addressSearching() || fetchingAddressCounties() || !addressForm().site_state"
+                  [ngModel]="addressForm().county"
+                  (ngModelChange)="patchAddressForm({ county: $event })"
+                />
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+
+        <div class="rounded-lg border border-border">
+          <button
+            type="button"
+            class="w-full cursor-pointer px-4 py-2 text-center text-body-sm font-semibold text-foreground"
+            (click)="historyOpen.set(!historyOpen())"
+          >
+            Last 10 searches
+          </button>
+          @if (historyOpen()) {
+          <div class="border-t border-border px-4 py-3">
+            @if (!addressHistory().length) {
+              <p class="text-body-sm text-muted">No history found to show.</p>
+            } @else {
+              <div class="space-y-0">
+                @for (entry of addressHistory(); track entry.searchTime + formatHistoryAddress(entry)) {
+                  <div
+                    class="flex min-w-0 items-center gap-3 border-b border-border py-2 text-body-sm last:border-b-0"
+                  >
+                    <app-button
+                      class="shrink-0"
+                      variant="success"
+                      size="sm"
+                      (onClick)="selectHistoryEntry(entry)"
+                    >
+                      Select
+                    </app-button>
+                    <span class="min-w-0 flex-1 truncate text-foreground" [title]="formatHistoryAddress(entry)">
+                      {{ formatHistoryAddress(entry) }}
+                    </span>
+                    <span class="shrink-0 whitespace-nowrap text-caption text-muted">
+                      {{ entry.searchTime || '—' }}
+                    </span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+          }
+        </div>
+
+        <div class="rounded-lg border border-border">
+          <button
+            type="button"
+            class="w-full cursor-pointer px-4 py-2 text-center text-body-sm font-semibold text-foreground"
+            (click)="mapAccordionOpen.set(!mapAccordionOpen())"
+          >
+            Map Search
+          </button>
+          @if (mapAccordionOpen()) {
+          <div class="border-t border-border px-4 py-8 text-center">
+            <p class="text-body-sm text-muted">Map search coming soon</p>
+          </div>
+          }
+        </div>
+      </div>
+
+      @if (addressStatus()) {
+        <app-alert [type]="addressStatus()!.type" [compact]="true">
+          {{ addressStatus()!.message }}
+        </app-alert>
+      }
+
+      <div class="flex flex-wrap gap-2">
+        <app-button variant="danger" [disabled]="addressSearching()" (onClick)="resetAddressForm()">Reset</app-button>
+        <app-button variant="success" [loading]="addressSearching()" (onClick)="searchAddress()">Search</app-button>
+      </div>
+    </div>
+  }
+
+  @if (activeTab() === 'owner') {
+    <div class="space-y-3">
+      <div class="grid gap-2 md:grid-cols-2">
+        <div>
+          <input
+            pInputText
+            pSize="small"
+            class="w-full"
+            placeholder="First Name or Company Name"
+            maxlength="15"
+            [ngModel]="ownerForm().first_name"
+            (ngModelChange)="patchOwnerForm({ first_name: $event })"
+            [disabled]="ownerSearching()"
+          />
+        </div>
+        <div>
+          <input
+            pInputText
+            pSize="small"
+            class="w-full"
+            placeholder="Last Name"
+            maxlength="15"
+            [ngModel]="ownerForm().last_name"
+            (ngModelChange)="patchOwnerForm({ last_name: $event })"
+            [disabled]="ownerSearching()"
+          />
+        </div>
+        <div>
+          <p-select
+            inputId="owner-county"
+            size="small"
+            class="w-full"
+                  appendTo="body"
+            [options]="ownerCountyOptions()"
+            optionLabel="name"
+            optionValue="fips"
+            placeholder="County (enter at least 3 characters)"
+            [filter]="true"
+            [showClear]="true"
+            [disabled]="ownerSearching()"
+            [ngModel]="ownerForm().state_county_fips"
+            (ngModelChange)="patchOwnerForm({ state_county_fips: $event })"
+            (onFilter)="onOwnerCountyFilter($event)"
+          />
+          @if (fetchingOwnerCounties()) {
+            <p class="mt-1 text-caption text-muted">Loading counties…</p>
+          }
+        </div>
+        <div class="flex items-center">
+          <label class="inline-flex items-center gap-2 text-body-sm" [class.opacity-50]="!canSearchEntireState()">
+            <input
+              type="checkbox"
+              [disabled]="!canSearchEntireState() || ownerSearching()"
+              [checked]="!!ownerForm().search_entire_state"
+              (change)="patchOwnerForm({ search_entire_state: $any($event.target).checked })"
+            />
+            Search Entire State
+          </label>
+        </div>
+      </div>
+
+      @if (ownerStatus()) {
+        <app-alert [type]="ownerStatus()!.type" [compact]="true">
+          {{ ownerStatus()!.message }}
+        </app-alert>
+      }
+
+      <div class="flex flex-wrap gap-2">
+        <app-button variant="danger" [disabled]="ownerSearching()" (onClick)="resetOwnerForm()">Reset</app-button>
+        <app-button variant="success" [loading]="ownerSearching()" (onClick)="searchOwner()">Search</app-button>
+      </div>
+    </div>
+  }
+
+  @if (activeTab() === 'parcel') {
+    <div class="space-y-3">
+      <div class="grid gap-2 md:grid-cols-2">
+        <div>
+          <input
+            pInputText
+            pSize="small"
+            class="w-full"
+            placeholder="Parcel Number"
+            [ngModel]="parcelForm().parcel_number"
+            (ngModelChange)="patchParcelForm({ parcel_number: $event })"
+            [disabled]="parcelSearching()"
+          />
+        </div>
+        <div>
+          <p-select
+            inputId="parcel-county"
+            size="small"
+            class="w-full"
+                  appendTo="body"
+            [options]="parcelCountyOptions()"
+            optionLabel="name"
+            optionValue="fips"
+            placeholder="County (enter at least 3 characters)"
+            [filter]="true"
+            [showClear]="true"
+            [disabled]="parcelSearching()"
+            [ngModel]="parcelForm().state_county_fips"
+            (ngModelChange)="patchParcelForm({ state_county_fips: $event })"
+            (onFilter)="onParcelCountyFilter($event)"
+          />
+          @if (fetchingParcelCounties()) {
+            <p class="mt-1 text-caption text-muted">Loading counties…</p>
+          }
+        </div>
+      </div>
+
+      @if (parcelStatus()) {
+        <app-alert [type]="parcelStatus()!.type" [compact]="true">
+          {{ parcelStatus()!.message }}
+        </app-alert>
+      }
+
+      <div class="flex flex-wrap gap-2">
+        <app-button variant="danger" [disabled]="parcelSearching()" (onClick)="resetParcelForm()">Reset</app-button>
+        <app-button variant="success" [loading]="parcelSearching()" (onClick)="searchParcel()">Search</app-button>
+      </div>
+    </div>
+  }
+</app-modal>

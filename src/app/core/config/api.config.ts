@@ -40,7 +40,14 @@ export const API_CONFIG = {
     editUser: '/edit_user.json',
     changePassword: '/change_password.json',
     removeUserPic: '/remove_user_pic.json',
-    uploadUserPic: '/upload_user_pic.json'
+    uploadUserPic: '/upload_user_pic.json',
+    autocompleteFips: '/autocomplete_fips.json',
+    searchProperty: '/search_property/ttb.json',
+    searchOwner: '/search_owner_name/ttb.json',
+    searchParcel: '/search_parcel_number/ttb.json',
+    getExtraInfoBrief: '/get_extra_info_brief.json',
+    getStates: '/get_states',
+    getCounties: '/get_counties'
   }
 } as const;
 

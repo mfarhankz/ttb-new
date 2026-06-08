@@ -66,6 +66,20 @@ export class VerticalService {
   /** user_pic path segment: ttb-storage/{vertical}/user_pic */
   readonly userPicLocation = computed(() => `ttb-storage/${this.verticalName()}/user_pic`);
 
+  /** Legacy $rootScope.isSmartyAutocompleteEnabled */
+  readonly smartyAutocompleteEnabled = computed(
+    () => !!this._content()?.app_config?.['smarty_autocomplete']
+  );
+
+  readonly smartyVerificationEnabled = computed(
+    () => !!this._content()?.app_config?.['enable_smarty_verification']
+  );
+
+  readonly smartyApiKey = computed(() => {
+    const key = this._content()?.app_config?.['SMARTY_API_KEY'];
+    return key != null ? String(key) : '';
+  });
+
   /** Legacy app_config.grayout_primary_fields — disables email/password on profile pages. */
   readonly grayoutPrimaryFields = computed(() => {
     const value = this._content()?.app_config?.['grayout_primary_fields'];
@@ -87,7 +101,7 @@ export class VerticalService {
       const meta = await this.fetchVerticalMeta(domain);
       this._meta.set(meta);
 
-      const content = await this.fetchVerticalConf(meta);
+      const content = this.applyDevVerticalFlags(await this.fetchVerticalConf(meta));
       let companyInfo = { ...content.company_info };
 
       const agencyRoute = this.detectAgencyRoute();
@@ -143,6 +157,25 @@ export class VerticalService {
     }
 
     return path.startsWith('/') ? path : `/${path}`;
+  }
+
+  /** Legacy app.verticalConfig.run — enable Smarty autocomplete on local/dev hosts. */
+  private applyDevVerticalFlags(content: VerticalContentData): VerticalContentData {
+    const devHosts = ['localhost', '127.0.0.1', 'dev.titletoolbox.com', 'qa.titletoolbox.com'];
+    if (
+      devHosts.includes(window.location.hostname) &&
+      content.app_config?.['smarty_autocomplete'] === undefined
+    ) {
+      return {
+        ...content,
+        app_config: {
+          ...content.app_config,
+          smarty_autocomplete: true
+        }
+      };
+    }
+
+    return content;
   }
 
   private resolveVerticalDomain(): string {

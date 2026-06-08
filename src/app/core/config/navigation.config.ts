@@ -2,14 +2,14 @@ export interface NavItem {
   label: string;
   icon: string;
   route?: string;
-  action?: 'logout';
+  action?: 'logout' | 'property-search';
   badge?: string;
   children?: NavItem[];
 }
 
 export const MAIN_NAV: NavItem[] = [
   { label: 'Dashboard', icon: 'pi pi-map', route: '/dashboard' },
-  { label: 'Property Search', icon: 'pi pi-search', route: '/property-search' },
+  { label: 'Property Search', icon: 'pi pi-search', action: 'property-search' },
   {
     label: 'Farming',
     icon: 'pi pi-sitemap',

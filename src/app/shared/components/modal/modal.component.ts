@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, effect } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '../button/button.component';
 
@@ -41,7 +41,8 @@ export class ModalComponent {
   }
 
   getModalClasses(): string {
-    const baseClasses = 'relative bg-surface rounded-lg shadow-lg transform transition-all pointer-events-auto';
+    const baseClasses =
+      'relative z-10 flex max-h-[min(90vh,100%)] w-full flex-col overflow-hidden bg-surface rounded-lg shadow-lg pointer-events-auto';
     
     const sizeClasses = {
       sm: 'w-full max-w-sm',
@@ -55,7 +56,7 @@ export class ModalComponent {
   }
 
   getBodyClasses(): string {
-    return 'px-6 py-4';
+    return 'min-h-0 flex-1 overflow-y-auto px-6 py-4';
   }
 }
 

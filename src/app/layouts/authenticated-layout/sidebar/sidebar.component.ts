@@ -3,6 +3,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/ro
 import { filter, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/core/services/auth.service';
+import { PropertySearchModalService } from '@app/core/services/property-search-modal.service';
 import { LayoutService } from '@app/core/services/layout.service';
 import { VerticalService } from '@app/core/services/vertical.service';
 import {
@@ -29,6 +30,7 @@ const SIDEBAR_SHORT_LOGO_PATH = VERTICAL_CONFIG.defaultShortLogoPath;
 })
 export class SidebarComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
+  private propertySearchModalService = inject(PropertySearchModalService);
   private layoutService = inject(LayoutService);
   private verticalService = inject(VerticalService);
   private router = inject(Router);
@@ -164,6 +166,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
   onNavAction(item: NavItem): void {
     if (item.action === 'logout') {
       this.authService.logout();
+      return;
+    }
+
+    if (item.action === 'property-search') {
+      this.propertySearchModalService.open();
     }
   }
 

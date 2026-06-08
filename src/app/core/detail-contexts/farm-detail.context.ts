@@ -231,6 +231,8 @@ export class FarmDetailContext implements DetailContext {
   }
 }
 
+const SUPPORTED_DETAIL_SOURCES = new Set(['farm', 'search']);
+
 export function isUnsupportedDetailSource(source: string): boolean {
-  return source !== 'farm';
+  return !SUPPORTED_DETAIL_SOURCES.has(source);
 }

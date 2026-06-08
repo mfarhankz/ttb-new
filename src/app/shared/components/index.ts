@@ -19,6 +19,10 @@ export { ButtonComponent, type ButtonVariant, type ButtonSize } from './button/b
 export { CardComponent } from './card/card.component';
 export { TabToolbarComponent } from './tab-toolbar/tab-toolbar.component';
 export { ModalComponent } from './modal/modal.component';
+export { PropertySearchModalComponent } from './property-search-modal/property-search-modal.component';
+export { AutocompleteComponent } from './autocomplete/autocomplete.component';
+export { type AutocompleteItem } from './autocomplete/autocomplete.types';
+export { AddressAutocompleteComponent } from './address-autocomplete/address-autocomplete.component';
 
 // Feedback Components
 export { AlertComponent, type AlertType } from './alert/alert.component';

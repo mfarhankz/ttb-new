@@ -216,6 +216,12 @@
   }
 }
 
+/* PrimeNG select/menu overlays above app-modal (z-50). */
+.p-select-overlay,
+.p-select-overlay-visible {
+  z-index: 1100;
+}
+
 /* Compact PrimeNG select dropdown options site-wide. */
 .p-select-overlay .p-select-list {
   gap: 0.125rem;
