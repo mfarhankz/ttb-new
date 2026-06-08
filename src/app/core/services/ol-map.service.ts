@@ -170,6 +170,85 @@ export class OlMapService {
     });
   }
 
+  /** Clear user-drawn / preview shapes without resetting map center. */
+  clearShapesLayer(refs: MapObjectRefs): void {
+    refs.shapesLayer?.getSource()?.clear();
+  }
+
+  /** Draw legacy farm/search geometry objects on the shapes layer. */
+  drawGeometries(refs: MapObjectRefs, geometryInput: unknown): void {
+    if (!refs.shapesLayer || geometryInput == null) {
+      return;
+    }
+
+    this.clearShapesLayer(refs);
+
+    const geometries = this.normalizeGeometries(geometryInput);
+    geometries.forEach((geometry) => this.drawSingleGeometry(refs, geometry));
+
+    this.fitMapToShapes(refs);
+  }
+
+  /** Fit map view to current shape features. */
+  fitMapToShapes(refs: MapObjectRefs): void {
+    const source = refs.shapesLayer?.getSource();
+    if (!refs.map || !source) {
+      return;
+    }
+
+    const features = source.getFeatures();
+    if (!features.length) {
+      return;
+    }
+
+    const extent = source.getExtent();
+    if (extent.some((value: number) => !Number.isFinite(value))) {
+      return;
+    }
+
+    refs.map.getView().fit(extent, { padding: [40, 40, 40, 40], maxZoom: 16, duration: 250 });
+  }
+
+  private normalizeGeometries(input: unknown): Array<Record<string, unknown>> {
+    if (Array.isArray(input)) {
+      return input.filter((item): item is Record<string, unknown> => !!item && typeof item === 'object');
+    }
+
+    if (typeof input === 'object' && input !== null) {
+      return [input as Record<string, unknown>];
+    }
+
+    return [];
+  }
+
+  private drawSingleGeometry(refs: MapObjectRefs, geometry: Record<string, unknown>): void {
+    const value = geometry['value'] as Record<string, unknown> | undefined;
+    if (!value) {
+      return;
+    }
+
+    const shapeType = String(geometry['match'] ?? geometry['type'] ?? '').toLowerCase();
+
+    if (shapeType === 'circle') {
+      this.createRadius(
+        refs,
+        {
+          value: {
+            center_lng: value['center_lng'] as number | undefined,
+            center_lat: value['center_lat'] as number | undefined,
+            radius: value['radius'] as number | undefined
+          }
+        },
+        Number(value['radius'] ?? 0)
+      );
+      return;
+    }
+
+    if (shapeType === 'polygon' && typeof value['wkt'] === 'string') {
+      this.createMultiPolygons(refs, [{ wkt: value['wkt'] }]);
+    }
+  }
+
   /** Create markers for property/record details. */
   createDetailsMarkerObj(refs: MapObjectRefs, records: any[]): void {
     if (!refs.vectorLayer || !records?.length) return;

@@ -36,6 +36,9 @@ export class DataTableComponent {
   @Input() pageSize = 10;
 
   readonly rowAction = output<{ actionId: string; row: Record<string, unknown> }>();
+  readonly rowEnter = output<Record<string, unknown>>();
+  readonly rowLeave = output<Record<string, unknown>>();
+  readonly rowClick = output<Record<string, unknown>>();
 
   readonly openActionsRowId = signal<string | null>(null);
   readonly openActionsRow = signal<Record<string, unknown> | null>(null);

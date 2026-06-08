@@ -14,6 +14,7 @@ export const MAIN_NAV: NavItem[] = [
     label: 'Farming',
     icon: 'pi pi-sitemap',
     children: [
+      { label: 'Saved Farms', icon: 'pi pi-bookmark', route: '/farming/saved-farms' },
       { label: 'Radius search', icon: 'pi pi-circle', route: '/farming/radius-search' },
       { label: 'Boundary search', icon: 'pi pi-stop', route: '/farming/boundary-search' }
     ]

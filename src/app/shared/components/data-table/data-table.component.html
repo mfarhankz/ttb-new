@@ -48,6 +48,9 @@
             <tr
               class="border-b border-border/70 transition-colors last:border-b-0 hover:bg-sidebar-hover"
               [class.bg-sidebar-active/25]="even"
+              (mouseenter)="rowEnter.emit(row)"
+              (mouseleave)="rowLeave.emit(row)"
+              (click)="rowClick.emit(row)"
             >
               @for (column of columns; track column.key; let colIndex = $index; let last = $last) {
                 <td [class]="cellClasses(column, colIndex, last)">

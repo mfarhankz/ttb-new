@@ -43,6 +43,12 @@ export const routes: Routes = [
         pathMatch: 'full'
       },
       {
+        path: 'farming/saved-farms',
+        loadComponent: () =>
+          import('./pages/authenticated/farming/saved-farms/saved-farms.component').then(m => m.SavedFarmsComponent),
+        title: 'Saved Farms'
+      },
+      {
         path: 'farming/radius-search',
         loadComponent: () => import('./pages/authenticated/farming/farming.component').then(m => m.FarmingComponent),
         title: 'Radius search',

@@ -1,0 +1,45 @@
+<div class="fixed top-0 right-0 bottom-0 z-0 bg-background transition-[left] duration-200 left-[var(--sidebar-width)]">
+  <app-map-table-pipeline
+    class="block h-full w-full"
+    [config]="pipelineConfig"
+    (mapResize)="onMapResize()"
+  >
+    <div mapTablePipelineToolbar class="flex items-center gap-2">
+      <span class="text-body-sm text-muted">
+        Total saved farms:
+        <span class="font-medium text-foreground">{{ totalCount() }}</span>
+      </span>
+      <app-button
+        variant="outline"
+        size="sm"
+        icon="pi pi-refresh"
+        [disabled]="loading()"
+        (onClick)="refreshFarms()"
+      >
+        Refresh
+      </app-button>
+    </div>
+
+    <div mapTablePipelineMap class="h-full w-full">
+      <div
+        appOlMap
+        [mapObject]="mapObject"
+        [options]="mapOptions"
+        class="h-full w-full"
+      ></div>
+    </div>
+
+    <div mapTablePipelineTable>
+      <app-data-table
+        [columns]="columns"
+        [rows]="rows()"
+        [loading]="loading()"
+        [error]="error()"
+        [emptyTitle]="'No saved farms yet'"
+        [emptyDescription]="'Saved farms from your property searches will appear here.'"
+        (rowEnter)="onFarmHover($event)"
+        (rowLeave)="onFarmHoverEnd()"
+      />
+    </div>
+  </app-map-table-pipeline>
+</div>

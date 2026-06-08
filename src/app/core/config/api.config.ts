@@ -30,6 +30,7 @@ export const API_CONFIG = {
     listOffices: '/list_offices',
     searchOffice: '/search_office.json',
     userUsageReport: '/usage_report',
+    getFarmMetainfo: '/get_farm_metainfo.json',
     loadEditUser: '/load_edit_user.json',
     editUser: '/edit_user.json',
     changePassword: '/change_password.json',
