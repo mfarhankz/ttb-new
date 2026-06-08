@@ -17,8 +17,6 @@ import { ModalComponent } from '@app/shared/components/modal/modal.component';
 import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
 import { MapTablePipelineComponent } from '@app/shared/components/map-table-pipeline/map-table-pipeline.component';
 import { MapPipelineViewMode } from '@app/shared/components/map-table-pipeline/map-table-pipeline.types';
-import { OlMapComponent } from '@app/shared/components/ol-map/ol-map.component';
-import { MAP_DEFAULTS } from '@app/core/config/map.config';
 import {
   SAVED_SEARCHES_DEFAULT_PAGE_SIZE,
   SAVED_SEARCHES_EMPTY_COPY,
@@ -26,7 +24,6 @@ import {
   SAVED_SEARCHES_PAGE_SIZE_OPTIONS
 } from '@app/core/config/saved-searches.config';
 import { AuthService } from '@app/core/services/auth.service';
-import { type MapObjectRefs } from '@app/core/services/ol-map.service';
 import { SavedSearchesService } from '@app/core/services/saved-searches.service';
 import { SessionExpiredService } from '@app/core/services/session-expired.service';
 import { VerticalService } from '@app/core/services/vertical.service';
@@ -36,7 +33,6 @@ import { VerticalService } from '@app/core/services/vertical.service';
   standalone: true,
   imports: [
     MapTablePipelineComponent,
-    OlMapComponent,
     DataTableComponent,
     ButtonComponent,
     ModalComponent,
@@ -105,15 +101,6 @@ export class SavedSearchesComponent {
   readonly deleteConfirmTitle = computed(() =>
     this.pendingDeleteCount() === 1 ? 'Delete saved search?' : `Delete ${this.pendingDeleteCount()} saved searches?`
   );
-
-  mapObject: MapObjectRefs = {};
-
-  mapOptions = {
-    lonLat: MAP_DEFAULTS.lonLat,
-    zoom: MAP_DEFAULTS.zoom,
-    calculateHeight: false,
-    listenResize: true
-  };
 
   constructor() {
     effect(() => {

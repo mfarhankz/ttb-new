@@ -29,15 +29,6 @@
       </button>
     </div>
 
-    <div mapTablePipelineMap class="h-full w-full">
-      <div
-        appOlMap
-        [mapObject]="mapObject"
-        [options]="mapOptions"
-        class="h-full w-full"
-      ></div>
-    </div>
-
     <div mapTablePipelineTable class="flex h-full min-h-0 flex-1 flex-col gap-3">
       @if (filtersOpen()) {
         <div class="shrink-0 rounded-lg border border-border bg-surface px-2.5 py-1.5">
