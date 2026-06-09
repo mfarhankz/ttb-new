@@ -21,13 +21,15 @@ export class AreaSearchService {
   private readonly apiService = inject(ApiService);
 
   private readonly _countResult = signal<GlobalSearchCountData | null>(null);
-  private readonly _sending = signal(false);
+  private readonly _countSending = signal(false);
+  private readonly _recordsSending = signal(false);
 
   readonly countResult = this._countResult.asReadonly();
-  readonly sending = this._sending.asReadonly();
+  readonly countSending = this._countSending.asReadonly();
+  readonly recordsSending = this._recordsSending.asReadonly();
 
   getCount(payload: AreaSearchPayload): Observable<GlobalSearchCountData> {
-    this._sending.set(true);
+    this._countSending.set(true);
 
     return this.apiService
       .postParsedJson<TtbGlobalSearchCountResponse>(API_CONFIG.endpoints.globalSearchCount, payload)
@@ -40,18 +42,18 @@ export class AreaSearchService {
 
           const countData = data.data ?? {};
           this._countResult.set(countData);
-          this._sending.set(false);
+          this._countSending.set(false);
           return countData;
         }),
         catchError((err: Error) => {
-          this._sending.set(false);
+          this._countSending.set(false);
           return throwError(() => err);
         })
       );
   }
 
   searchRecords(payload: AreaSearchPayload, page = 1, limit = 1000): Observable<GlobalSearchResponseData> {
-    this._sending.set(true);
+    this._recordsSending.set(true);
 
     const endpoint = `${API_CONFIG.endpoints.globalSearch}?limit=${limit}&page=${page}`;
     return this.apiService.postParsedJson<TtbGlobalSearchResponse>(endpoint, payload).pipe(
@@ -61,11 +63,11 @@ export class AreaSearchService {
           throw new Error(data?.message ?? 'Failed to load search records.');
         }
 
-        this._sending.set(false);
+        this._recordsSending.set(false);
         return data.data ?? {};
       }),
       catchError((err: Error) => {
-        this._sending.set(false);
+        this._recordsSending.set(false);
         return throwError(() => err);
       })
     );
@@ -107,5 +109,35 @@ export class AreaSearchService {
 
   clearCountResult(): void {
     this._countResult.set(null);
+  }
+
+  updateResult(
+    payload: {
+      searchOptions: {
+        omit_sa_property_ids?: number[];
+        include_sa_property_ids?: number[];
+      };
+    },
+    page = 1,
+    limit = 1000
+  ): Observable<GlobalSearchResponseData> {
+    const endpoint = `${API_CONFIG.endpoints.updateResult}?limit=${limit}&page=${page}`;
+
+    return this.apiService.postParsedJson<TtbGlobalSearchResponse>(endpoint, payload).pipe(
+      map((response) => {
+        const data = response.response;
+        if (!data || data.status !== 'OK') {
+          throw new Error(data?.message ?? 'Failed to update search results.');
+        }
+
+        const result = data.data ?? {};
+        if (!result.recs?.length) {
+          throw new Error('0 properties found against given search criteria.');
+        }
+
+        return result;
+      }),
+      catchError((err: Error) => throwError(() => err))
+    );
   }
 }

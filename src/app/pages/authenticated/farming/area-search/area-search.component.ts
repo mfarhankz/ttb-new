@@ -1,4 +1,4 @@
-import { JsonPipe } from '@angular/common';
+import { DecimalPipe, JsonPipe } from '@angular/common';
 import {
   AfterViewInit,
   Component,
@@ -44,6 +44,7 @@ import { AreaSearchCriteriaChipsComponent } from '@app/shared/components/area-se
   selector: 'app-area-search',
   standalone: true,
   imports: [
+    DecimalPipe,
     JsonPipe,
     FormsModule,
     InputText,
@@ -92,7 +93,9 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly activeFieldGroup = this.formService.activeFieldGroup;
   readonly hasGeometry = this.formService.hasGeometry;
   readonly countResult = this.areaSearchService.countResult;
-  readonly sending = this.areaSearchService.sending;
+  readonly countSending = this.areaSearchService.countSending;
+  readonly recordsSending = this.areaSearchService.recordsSending;
+  readonly searchBusy = computed(() => this.countSending() || this.recordsSending());
   readonly showQueriesPanel = this.stateService.showQueriesPanel;
   readonly activeQueriesTab = this.stateService.activeQueriesTab;
 
@@ -118,6 +121,9 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   );
 
   readonly hasCountResult = computed(() => !!this.countResult());
+  readonly countFound = computed(
+    () => this.countResult()?.rec_count ?? this.countResult()?.total_found ?? 0
+  );
   readonly promotedOafFields = this.formService.promotedOafFields;
 
   readonly commonQueriesSupport = computed(
@@ -274,6 +280,10 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   changeTab(index: number): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.renderedFieldCount.set(0);
     this.formService.setActiveTab(index);
     this.mobileTabOpen.set(false);
@@ -293,6 +303,10 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   clearFields(): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.formService.clearAllFields();
     this.areaSearchService.clearCountResult();
     this.actionError.set(null);
@@ -300,10 +314,18 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   resetArrangements(): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.formService.resetArrangements();
   }
 
   removeCriteria(fieldName: string): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     if (this.formService.isOafPromoted(fieldName)) {
       this.formService.demoteOafField(fieldName);
       return;
@@ -324,6 +346,10 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   toggleQueriesPanel(): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     const willOpen = !this.showQueriesPanel();
     this.stateService.toggleQueriesPanel();
 
@@ -333,10 +359,18 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   setQueriesTab(tab: 0 | 1): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.stateService.setActiveQueriesTab(tab);
   }
 
   onFieldChange(fieldName: string, patch: Record<string, unknown>): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.formService.updateFieldValue(fieldName, patch);
 
     if (fieldName === 'mm_fips_state_code' || fieldName === 'mm_fips_muni_code') {
@@ -358,14 +392,26 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   promoteOafField(field: AreaSearchFieldMeta): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.formService.promoteOafField(field);
   }
 
   demoteOafField(fieldName: string): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.formService.demoteOafField(fieldName);
   }
 
   enableLimitRecords(): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     const current = this.formData().max_limit;
     if (!current?.check) {
       this.formService.updateFieldValue('max_limit', { check: true, value: AREA_SEARCH_DEFAULT_MAX_LIMIT });
@@ -373,13 +419,16 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getCount(): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.actionError.set(null);
     const payload = this.formService.buildPayload();
 
     this.areaSearchService.getCount(payload).subscribe({
       next: (result) => {
         this.recentQueriesService.addOrPromote('Recent Search', payload, result.rec_count ?? result.total_found);
-        this.showNotice(`Found ${result.rec_count ?? result.total_found ?? 0} record(s).`);
       },
       error: (err: Error) => {
         this.actionError.set(err.message ?? 'Failed to get record count.');
@@ -388,6 +437,10 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   viewRecords(): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.actionError.set(null);
     const payload = this.formService.buildPayload();
     const limit = Number(payload.searchOptions?.max_limit) || AREA_SEARCH_DEFAULT_MAX_LIMIT;
@@ -435,6 +488,10 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openSaveModal(): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.saveName.set(this.stateService.queryName() ?? '');
     this.saveModal?.open();
   }
@@ -465,6 +522,10 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openShareModal(): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.shareEmail.set('');
     this.shareModal?.open();
   }
@@ -491,6 +552,10 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   payNow(): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.areaSearchService.purchaseRecs(this.formService.buildPayload()).subscribe({
       next: () => this.showNotice('Purchase request submitted.'),
       error: (err: Error) => this.actionError.set(err.message ?? 'Failed to process purchase.')
@@ -498,27 +563,48 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openGeographyModal(): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.geographyModal?.open();
   }
 
   openAlmModal(): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.almModal?.open();
   }
 
   onRecentSearch(query: RecentAreaSearchQuery): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.formService.loadFromPayload(query.query);
     this.getCount();
   }
 
   onRecentRevise(query: RecentAreaSearchQuery): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     this.formService.loadFromPayload(query.query);
     this.showNotice('Criteria loaded. Update fields and search again.');
   }
 
   onCommonSearch(query: CommonAreaSearchQuery): void {
+    if (this.searchBusy()) {
+      return;
+    }
+
     if (!query.query) {
       return;
     }
+
 
     this.formService.loadFromPayload(query.query);
     this.getCount();

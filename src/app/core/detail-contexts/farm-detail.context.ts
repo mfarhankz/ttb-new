@@ -133,7 +133,7 @@ export class FarmDetailContext implements DetailContext {
       filterOptions: FARM_DETAIL_FILTER_OPTIONS,
       showFilter: true,
       titleLabel: 'Selected Farm',
-      supportsDelete: true,
+      bulkSelectionMode: 'farm-exclude',
       leadsTypes: result.leadsTypes
     };
   }

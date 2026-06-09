@@ -13,6 +13,7 @@ import { AreaSearchCriteriaChip } from '@app/core/utils/area-search-criteria.uti
           <span class="font-medium">{{ chip.label }}:</span>
           <span>{{ chip.displayValue }}</span>
           @if (removable) {
+            <span class="text-muted" aria-hidden="true">|</span>
             <button
               type="button"
               class="inline-flex h-4.5 w-4.5 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-danger hover:bg-danger/10"

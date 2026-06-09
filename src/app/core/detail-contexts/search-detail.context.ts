@@ -56,7 +56,6 @@ export class SearchDetailContext implements DetailContext {
       filterOptions: [],
       showFilter: false,
       titleLabel: 'Search Results',
-      supportsDelete: false,
       leadsTypes
     };
   }

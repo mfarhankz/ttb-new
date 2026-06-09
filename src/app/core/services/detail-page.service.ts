@@ -42,7 +42,7 @@ export class DetailPageService {
   private readonly _activeFilter = signal(DETAIL_PAGE_DEFAULT_FILTER);
   private readonly _showFilter = signal(false);
   private readonly _filterOptions = signal<{ value: string; label: string }[]>([]);
-  private readonly _supportsDelete = signal(false);
+  private readonly _bulkSelectionMode = signal<'farm-exclude' | 'query-include-exclude' | null>(null);
   private readonly _leadsTypes = signal<string[]>([]);
   private readonly _searchText = signal('');
   private readonly _searchField = signal('$');
@@ -61,7 +61,7 @@ export class DetailPageService {
   readonly activeFilter = this._activeFilter.asReadonly();
   readonly showFilter = this._showFilter.asReadonly();
   readonly filterOptions = this._filterOptions.asReadonly();
-  readonly supportsDelete = this._supportsDelete.asReadonly();
+  readonly bulkSelectionMode = this._bulkSelectionMode.asReadonly();
   readonly searchText = this._searchText.asReadonly();
   readonly searchField = this._searchField.asReadonly();
   readonly criteriaChips = this._criteriaChips.asReadonly();
@@ -161,25 +161,45 @@ export class DetailPageService {
   }
 
   excludeSelected(propertyIds: string[]): Observable<void> {
+    return this.applyBulkSelection('exclude', propertyIds);
+  }
+
+  includeSelected(propertyIds: string[]): Observable<void> {
+    return this.applyBulkSelection('include', propertyIds);
+  }
+
+  private applyBulkSelection(
+    action: 'exclude' | 'include',
+    propertyIds: string[]
+  ): Observable<void> {
     return new Observable((subscriber) => {
       const source = this._source();
       const sourceId = this._sourceId();
-      if (!source || !sourceId || !this._supportsDelete()) {
-        subscriber.error(new Error('Delete is not supported for this detail view.'));
+      const mode = this._bulkSelectionMode();
+
+      if (!source || !sourceId || !mode) {
+        subscriber.error(new Error('Bulk selection is not supported for this detail view.'));
+        return;
+      }
+
+      if (action === 'include' && mode !== 'query-include-exclude') {
+        subscriber.error(new Error('Include is not supported for this detail view.'));
         return;
       }
 
       const context = this.resolveContext(source);
-      if (!context.excludeSelected) {
-        subscriber.error(new Error('Delete is not supported for this detail view.'));
+      const handler = action === 'exclude' ? context.excludeSelected : context.includeSelected;
+
+      if (!handler) {
+        subscriber.error(new Error('Bulk selection is not supported for this detail view.'));
         return;
       }
 
       this._loading.set(true);
       this._error.set(null);
 
-      context
-        .excludeSelected(sourceId, propertyIds, this._activeFilter(), {
+      handler
+        .call(context, sourceId, propertyIds, this._activeFilter(), {
           ...this._initState(),
           title: this._title()
         })
@@ -217,7 +237,7 @@ export class DetailPageService {
     this._activeFilter.set(DETAIL_PAGE_DEFAULT_FILTER);
     this._showFilter.set(false);
     this._filterOptions.set([]);
-    this._supportsDelete.set(false);
+    this._bulkSelectionMode.set(null);
     this._leadsTypes.set([]);
     this._searchText.set('');
     this._searchField.set('$');
@@ -262,7 +282,7 @@ export class DetailPageService {
     activeFilter: string;
     showFilter: boolean;
     filterOptions: { value: string; label: string }[];
-    supportsDelete?: boolean;
+    bulkSelectionMode?: 'farm-exclude' | 'query-include-exclude';
     leadsTypes?: string[];
     criteriaChips?: AreaSearchCriteriaChip[];
   }): void {
@@ -275,7 +295,7 @@ export class DetailPageService {
     this._activeFilter.set(result.activeFilter);
     this._showFilter.set(result.showFilter);
     this._filterOptions.set(result.filterOptions);
-    this._supportsDelete.set(!!result.supportsDelete);
+    this._bulkSelectionMode.set(result.bulkSelectionMode ?? null);
     this._leadsTypes.set(result.leadsTypes ?? []);
     this._loading.set(false);
     this._error.set(null);

@@ -57,4 +57,19 @@ export class AreaSearchSessionService {
   clearSession(sessionId: string): void {
     this.sessions.delete(sessionId);
   }
+
+  updateSession(
+    sessionId: string,
+    patch: Partial<Pick<AreaSearchSession, 'rows' | 'rawRecords' | 'pagingInfo' | 'criteria' | 'criteriaChips'>>
+  ): void {
+    const session = this.sessions.get(sessionId);
+    if (!session) {
+      return;
+    }
+
+    this.sessions.set(sessionId, {
+      ...session,
+      ...patch
+    });
+  }
 }

@@ -25,7 +25,7 @@ export interface DetailContextLoadResult {
   filterOptions: DetailFilterOption[];
   showFilter: boolean;
   titleLabel: string;
-  supportsDelete?: boolean;
+  bulkSelectionMode?: 'farm-exclude' | 'query-include-exclude';
   leadsTypes?: string[];
   criteriaChips?: AreaSearchCriteriaChip[];
 }
@@ -48,6 +48,13 @@ export interface DetailContext {
   ): Observable<DetailContextLoadResult>;
 
   excludeSelected?(
+    sourceId: string,
+    propertyIds: Array<number | string>,
+    activeFilter: string,
+    initState?: DetailContextInitState
+  ): Observable<DetailContextLoadResult>;
+
+  includeSelected?(
     sourceId: string,
     propertyIds: Array<number | string>,
     activeFilter: string,

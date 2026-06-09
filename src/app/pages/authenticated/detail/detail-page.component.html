@@ -222,28 +222,52 @@
       }
 
       @if (selectionMode()) {
-        <div class="flex shrink-0 flex-wrap items-center justify-end gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2">
-          <span class="mr-auto text-body-sm text-foreground">
-            @if (hasSelection()) {
-              <span class="font-medium">{{ selectedCount() }}</span>
-              {{ selectedCount() === 1 ? 'property' : 'properties' }} selected
-            } @else {
-              Select properties to exclude from farm
-            }
-          </span>
-          <app-button variant="outline" size="sm" (onClick)="exitSelectionMode()">
-            Cancel
-          </app-button>
-          <app-button
-            variant="danger"
-            size="sm"
-            icon="pi pi-trash"
-            [disabled]="!hasSelection() || deleting()"
-            (onClick)="openDeleteConfirm()"
-          >
-            Delete selected
-          </app-button>
-        </div>
+        @if (isQueryDetail()) {
+          <div class="flex shrink-0 flex-wrap items-center gap-2">
+            <app-button variant="danger" size="sm" (onClick)="exitSelectionMode()">
+              Cancel
+            </app-button>
+            <app-button
+              variant="primary"
+              size="sm"
+              [disabled]="!hasSelection() || deleting()"
+              (onClick)="excludeSelectedRecords()"
+            >
+              Exclude Selected
+            </app-button>
+            <app-button
+              variant="primary"
+              size="sm"
+              [disabled]="!hasSelection() || deleting()"
+              (onClick)="includeSelectedRecords()"
+            >
+              Include Selected
+            </app-button>
+          </div>
+        } @else {
+          <div class="flex shrink-0 flex-wrap items-center justify-end gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2">
+            <span class="mr-auto text-body-sm text-foreground">
+              @if (hasSelection()) {
+                <span class="font-medium">{{ selectedCount() }}</span>
+                {{ selectedCount() === 1 ? 'property' : 'properties' }} selected
+              } @else {
+                Select properties to exclude from farm
+              }
+            </span>
+            <app-button variant="outline" size="sm" (onClick)="exitSelectionMode()">
+              Cancel
+            </app-button>
+            <app-button
+              variant="danger"
+              size="sm"
+              icon="pi pi-trash"
+              [disabled]="!hasSelection() || deleting()"
+              (onClick)="openDeleteConfirm()"
+            >
+              Delete selected
+            </app-button>
+          </div>
+        }
       }
 
       <app-data-table
@@ -253,7 +277,7 @@
         [pageSizeOptions]="pageSizeOptions"
         [showSelectionColumn]="selectionMode()"
         [selectionColumnAfterActions]="true"
-        [actionsHeaderLabel]="selectionMode() || !supportsDelete() ? null : 'Select'"
+        [actionsHeaderLabel]="selectionMode() || !supportsBulkSelection() ? null : 'Select'"
         [actionsHeaderDisabled]="loading() || !rows().length"
         [showSecondaryRowAction]="true"
         secondaryRowActionIcon="pi pi-file-o"

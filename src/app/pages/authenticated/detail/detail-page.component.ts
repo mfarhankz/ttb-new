@@ -141,7 +141,8 @@ export class DetailPageComponent implements OnInit, OnDestroy {
   readonly showFilter = this.detailPageService.showFilter;
   readonly filterOptions = this.detailPageService.filterOptions;
   readonly activeFilter = this.detailPageService.activeFilter;
-  readonly supportsDelete = this.detailPageService.supportsDelete;
+  readonly bulkSelectionMode = this.detailPageService.bulkSelectionMode;
+  readonly supportsBulkSelection = computed(() => !!this.bulkSelectionMode());
   readonly searchText = this.detailPageService.searchText;
   readonly searchField = this.detailPageService.searchField;
   readonly searchFieldOptions = DETAIL_SEARCH_FIELD_OPTIONS;
@@ -333,7 +334,7 @@ export class DetailPageComponent implements OnInit, OnDestroy {
   }
 
   enterSelectionMode(): void {
-    if (!this.supportsDelete()) {
+    if (!this.supportsBulkSelection()) {
       return;
     }
 
@@ -405,6 +406,50 @@ export class DetailPageComponent implements OnInit, OnDestroy {
       error: (err: Error) => {
         this.deleting.set(false);
         this.deleteError.set(err.message ?? 'Failed to exclude selected properties.');
+      }
+    });
+  }
+
+  excludeSelectedRecords(): void {
+    this.applyQueryBulkSelection('exclude');
+  }
+
+  includeSelectedRecords(): void {
+    this.applyQueryBulkSelection('include');
+  }
+
+  private applyQueryBulkSelection(action: 'exclude' | 'include'): void {
+    const ids = [...this.selectedPropertyIds()];
+    if (!ids.length || this.deleting()) {
+      return;
+    }
+
+    this.deleting.set(true);
+    this.actionError.set(null);
+
+    const request =
+      action === 'exclude'
+        ? this.detailPageService.excludeSelected(ids)
+        : this.detailPageService.includeSelected(ids);
+
+    request.subscribe({
+      next: () => {
+        this.deleting.set(false);
+        this.exitSelectionMode();
+        this.showActionNotice(
+          action === 'exclude'
+            ? 'Selected properties excluded from results.'
+            : 'Selected properties included in results.'
+        );
+      },
+      error: (err: Error) => {
+        this.deleting.set(false);
+        this.actionError.set(
+          err.message ??
+            (action === 'exclude'
+              ? 'Failed to exclude selected properties.'
+              : 'Failed to include selected properties.')
+        );
       }
     });
   }
