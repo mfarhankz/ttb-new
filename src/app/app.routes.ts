@@ -65,6 +65,14 @@ export const routes: Routes = [
         title: 'Saved Net Sheets'
       },
       {
+        path: 'farming/area-search',
+        loadComponent: () =>
+          import('./pages/authenticated/farming/area-search/area-search.component').then(
+            m => m.AreaSearchComponent
+          ),
+        title: 'Area Search'
+      },
+      {
         path: 'detail/:source/:sourceId',
         loadComponent: () =>
           import('./pages/authenticated/detail/detail-page.component').then(m => m.DetailPageComponent),

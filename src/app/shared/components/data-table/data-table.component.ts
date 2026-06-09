@@ -25,61 +25,6 @@ import {
   standalone: true,
   imports: [FormsModule],
   templateUrl: './data-table.component.html',
-  styles: [
-    `
-      .pipeline-score__content {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3125rem;
-        min-width: 8.125rem;
-      }
-
-      .pipeline-score__bar {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.1875rem;
-      }
-
-      .pipeline-score__pill {
-        display: inline-block;
-        flex-shrink: 0;
-        width: 0.625rem;
-        height: 0.4375rem;
-        border-radius: 0.25rem;
-        opacity: 0.2;
-      }
-
-      .pipeline-score__pill.is-filled {
-        opacity: 1;
-      }
-
-      .pipeline-score__pill--tier-1 {
-        background-color: #e83030;
-      }
-
-      .pipeline-score__pill--tier-2 {
-        background-color: #f9851f;
-      }
-
-      .pipeline-score__pill--tier-3 {
-        background-color: #ffd500;
-      }
-
-      .pipeline-score__pill--tier-4 {
-        background-color: #afdf20;
-      }
-
-      .pipeline-score__pill--tier-5 {
-        background-color: #21c45d;
-      }
-
-      .pipeline-score__value {
-        min-width: 2.5rem;
-        text-align: right;
-        font-weight: 600;
-      }
-    `
-  ],
   host: {
     class: 'block',
     '[class.flex]': 'fillHeight',
@@ -598,6 +543,14 @@ export class DataTableComponent {
 
   readonly scoreSteps = [0, 1, 2, 3, 4] as const;
 
+  private static readonly SCORE_TIER_COLORS: Record<number, string> = {
+    1: 'bg-[#e83030]',
+    2: 'bg-[#f9851f]',
+    3: 'bg-[#ffd500]',
+    4: 'bg-[#afdf20]',
+    5: 'bg-[#21c45d]'
+  };
+
   scorePercent(row: Record<string, unknown>, column: DataTableColumn): number | null {
     const field = column.scoreField ?? column.key;
     const raw = row[field];
@@ -641,10 +594,13 @@ export class DataTableComponent {
   scorePillClasses(score: number, index: number): string {
     const band = this.scoreBand(score);
     const filled = index < this.scoreFilledPills(score);
+    const tierColor = DataTableComponent.SCORE_TIER_COLORS[band] ?? DataTableComponent.SCORE_TIER_COLORS[1];
 
-    return ['pipeline-score__pill', `pipeline-score__pill--tier-${band}`, filled ? 'is-filled' : '']
-      .filter(Boolean)
-      .join(' ');
+    return [
+      'inline-block h-[0.4375rem] w-2.5 shrink-0 rounded',
+      filled ? 'opacity-100' : 'opacity-20',
+      tierColor
+    ].join(' ');
   }
 
   leadDetailItems(value: unknown): DataTableLeadDetailItem[] {

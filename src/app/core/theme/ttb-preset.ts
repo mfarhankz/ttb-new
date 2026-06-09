@@ -80,7 +80,9 @@ export const TTBPreset = definePreset(Aura, {
         padding: SELECT_OPTION_PADDING
       },
       css: `
-        .p-select-overlay {
+        .p-select-overlay,
+        .p-select-overlay-visible {
+          z-index: 1100;
           font-size: ${TTB_FONT.sizeBodySm};
         }
         .p-select-list {

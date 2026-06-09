@@ -1,0 +1,298 @@
+<div class="area-search-page flex min-h-screen flex-col bg-background p-4 md:p-6 lg:p-8">
+  @if (fieldsLoading()) {
+    <app-card [title]="pageTitle()" [subtitle]="pageSubtitle()" padding="lg" class="mx-auto w-full max-w-[90rem]">
+      <div class="py-8 text-center text-subtle">Loading search fields…</div>
+    </app-card>
+  } @else if (fieldsError()) {
+    <app-card [title]="pageTitle()" [subtitle]="pageSubtitle()" padding="lg" class="mx-auto w-full max-w-[90rem]">
+      <div class="py-8 text-center text-danger">
+        <p>{{ fieldsError() }}</p>
+        <app-button class="mt-4" variant="outline" (onClick)="reloadFields(true)">Retry</app-button>
+      </div>
+    </app-card>
+  } @else {
+    <app-card
+      [title]="pageTitle()"
+      [subtitle]="pageSubtitle()"
+      [headerActions]="true"
+      [padding]="'none'"
+      [footer]="fieldsReady()"
+      [fillHeight]="true"
+      class="mx-auto flex min-h-0 w-full max-w-[90rem] flex-1 flex-col overflow-hidden"
+    >
+      <div headerActions>
+        <button
+          type="button"
+          class="inline-flex cursor-pointer items-center gap-1 rounded-md border border-primary bg-primary px-3 py-1.5 text-caption font-semibold text-primary-foreground hover:brightness-95"
+          (click)="toggleQueriesPanel()"
+        >
+          Queries
+          <i class="pi pi-chevron-right text-xs"></i>
+        </button>
+      </div>
+
+      @if (actionNotice()) {
+        <app-alert type="success" class="mx-6 mt-4 block">{{ actionNotice() }}</app-alert>
+      }
+      @if (actionError()) {
+        <app-alert type="error" class="mx-6 mt-4 block">{{ actionError() }}</app-alert>
+      }
+
+      <div class="area-search-layout flex min-h-0 flex-1 [--main-content-height:auto]">
+        <aside class="hidden min-h-[var(--main-content-height,auto)] w-60 shrink-0 flex-col border-r border-border bg-background md:flex">
+          <ul class="m-0 flex list-none flex-col p-2">
+            @for (group of basicFieldGroups(); track group.group_id; let i = $index) {
+              @let isPremium = isPremiumTab(group.group_id);
+              @let isActive = activeTab() === i;
+              <li>
+                <button
+                  type="button"
+                  class="relative flex w-full items-center gap-2 rounded-md border-0 bg-transparent px-3 py-3 text-left text-body-sm transition-colors [&>i]:text-body-sm [&>i]:opacity-80"
+                  [class]="isPremium
+                    ? (isActive ? 'pt-5 text-warning bg-warning/10 hover:bg-warning/10' : 'pt-5 text-warning hover:bg-warning/10')
+                    : (isActive ? 'bg-primary/10 text-foreground' : 'text-subtle hover:bg-primary/10 hover:text-foreground')"
+                  (click)="changeTab(i)"
+                >
+                  @if (isPremiumTab(group.group_id)) {
+                    <span class="absolute left-2 top-1 text-overline font-bold uppercase tracking-wide text-warning">Premier</span>
+                  }
+                  <i [class]="tabIcon(group.group_name)"></i>
+                  <span>{{ group.group_name }}</span>
+                </button>
+              </li>
+            }
+          </ul>
+
+          <div class="search-options-fields mt-auto border-t border-border p-4">
+            <label class="mb-3 flex cursor-pointer items-start gap-2 text-sm">
+              <p-checkbox
+                [binary]="true"
+                [ngModel]="formData().omit_saved_records?.value"
+                (ngModelChange)="onFieldChange('omit_saved_records', { value: $event })"
+              />
+              <span>Suppress/Omit records already saved</span>
+            </label>
+
+            <label class="mb-2 flex cursor-pointer items-center gap-2 text-sm">
+              <p-checkbox
+                [binary]="true"
+                [ngModel]="formData().max_limit?.check"
+                (ngModelChange)="onFieldChange('max_limit', { check: $event, value: formData().max_limit?.value })"
+              />
+              <span>Limit Records</span>
+            </label>
+            <input
+              pInputText
+              type="number"
+              [class]="controlStyles.input"
+              [disabled]="!formData().max_limit?.check"
+              [ngModel]="formData().max_limit?.value"
+              (click)="enableLimitRecords()"
+              (ngModelChange)="onFieldChange('max_limit', { value: $event, check: true })"
+              placeholder="E.g. 1000"
+            />
+          </div>
+        </aside>
+
+        <div class="area-search-mobile-tabs border-b border-border p-4 md:hidden">
+          <button type="button" class="w-full text-left text-sm font-medium" (click)="mobileTabOpen.set(!mobileTabOpen())">
+            {{ mobileTabLabel() }}
+          </button>
+          @if (mobileTabOpen()) {
+            <div class="mt-2 flex flex-col gap-1">
+              @for (group of basicFieldGroups(); track group.group_id; let i = $index) {
+                <button type="button" class="py-1 text-left text-sm" (click)="changeTab(i)">{{ group.group_name }}</button>
+              }
+            </div>
+          }
+        </div>
+
+        <main #mainContent class="area-search-main min-w-0 flex-1 overflow-auto bg-surface">
+          <div class="w-full max-w-4xl p-5 md:p-8">
+            @if (!fieldsReady()) {
+              <div class="p-8 text-center text-subtle">Preparing search form…</div>
+            } @else if (activeFieldGroup(); as group) {
+              @let choiceCtx = fieldChoiceContext();
+
+              <app-area-search-premier-note [groupId]="group.group_id" />
+
+              <div [class]="usesRowLayout(group) ? 'grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2' : 'flex flex-col gap-6'">
+                @if (renderedFieldCount() < group.fields.length) {
+                  <p class="col-span-full text-sm text-subtle">Loading fields…</p>
+                }
+                @for (field of visibleFields(group.fields); track field.field_name) {
+                  <div [class.col-span-full]="usesFullWidthField(group)">
+                    <app-area-search-field
+                      [field]="field"
+                      [value]="formData()[field.field_name]"
+                      [dependencyKey]="choiceCtx.dependencyKeys[field.field_name]"
+                      [choicesDisabled]="choiceCtx.choicesDisabled[field.field_name]"
+                      (valueChange)="onFieldChange(field.field_name, $event)"
+                    />
+                  </div>
+                }
+              </div>
+
+              @if (renderedFieldCount() >= group.fields.length) {
+                @if (visibleOafFields().length) {
+                  <div [class]="usesRowLayout(group) ? 'mt-10 grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2' : 'mt-10 flex flex-col gap-6'">
+                    @for (field of visibleOafFields(); track field.field_name) {
+                      <app-area-search-field
+                        [field]="field"
+                        [value]="formData()[field.field_name]"
+                        [dependencyKey]="choiceCtx.dependencyKeys[field.field_name]"
+                        [choicesDisabled]="choiceCtx.choicesDisabled[field.field_name]"
+                        (valueChange)="onFieldChange(field.field_name, $event)"
+                      />
+                    }
+                  </div>
+                }
+
+                <app-area-search-oaf-accordion
+                  class="mt-6"
+                  [availableFields]="availableOafFields()"
+                  [promotedFieldNames]="promotedOafFields()"
+                  (promote)="promoteOafField($event)"
+                  (demote)="demoteOafField($event)"
+                />
+              }
+            }
+          </div>
+        </main>
+
+        <aside [class]="queriesPanelClass()">
+          <button
+            type="button"
+            class="absolute left-0 top-4 z-[2] inline-flex -translate-x-1/2 cursor-pointer items-center gap-1 rounded-full border border-border bg-surface px-2 py-1.5 text-xs md:hidden"
+            (click)="toggleQueriesPanel()"
+          >
+            <i class="pi" [class.pi-chevron-left]="showQueriesPanel()" [class.pi-chevron-right]="!showQueriesPanel()"></i>
+            <span>Queries</span>
+          </button>
+
+          @if (showQueriesPanel()) {
+            <div class="min-h-[var(--main-content-height,auto)] p-5">
+              <div class="mb-4 flex gap-2">
+                @if (commonQueriesSupport()) {
+                  <button
+                    type="button"
+                    class="rounded px-3 py-1 text-sm"
+                    [class.bg-primary]="activeQueriesTab() === 0"
+                    [class.text-primary-foreground]="activeQueriesTab() === 0"
+                    (click)="setQueriesTab(0)"
+                  >
+                    Common
+                  </button>
+                }
+                <button
+                  type="button"
+                  class="rounded px-3 py-1 text-sm"
+                  [class.bg-primary]="activeQueriesTab() === 1"
+                  [class.text-primary-foreground]="activeQueriesTab() === 1"
+                  (click)="setQueriesTab(1)"
+                >
+                  Recent
+                </button>
+              </div>
+
+              @if (activeQueriesTab() === 0 && commonQueriesSupport()) {
+                <app-common-queries-panel (search)="onCommonSearch($event)" />
+              } @else {
+                <app-recent-queries-panel
+                  (search)="onRecentSearch($event)"
+                  (revise)="onRecentRevise($event)"
+                />
+              }
+            </div>
+          }
+        </aside>
+      </div>
+
+      <div footer>
+        @if (selectedCriteria().length) {
+          <div class="area-search-criteria -mx-6 border-b border-border px-6 pb-3">
+            <app-area-search-criteria-chips
+              [chips]="selectedCriteria()"
+              [removable]="true"
+              (remove)="removeCriteria($event)"
+            />
+          </div>
+        }
+
+        @if (hasCountResult()) {
+          <div class="pt-3 text-sm text-foreground">
+            Found {{ countResult()?.rec_count ?? countResult()?.total_found ?? 0 }} record(s)
+            @if (countResult()?.rec_price != null) {
+              — estimated price: {{ countResult()?.rec_price }}
+            }
+          </div>
+        }
+
+        <div class="area-search-footer-actions flex flex-wrap items-center justify-between gap-3 pt-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <app-button variant="danger" size="sm" (onClick)="clearFields()">Clear Fields</app-button>
+            <app-button variant="danger" size="sm" (onClick)="resetArrangements()">Reset Arrangements</app-button>
+
+            @if (hasCountResult()) {
+              <app-button variant="outline" size="sm" (onClick)="openSaveModal()">Save Search</app-button>
+              <app-button variant="outline" size="sm" (onClick)="openShareModal()">Share</app-button>
+
+              @if (supportDirectGlobalSearch()) {
+                <app-button variant="outline" size="sm" (onClick)="payNow()">Pay Now</app-button>
+              }
+
+              @if (countResult()?.rec_group_zip) {
+                <app-button variant="ghost" size="sm" (onClick)="openGeographyModal()">Geography Details</app-button>
+              }
+
+              @if (automationSupport()) {
+                <app-button variant="ghost" size="sm" (onClick)="openAlmModal()">Dynamic Data</app-button>
+              }
+            }
+          </div>
+
+          <div class="ml-auto flex flex-wrap items-center gap-2">
+            <app-button variant="success" [loading]="sending()" (onClick)="getCount()">Get Count</app-button>
+            <app-button variant="secondary" [loading]="sending()" (onClick)="viewRecords()">View Records</app-button>
+          </div>
+        </div>
+      </div>
+    </app-card>
+  }
+</div>
+
+<app-modal #saveModal title="Save Search" [showFooter]="false">
+  <div class="flex flex-col gap-3">
+    <label class="text-sm font-medium">Search name</label>
+    <input pInputText type="text" [ngModel]="saveName()" (ngModelChange)="saveName.set($event)" />
+    <div class="flex justify-end gap-2">
+      <app-button variant="ghost" (onClick)="closeSaveModal()">Cancel</app-button>
+      <app-button (onClick)="confirmSave()">Save</app-button>
+    </div>
+  </div>
+</app-modal>
+
+<app-modal #shareModal title="Share Search" [showFooter]="false">
+  <div class="flex flex-col gap-3">
+    <label class="text-sm font-medium">Recipient email</label>
+    <input pInputText type="email" [ngModel]="shareEmail()" (ngModelChange)="shareEmail.set($event)" />
+    <div class="flex justify-end gap-2">
+      <app-button variant="ghost" (onClick)="closeShareModal()">Cancel</app-button>
+      <app-button (onClick)="confirmShare()">Share</app-button>
+    </div>
+  </div>
+</app-modal>
+
+<app-modal #geographyModal title="Geography Details" [showFooter]="false">
+  <pre class="max-h-80 overflow-auto text-xs">{{ countResult()?.rec_group_zip | json }}</pre>
+  <div class="mt-4 flex justify-end">
+    <app-button variant="ghost" (onClick)="closeGeographyModal()">Close</app-button>
+  </div>
+</app-modal>
+
+<app-modal #almModal title="Dynamic Data" [showFooter]="false">
+  <p class="text-sm text-subtle">Configure live query automation for this search criteria.</p>
+  <div class="mt-4 flex justify-end">
+    <app-button variant="ghost" (onClick)="closeAlmModal()">Close</app-button>
+  </div>
+</app-modal>

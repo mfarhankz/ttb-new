@@ -1,3 +1,32 @@
+/**
+ * Legacy utilFactory.fixInvalidJSONResponse — some pipeline responses (notably
+ * get_search_fields) can be truncated when third-party cookies are blocked.
+ */
+export function repairTruncatedLegacyJson(body: string): string {
+  const trimmed = body.trim();
+  if (!trimmed) {
+    return trimmed;
+  }
+
+  try {
+    JSON.parse(trimmed);
+    return trimmed;
+  } catch {
+    const suffixes = ['}]', '}', ']'];
+    for (const suffix of suffixes) {
+      try {
+        const repaired = `${trimmed}${suffix}`;
+        JSON.parse(repaired);
+        return repaired;
+      } catch {
+        // try next suffix
+      }
+    }
+
+    return trimmed;
+  }
+}
+
 /** Extract a human-readable message from legacy TTB `{ response: { status, message, data } }` envelopes. */
 export function extractTtbErrorMessage(data: unknown): string | null {
   if (!data || typeof data !== 'object') {

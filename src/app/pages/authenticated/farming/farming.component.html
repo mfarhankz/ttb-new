@@ -8,6 +8,9 @@
     ></div>
     <div class="absolute top-0 left-0 right-0 z-toolbar flex flex-wrap gap-2 items-center px-4 py-2 bg-surface/55 border-b border-border">
       <app-button variant="outline" (onClick)="onClearSearch()">Clear search</app-button>
+      @if (hasDrawnGeometry()) {
+        <app-button variant="primary" (onClick)="onAreaSearch()">Area Search</app-button>
+      }
     </div>
   </div>
 </div>

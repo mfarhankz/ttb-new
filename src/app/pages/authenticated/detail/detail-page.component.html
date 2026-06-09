@@ -26,6 +26,38 @@
         />
       }
 
+      @if (isQueryDetail()) {
+        <button
+          type="button"
+          [class]="toolbarBtnPrimaryClass"
+          [disabled]="toolbarDisabled()"
+          (click)="toggleExportMenu($event)"
+        >
+          Export
+          <i class="pi pi-chevron-down text-xs" aria-hidden="true"></i>
+        </button>
+
+        <button
+          type="button"
+          [class]="toolbarBtnPrimaryClass"
+          [disabled]="toolbarDisabled()"
+          (click)="toggleSaveShareMenu($event)"
+        >
+          Save/Share
+          <i class="pi pi-chevron-down text-xs" aria-hidden="true"></i>
+        </button>
+
+        <button
+          type="button"
+          [class]="toolbarBtnIconClass"
+          aria-label="More search actions"
+          [disabled]="toolbarDisabled()"
+          (click)="toggleOverflowMenu($event)"
+        >
+          <i class="pi pi-ellipsis-v text-sm" aria-hidden="true"></i>
+        </button>
+      }
+
       @if (isFarmDetail()) {
         <button
           type="button"
@@ -72,7 +104,7 @@
         Filters
       </button>
 
-      @if (isFarmDetail()) {
+      @if (isQueryDetail() || isFarmDetail()) {
         <div class="hidden">
           <p-menu
             #exportMenu
@@ -81,14 +113,33 @@
             [popup]="true"
             appendTo="body"
           />
-          <p-menu
-            #overflowMenu
-            styleClass="detail-overflow-menu"
-            [model]="overflowMenuItems()"
-            [popup]="true"
-            appendTo="body"
-          />
+          @if (isQueryDetail()) {
+            <p-menu
+              #saveShareMenu
+              styleClass="detail-export-menu"
+              [model]="saveShareMenuItems()"
+              [popup]="true"
+              appendTo="body"
+            />
+          }
+          @if (isQueryDetail() || isFarmDetail()) {
+            <p-menu
+              #overflowMenu
+              styleClass="detail-overflow-menu"
+              [model]="overflowMenuItems()"
+              [popup]="true"
+              appendTo="body"
+            />
+          }
         </div>
+      }
+
+      @if (actionNotice()) {
+        <p class="w-full basis-full text-sm text-success">{{ actionNotice() }}</p>
+      }
+
+      @if (actionError()) {
+        <p class="w-full basis-full text-sm text-danger">{{ actionError() }}</p>
       }
     </div>
 
@@ -103,10 +154,14 @@
 
     <div mapTablePipelineTable class="flex h-full min-h-0 flex-1 flex-col gap-2">
       <div class="shrink-0">
-        <p class="text-body-sm text-muted">
-          {{ titleLabel() }}:
-          <span class="font-medium text-foreground">{{ title() }}</span>
-        </p>
+        @if (isQueryDetail() && criteriaChips().length) {
+          <app-area-search-criteria-chips [chips]="criteriaChips()" />
+        } @else {
+          <p class="text-body-sm text-muted">
+            {{ titleLabel() }}:
+            <span class="font-medium text-foreground">{{ title() }}</span>
+          </p>
+        }
       </div>
 
       @if (filtersOpen()) {
@@ -251,5 +306,71 @@
         Delete
       }
     </app-button>
+  </div>
+</app-modal>
+
+<app-modal #saveSearchModal title="Save Search" [showFooter]="false">
+  <div class="flex flex-col gap-3">
+    <label class="text-sm font-medium" for="detail-save-search-name">Search name</label>
+    <input
+      id="detail-save-search-name"
+      pInputText
+      type="text"
+      [ngModel]="saveName()"
+      (ngModelChange)="saveName.set($event)"
+    />
+    @if (actionError()) {
+      <p class="text-sm text-danger">{{ actionError() }}</p>
+    }
+    <div class="flex justify-end gap-2">
+      <app-button variant="ghost" [disabled]="queryActionLoading()" (onClick)="closeSaveSearchModal()">
+        Cancel
+      </app-button>
+      <app-button [loading]="queryActionLoading()" (onClick)="confirmSaveSearch()">Save</app-button>
+    </div>
+  </div>
+</app-modal>
+
+<app-modal #shareSearchModal title="Share Search" [showFooter]="false">
+  <div class="flex flex-col gap-3">
+    <label class="text-sm font-medium" for="detail-share-search-email">Recipient email</label>
+    <input
+      id="detail-share-search-email"
+      pInputText
+      type="email"
+      [ngModel]="shareEmail()"
+      (ngModelChange)="shareEmail.set($event)"
+    />
+    @if (actionError()) {
+      <p class="text-sm text-danger">{{ actionError() }}</p>
+    }
+    <div class="flex justify-end gap-2">
+      <app-button variant="ghost" [disabled]="queryActionLoading()" (onClick)="closeShareSearchModal()">
+        Cancel
+      </app-button>
+      <app-button [loading]="queryActionLoading()" (onClick)="confirmShareSearch()">Share</app-button>
+    </div>
+  </div>
+</app-modal>
+
+<app-modal #sendDataModal title="Send Data" [showFooter]="false">
+  <div class="flex flex-col gap-3">
+    <label class="text-sm font-medium" for="detail-send-data-email">Recipient email</label>
+    <input
+      id="detail-send-data-email"
+      pInputText
+      type="email"
+      [ngModel]="sendDataEmail()"
+      (ngModelChange)="sendDataEmail.set($event)"
+    />
+    @if (actionError()) {
+      <p class="text-sm text-danger">{{ actionError() }}</p>
+    }
+    <div class="flex justify-end gap-2">
+      <app-button variant="ghost" [disabled]="queryActionLoading()" (onClick)="closeSendDataModal()">
+        Cancel
+      </app-button>
+      <app-button [loading]="queryActionLoading()" (onClick)="confirmSendData()">Send</app-button>
+    </div>
   </div>
 </app-modal>

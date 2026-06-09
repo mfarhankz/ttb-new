@@ -16,6 +16,7 @@ export const MAIN_NAV: NavItem[] = [
     children: [
       { label: 'Radius search', icon: 'pi pi-circle', route: '/farming/radius-search' },
       { label: 'Boundary search', icon: 'pi pi-stop', route: '/farming/boundary-search' },
+      { label: 'Area Search', icon: 'pi pi-sliders-h', route: '/farming/area-search' },
       { label: 'Saved Farms', icon: 'pi pi-bookmark', route: '/farming/saved-farms' },
       { label: 'Saved Searches', icon: 'pi pi-search-plus', route: '/farming/saved-searches' },
       { label: 'Saved Net Sheets', icon: 'pi pi-file-edit', route: '/farming/saved-net-sheets' }

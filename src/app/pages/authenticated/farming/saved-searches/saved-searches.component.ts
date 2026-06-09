@@ -8,6 +8,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
@@ -48,6 +49,7 @@ export class SavedSearchesComponent {
   @ViewChild('deleteConfirmModal') private deleteConfirmModal?: ModalComponent;
   @ViewChild('renameModal') private renameModal?: ModalComponent;
 
+  private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly savedSearchesService = inject(SavedSearchesService);
   private readonly sessionExpiredService = inject(SessionExpiredService);
@@ -145,7 +147,7 @@ export class SavedSearchesComponent {
 
     switch (event.actionId) {
       case 'select':
-        this.showActionNotice('Opening a saved search will be available once Query Tool is ported.');
+        void this.router.navigate(['/farming/area-search'], { queryParams: { queryId } });
         break;
       case 'rename':
         this.openRenameModal(queryId, String(event.row['name'] ?? ''));

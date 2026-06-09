@@ -156,13 +156,13 @@
                     </div>
                   } @else if (column.variant === 'score') {
                     @if (scorePercent(row, column); as score) {
-                      <div class="pipeline-score__content">
-                        <span class="pipeline-score__bar" aria-hidden="true">
+                      <div class="inline-flex min-w-[8.125rem] items-center gap-[0.3125rem]">
+                        <span class="inline-flex items-center gap-[0.1875rem]" aria-hidden="true">
                           @for (step of scoreSteps; track step) {
                             <span [class]="scorePillClasses(score, step)"></span>
                           }
                         </span>
-                        <span class="pipeline-score__value">{{ formatCell(row[column.key]) }}</span>
+                        <span class="min-w-10 text-right font-semibold">{{ formatCell(row[column.key]) }}</span>
                       </div>
                     } @else {
                       —

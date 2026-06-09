@@ -22,8 +22,17 @@ import {
   buildDetailExportMenuItems,
   buildDetailOverflowMenuItems,
   DETAIL_FARM_OVERFLOW_MENU_ACTIONS,
+  DetailExportActionId,
   DetailToolbarActionId
 } from '@app/core/config/detail-page-toolbar.config';
+import {
+  buildQueryOverflowMenuItems,
+  buildQuerySaveShareMenuItems,
+  QueryOverflowActionId,
+  QuerySaveShareActionId
+} from '@app/core/config/detail-page-query-toolbar.config';
+import { AreaSearchPayload } from '@app/core/interfaces/area-search-field.interface';
+import { AreaSearchService } from '@app/core/services/area-search.service';
 import { AlertComponent, ButtonComponent } from '@app/shared/components';
 import { ModalComponent } from '@app/shared/components/modal/modal.component';
 import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
@@ -31,6 +40,7 @@ import { DataTableColumn } from '@app/shared/components/data-table/data-table.ty
 import { MapTablePipelineComponent } from '@app/shared/components/map-table-pipeline/map-table-pipeline.component';
 import { MapPipelineViewMode } from '@app/shared/components/map-table-pipeline/map-table-pipeline.types';
 import { OlMapComponent } from '@app/shared/components/ol-map/ol-map.component';
+import { AreaSearchCriteriaChipsComponent } from '@app/shared/components/area-search-fields/area-search-criteria-chips.component';
 import {
   DETAIL_PAGE_DEFAULT_PAGE_SIZE,
   DETAIL_PAGE_EMPTY_COPY,
@@ -41,6 +51,8 @@ import {
 } from '@app/core/config/detail-page.config';
 import { MAP_DEFAULTS } from '@app/core/config/map.config';
 import { DetailPageRouterState } from '@app/core/interfaces/property-record.interface';
+import { AreaSearchSessionService } from '@app/core/services/area-search-session.service';
+import { AreaSearchStateService } from '@app/core/services/area-search-state.service';
 import { DetailPageService } from '@app/core/services/detail-page.service';
 import { LayoutService } from '@app/core/services/layout.service';
 import { MapTableSyncService } from '@app/core/services/map-table-sync.service';
@@ -70,7 +82,8 @@ const DETAIL_ACTIONS_COLUMN: DataTableColumn = {
     Menu,
     IconField,
     InputIcon,
-    InputText
+    InputText,
+    AreaSearchCriteriaChipsComponent
   ],
   templateUrl: './detail-page.component.html',
   styles: [
@@ -99,14 +112,22 @@ export class DetailPageComponent implements OnInit, OnDestroy {
 
   readonly toolbarBtnIconClass =
     'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-transparent text-muted transition-colors hover:bg-sidebar-active hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus disabled:pointer-events-none disabled:opacity-40';
+
   @ViewChild('deleteConfirmModal') private deleteConfirmModal?: ModalComponent;
+  @ViewChild('saveSearchModal') private saveSearchModal?: ModalComponent;
+  @ViewChild('shareSearchModal') private shareSearchModal?: ModalComponent;
+  @ViewChild('sendDataModal') private sendDataModal?: ModalComponent;
   readonly exportMenu = viewChild<Menu>('exportMenu');
+  readonly saveShareMenu = viewChild<Menu>('saveShareMenu');
   readonly overflowMenu = viewChild<Menu>('overflowMenu');
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly location = inject(Location);
   private readonly detailPageService = inject(DetailPageService);
+  private readonly areaSearchSessionService = inject(AreaSearchSessionService);
+  private readonly areaSearchStateService = inject(AreaSearchStateService);
+  private readonly areaSearchService = inject(AreaSearchService);
   private readonly mapTableSync = inject(MapTableSyncService);
   private readonly olMapService = inject(OlMapService);
   private readonly layoutService = inject(LayoutService);
@@ -116,6 +137,7 @@ export class DetailPageComponent implements OnInit, OnDestroy {
   readonly error = this.detailPageService.error;
   readonly title = this.detailPageService.title;
   readonly titleLabel = this.detailPageService.titleLabel;
+  readonly criteriaChips = this.detailPageService.criteriaChips;
   readonly showFilter = this.detailPageService.showFilter;
   readonly filterOptions = this.detailPageService.filterOptions;
   readonly activeFilter = this.detailPageService.activeFilter;
@@ -125,17 +147,29 @@ export class DetailPageComponent implements OnInit, OnDestroy {
   readonly searchFieldOptions = DETAIL_SEARCH_FIELD_OPTIONS;
 
   readonly isFarmDetail = computed(() => this.detailPageService.source() === 'farm');
+  readonly isQueryDetail = computed(() => this.detailPageService.source() === 'query');
   readonly toolbarDisabled = computed(() => this.loading() || this.selectionMode());
   readonly exportMenuItems = computed(() =>
-    buildDetailExportMenuItems((actionId) => this.onToolbarAction(actionId))
+    buildDetailExportMenuItems((actionId) => this.onExportAction(actionId))
+  );
+  readonly saveShareMenuItems = computed(() =>
+    buildQuerySaveShareMenuItems((actionId) => this.onQuerySaveShareAction(actionId))
   );
   readonly overflowMenuItems = computed(() => {
+    if (this.isQueryDetail()) {
+      return buildQueryOverflowMenuItems((actionId) => this.onQueryOverflowAction(actionId));
+    }
+
+    if (!this.isFarmDetail()) {
+      return [];
+    }
+
     const hideSellRefiScores = shouldHideSellRefiScoresMenuAction(this.detailPageService.allRows());
     const actions = DETAIL_FARM_OVERFLOW_MENU_ACTIONS.filter(
       (action) => action.id !== 'sell-refi-scores' || !hideSellRefiScores
     );
 
-    return buildDetailOverflowMenuItems(actions, (actionId) => this.onToolbarAction(actionId));
+    return buildDetailOverflowMenuItems(actions, (actionId) => this.onFarmOverflowAction(actionId));
   });
 
   readonly sellRefiScoresPending = computed(() =>
@@ -166,6 +200,12 @@ export class DetailPageComponent implements OnInit, OnDestroy {
   readonly pageSizeOptions = DETAIL_PAGE_SIZE_OPTIONS;
 
   readonly filtersOpen = signal(false);
+  readonly actionNotice = signal<string | null>(null);
+  readonly actionError = signal<string | null>(null);
+  readonly saveName = signal('');
+  readonly shareEmail = signal('');
+  readonly sendDataEmail = signal('');
+  readonly queryActionLoading = signal(false);
   readonly selectionMode = signal(false);
   readonly selectedPropertyIds = signal<Set<string>>(new Set());
   readonly deleting = signal(false);
@@ -378,12 +418,235 @@ export class DetailPageComponent implements OnInit, OnDestroy {
     (event.currentTarget as HTMLButtonElement).blur();
   }
 
+  toggleSaveShareMenu(event: Event): void {
+    this.saveShareMenu()?.toggle(event);
+    (event.currentTarget as HTMLButtonElement).blur();
+  }
+
   toggleOverflowMenu(event: Event): void {
     this.overflowMenu()?.toggle(event);
     (event.currentTarget as HTMLButtonElement).blur();
   }
 
-  onToolbarAction(_actionId: DetailToolbarActionId): void {}
+  onExportAction(_actionId: DetailExportActionId): void {
+    this.showActionNotice('This export option will be available in a future update.');
+  }
+
+  onQueryOverflowAction(actionId: QueryOverflowActionId): void {
+    switch (actionId) {
+      case 'save-farm':
+        this.saveFarmFromQuery();
+        break;
+      case 'send-data':
+        this.openSendDataModal();
+        break;
+      case 'edit-search':
+        this.editSearch();
+        break;
+      case 'dynamic-stats':
+        this.openDynamicStats();
+        break;
+      case 'clear-start-over':
+        this.clearStartOver();
+        break;
+      case 'new-possible-leads':
+        this.openNewPossibleLeads();
+        break;
+    }
+  }
+
+  onFarmOverflowAction(actionId: DetailToolbarActionId): void {
+    switch (actionId) {
+      case 'send-data':
+        this.showActionNotice('Send Data will be available in a future update.');
+        break;
+      case 'dynamic-stats':
+        this.showActionNotice('Dynamic Stats will be available in a future update.');
+        break;
+      case 'new-possible-leads':
+        this.showActionNotice('New Possible Leads will be available in a future update.');
+        break;
+      case 'sell-refi-scores':
+        this.showActionNotice('Sell & Refi Scores will be available in a future update.');
+        break;
+      default:
+        this.showActionNotice('This action will be available in a future update.');
+    }
+  }
+
+  onQuerySaveShareAction(actionId: QuerySaveShareActionId): void {
+    if (actionId === 'save-search') {
+      this.openSaveSearchModal();
+      return;
+    }
+
+    this.openShareSearchModal();
+  }
+
+  openSaveSearchModal(): void {
+    const session = this.getQuerySession();
+    this.actionError.set(null);
+    this.saveName.set(session?.title && session.title !== 'Area Search Results' ? session.title : '');
+    this.saveSearchModal?.open();
+  }
+
+  closeSaveSearchModal(): void {
+    this.saveSearchModal?.close();
+  }
+
+  confirmSaveSearch(): void {
+    const name = this.saveName().trim();
+    const payload = this.getQueryPayload();
+    if (!name || !payload) {
+      return;
+    }
+
+    const session = this.getQuerySession();
+    this.queryActionLoading.set(true);
+    this.actionError.set(null);
+
+    this.areaSearchService
+      .saveQuery({
+        name,
+        query: payload,
+        is_to_update: !!session?.queryId,
+        query_id: session?.queryId
+      })
+      .subscribe({
+        next: () => {
+          this.queryActionLoading.set(false);
+          this.closeSaveSearchModal();
+          this.areaSearchStateService.setQueryMeta(
+            session?.queryId != null ? String(session.queryId) : null,
+            name
+          );
+          this.showActionNotice('Search saved successfully.');
+        },
+        error: (err: Error) => {
+          this.queryActionLoading.set(false);
+          this.actionError.set(err.message ?? 'Failed to save search.');
+        }
+      });
+  }
+
+  openShareSearchModal(): void {
+    this.actionError.set(null);
+    this.shareEmail.set('');
+    this.shareSearchModal?.open();
+  }
+
+  closeShareSearchModal(): void {
+    this.shareSearchModal?.close();
+  }
+
+  confirmShareSearch(): void {
+    const email = this.shareEmail().trim();
+    const payload = this.getQueryPayload();
+    if (!email || !payload) {
+      return;
+    }
+
+    this.queryActionLoading.set(true);
+    this.actionError.set(null);
+
+    this.areaSearchService
+      .shareQuery({
+        shared_to_email: email,
+        query: payload,
+        name: this.saveName().trim() || this.getQuerySession()?.title || 'Shared Search'
+      })
+      .subscribe({
+        next: () => {
+          this.queryActionLoading.set(false);
+          this.closeShareSearchModal();
+          this.showActionNotice('Search shared successfully.');
+        },
+        error: (err: Error) => {
+          this.queryActionLoading.set(false);
+          this.actionError.set(err.message ?? 'Failed to share search.');
+        }
+      });
+  }
+
+  openSendDataModal(): void {
+    this.actionError.set(null);
+    this.sendDataEmail.set('');
+    this.sendDataModal?.open();
+  }
+
+  closeSendDataModal(): void {
+    this.sendDataModal?.close();
+  }
+
+  confirmSendData(): void {
+    const email = this.sendDataEmail().trim();
+    const payload = this.getQueryPayload();
+    if (!email || !payload) {
+      return;
+    }
+
+    this.queryActionLoading.set(true);
+    this.actionError.set(null);
+
+    this.areaSearchService.sendData({ shared_to_email: email, query: payload }).subscribe({
+      next: () => {
+        this.queryActionLoading.set(false);
+        this.closeSendDataModal();
+        this.showActionNotice('Data sent successfully.');
+      },
+      error: (err: Error) => {
+        this.queryActionLoading.set(false);
+        this.actionError.set(err.message ?? 'Failed to send data.');
+      }
+    });
+  }
+
+  saveFarmFromQuery(): void {
+    this.showActionNotice('Save Farm will be available in a future update.');
+  }
+
+  openDynamicStats(): void {
+    this.showActionNotice('Dynamic Stats will be available in a future update.');
+  }
+
+  openNewPossibleLeads(): void {
+    this.showActionNotice('New Possible Leads will be available in a future update.');
+  }
+
+  clearStartOver(): void {
+    const sessionId = this.detailPageService.sourceId();
+    this.queryActionLoading.set(true);
+    this.actionError.set(null);
+
+    this.areaSearchService.clearGlobalSearch().subscribe({
+      next: () => {
+        this.queryActionLoading.set(false);
+        if (sessionId) {
+          this.areaSearchSessionService.clearSession(sessionId);
+        }
+        void this.router.navigate(['/farming/area-search']);
+      },
+      error: (err: Error) => {
+        this.queryActionLoading.set(false);
+        this.actionError.set(err.message ?? 'Failed to clear search.');
+      }
+    });
+  }
+
+  editSearch(): void {
+    const sessionId = this.detailPageService.sourceId();
+    if (!sessionId) {
+      return;
+    }
+
+    const session = this.areaSearchSessionService.getSession(sessionId);
+    if (!session) {
+      return;
+    }
+
+    this.areaSearchStateService.setEditCriteria(session.criteria);
+    void this.router.navigate(['/farming/area-search'], { queryParams: { edit: 'true' } });
+  }
 
   goBack(): void {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
@@ -393,6 +656,28 @@ export class DetailPageComponent implements OnInit, OnDestroy {
     }
 
     this.location.back();
+  }
+
+  private getQuerySession() {
+    const sessionId = this.detailPageService.sourceId();
+    if (!sessionId) {
+      return undefined;
+    }
+
+    return this.areaSearchSessionService.getSession(sessionId);
+  }
+
+  private getQueryPayload(): AreaSearchPayload | undefined {
+    return this.getQuerySession()?.criteria;
+  }
+
+  private showActionNotice(message: string): void {
+    this.actionNotice.set(message);
+    setTimeout(() => {
+      if (this.actionNotice() === message) {
+        this.actionNotice.set(null);
+      }
+    }, 4000);
   }
 
   private renderMapWhenReady(

@@ -5,7 +5,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { API_CONFIG } from '../config/api.config';
 import { UNAUTHORIZED_MESSAGE } from '../constants/auth.constants';
 import { ApiError } from '../interfaces/api.interface';
-import { extractTtbErrorMessage } from '../utils/ttb-response.util';
+import { extractTtbErrorMessage, repairTruncatedLegacyJson } from '../utils/ttb-response.util';
 import { SessionExpiredService } from './session-expired.service';
 import { VerticalService } from './vertical.service';
 
@@ -50,20 +50,27 @@ export class ApiService {
    * GET as plain text then JSON.parse — for legacy pipeline endpoints that may not
    * return standard application/json (avoids HttpClient "200 OK" parse errors).
    */
-  getParsedJson<T>(endpoint: string, options?: { treatEmptyAs?: T }): Observable<T> {
+  getParsedJson<T>(
+    endpoint: string,
+    options?: { treatEmptyAs?: T; repairTruncatedJson?: boolean }
+  ): Observable<T> {
     return this.http
       .get(`${this.baseUrl}${endpoint}`, {
         headers: this.getHeaders(),
         responseType: 'text'
       })
       .pipe(
-        map((body) => this.parseJsonBody<T>(body, options?.treatEmptyAs)),
+        map((body) => this.parseJsonBody<T>(body, options)),
         tap((data) => this.inspectTtbResponseForAuth(data)),
         catchError(this.handleError)
       );
   }
 
-  private parseJsonBody<T>(body: string, treatEmptyAs?: T): T {
+  private parseJsonBody<T>(
+    body: string,
+    options?: { treatEmptyAs?: T; repairTruncatedJson?: boolean }
+  ): T {
+    const treatEmptyAs = options?.treatEmptyAs;
     const trimmed = body.trim();
 
     if (!trimmed) {
@@ -82,8 +89,10 @@ export class ApiService {
       return treatEmptyAs;
     }
 
+    const jsonText = options?.repairTruncatedJson ? repairTruncatedLegacyJson(trimmed) : trimmed;
+
     try {
-      const parsed = JSON.parse(trimmed) as T;
+      const parsed = JSON.parse(jsonText) as T;
 
       if (treatEmptyAs !== undefined && this.isLegacyNoRecordsPayload(parsed)) {
         return treatEmptyAs;
@@ -142,14 +151,18 @@ export class ApiService {
    * POST as plain text then JSON.parse — for legacy pipeline endpoints that may not
    * return standard application/json.
    */
-  postParsedJson<T>(endpoint: string, body: unknown, options?: { treatEmptyAs?: T }): Observable<T> {
+  postParsedJson<T>(
+    endpoint: string,
+    body: unknown,
+    options?: { treatEmptyAs?: T; repairTruncatedJson?: boolean }
+  ): Observable<T> {
     return this.http
       .post(`${this.baseUrl}${endpoint}`, body, {
         headers: this.getHeaders(),
         responseType: 'text'
       })
       .pipe(
-        map((response) => this.parseJsonBody<T>(response, options?.treatEmptyAs)),
+        map((response) => this.parseJsonBody<T>(response, options)),
         tap((data) => this.inspectTtbResponseForAuth(data)),
         catchError(this.handleError)
       );

@@ -53,7 +53,22 @@ export const API_CONFIG = {
     renameQuery: '/rename_query.json',
     removeQuery: '/remove_query.json',
     getNetsheetList: '/get_netsheet_list.json',
-    deleteNetsheet: '/delete_netsheet.json'
+    deleteNetsheet: '/delete_netsheet.json',
+    getSearchFields: '/get_search_fields.json',
+    globalSearchCount: '/global_search_count.json',
+    globalSearch: '/global_search.json',
+    saveQuery: '/save_query.json',
+    getCommonQueries: '/get_common_queries.json',
+    saveCommonQuery: '/save_common_query.json',
+    renameCommonQuery: '/rename_common_query.json',
+    removeCommonQuery: '/remove_common_query.json',
+    sendData: '/send_data.json',
+    recsPurchase: '/recs_purchase.json',
+    almFetchConfig: '/alm_fetch_config.json',
+    almSaveConfig: '/alm_save_config.json',
+    updateResult: '/update_result.json',
+    clearGlobalSearch: '/clear_global_search.json',
+    contactLookup: '/contact_lookup.json'
   }
 } as const;
 

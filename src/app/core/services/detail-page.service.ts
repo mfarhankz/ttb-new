@@ -5,12 +5,14 @@ import {
   FarmDetailContext,
   isUnsupportedDetailSource
 } from '../detail-contexts/farm-detail.context';
+import { QueryDetailContext } from '../detail-contexts/query-detail.context';
 import { SearchDetailContext } from '../detail-contexts/search-detail.context';
 import {
   DETAIL_PAGE_DEFAULT_FILTER,
   resolveVisibleDetailColumns
 } from '../config/detail-page.config';
 import { SavedFarmGeometry } from '../interfaces/saved-farm.interface';
+import { AreaSearchCriteriaChip } from '../utils/area-search-criteria.util';
 
 const SEARCH_DEBOUNCE_MS = 320;
 
@@ -18,6 +20,7 @@ const SEARCH_DEBOUNCE_MS = 320;
 export class DetailPageService {
   private readonly farmDetailContext = inject(FarmDetailContext);
   private readonly searchDetailContext = inject(SearchDetailContext);
+  private readonly queryDetailContext = inject(QueryDetailContext);
 
   private readonly _source = signal<string | null>(null);
   private readonly _sourceId = signal<string | null>(null);
@@ -38,6 +41,7 @@ export class DetailPageService {
   private readonly _leadsTypes = signal<string[]>([]);
   private readonly _searchText = signal('');
   private readonly _searchField = signal('$');
+  private readonly _criteriaChips = signal<AreaSearchCriteriaChip[]>([]);
 
   readonly source = this._source.asReadonly();
   readonly sourceId = this._sourceId.asReadonly();
@@ -55,6 +59,7 @@ export class DetailPageService {
   readonly supportsDelete = this._supportsDelete.asReadonly();
   readonly searchText = this._searchText.asReadonly();
   readonly searchField = this._searchField.asReadonly();
+  readonly criteriaChips = this._criteriaChips.asReadonly();
 
   readonly columns = computed(() => resolveVisibleDetailColumns(this._allRows(), this._leadsTypes()));
 
@@ -70,6 +75,7 @@ export class DetailPageService {
     this._initState.set(initState);
     this._searchText.set('');
     this._searchField.set('$');
+    this._criteriaChips.set([]);
 
     if (isUnsupportedDetailSource(source)) {
       this._error.set(`Detail source "${source}" is not supported yet.`);
@@ -205,6 +211,7 @@ export class DetailPageService {
     this._initState.set(undefined);
     this._title.set('');
     this._titleLabel.set('Selected');
+    this._criteriaChips.set([]);
     this._geometry.set(undefined);
     this._allRows.set([]);
     this._rows.set([]);
@@ -229,6 +236,10 @@ export class DetailPageService {
       return this.searchDetailContext;
     }
 
+    if (source === 'query') {
+      return this.queryDetailContext;
+    }
+
     throw new Error(`Unsupported detail source: ${source}`);
   }
 
@@ -243,9 +254,11 @@ export class DetailPageService {
     filterOptions: { value: string; label: string }[];
     supportsDelete?: boolean;
     leadsTypes?: string[];
+    criteriaChips?: AreaSearchCriteriaChip[];
   }): void {
     this._title.set(result.title);
     this._titleLabel.set(result.titleLabel);
+    this._criteriaChips.set(result.criteriaChips ?? []);
     this._geometry.set(result.geometry);
     this._allRows.set(result.rows);
     this._totalCount.set(result.totalCount);

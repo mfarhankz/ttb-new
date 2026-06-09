@@ -1,11 +1,12 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ButtonComponent } from '@app/shared/components';
 import { LayoutService } from '@app/core/services/layout.service';
 import { OlMapComponent } from '@app/shared/components/ol-map/ol-map.component';
 import { OlMapService, type MapObjectRefs } from '@app/core/services/ol-map.service';
 import { MAP_DEFAULTS } from '@app/core/config/map.config';
+import { AreaSearchStateService } from '@app/core/services/area-search-state.service';
 
 export type FarmingMapMode = 'radius' | 'boundary';
 
@@ -18,8 +19,10 @@ export type FarmingMapMode = 'radius' | 'boundary';
 })
 export class FarmingComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private olMapService = inject(OlMapService);
   private layoutService = inject(LayoutService);
+  private areaSearchStateService = inject(AreaSearchStateService);
   private sidebarResizeSub?: Subscription;
   private mapReadyAttempts = 0;
 
@@ -46,6 +49,24 @@ export class FarmingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sidebarResizeSub?.unsubscribe();
+  }
+
+  onAreaSearch(): void {
+    const geometry = this.mapObject.geometry;
+    if (!geometry?.match) {
+      return;
+    }
+
+    this.areaSearchStateService.setPendingGeometry({
+      match: geometry.match,
+      value: geometry.value
+    });
+
+    void this.router.navigate(['/farming/area-search']);
+  }
+
+  hasDrawnGeometry(): boolean {
+    return !!this.mapObject.geometry?.match;
   }
 
   onClearSearch(): void {

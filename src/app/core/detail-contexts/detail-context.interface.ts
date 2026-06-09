@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs';
 import { SavedFarmGeometry } from '../interfaces/saved-farm.interface';
 import { DetailFilterOption } from '../config/detail-page.config';
+import { AreaSearchCriteriaChip } from '../utils/area-search-criteria.util';
 
 export interface DetailContextInitState {
   title?: string;
@@ -26,6 +27,7 @@ export interface DetailContextLoadResult {
   titleLabel: string;
   supportsDelete?: boolean;
   leadsTypes?: string[];
+  criteriaChips?: AreaSearchCriteriaChip[];
 }
 
 export interface DetailContext {
