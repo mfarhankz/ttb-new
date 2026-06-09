@@ -24,10 +24,10 @@ import { TargetOfficeService } from './target-office.service';
 
 export const ADMIN_USERS_COLUMNS: DataTableColumn[] = [
   { key: 'actions', label: '', variant: 'actions', sortable: false, align: 'center', width: 'w-12' },
-  { key: 'name', label: 'Name', sortType: 'text', truncate: true, width: 'min-w-[12rem]' },
-  { key: 'loggedInFrom', label: 'Logged in from', sortType: 'text', variant: 'muted', width: 'min-w-[9rem]' },
-  { key: 'email', label: 'Email (Username)', sortType: 'text', truncate: true, width: 'min-w-[14rem]' },
-  { key: 'typeBadges', label: 'Type', variant: 'badges', sortable: false, width: 'min-w-[12rem]' }
+  { key: 'name', label: 'Name', sortType: 'text', truncate: true, width: 'min-w-48' },
+  { key: 'loggedInFrom', label: 'Logged in from', sortType: 'text', variant: 'muted', width: 'min-w-36' },
+  { key: 'email', label: 'Email (Username)', sortType: 'text', truncate: true, width: 'min-w-56' },
+  { key: 'typeBadges', label: 'Type', variant: 'badges', sortable: false, width: 'min-w-48' }
 ];
 
 const DEFAULT_PIPELINE_LIMIT = 10000;

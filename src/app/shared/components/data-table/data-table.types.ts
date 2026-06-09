@@ -41,7 +41,7 @@ export interface DataTableColumn {
   badgesLayout?: DataTableBadgesLayout;
   sortable?: boolean;
   sortType?: DataTableSortType;
-  /** Tailwind width utility, e.g. `w-28`, `min-w-[10rem]`, `max-w-xs` */
+  /** Tailwind width utility, e.g. `w-28`, `min-w-40`, `max-w-xs` */
   width?: string;
   /** Raw numeric field used by the score column variant for pills and sorting. */
   scoreField?: string;

@@ -1,51 +1,51 @@
 /**
  * CSS variable references for design tokens defined in src/styles.css.
- * Tailwind (tailwind.config.js) and TTBPreset (ttb-preset.ts) both read from
- * the same --color-*, --radius-*, --font-*, and --form-* variables.
+ * Tailwind (@theme in styles.css) and TTBPreset (ttb-preset.ts) both read from
+ * the same --ttb-* raw tokens and --form-* variables.
  */
 
-/** rgb(var(--color-*)) — space-separated RGB triplets from styles.css */
+/** rgb(var(--ttb-*)) — space-separated RGB triplets from styles.css */
 export const TTB_COLOR = {
-  primary: 'rgb(var(--color-primary))',
-  primaryForeground: 'rgb(var(--color-primary-foreground))',
-  secondary: 'rgb(var(--color-secondary))',
-  secondaryForeground: 'rgb(var(--color-secondary-foreground))',
-  accent: 'rgb(var(--color-accent))',
-  accentForeground: 'rgb(var(--color-accent-foreground))',
-  background: 'rgb(var(--color-background))',
-  surface: 'rgb(var(--color-surface))',
-  surfaceElevated: 'rgb(var(--color-surface-elevated))',
-  foreground: 'rgb(var(--color-foreground))',
-  muted: 'rgb(var(--color-muted))',
-  subtle: 'rgb(var(--color-subtle))',
-  inverse: 'rgb(var(--color-inverse))',
-  border: 'rgb(var(--color-border))',
-  borderStrong: 'rgb(var(--color-border-strong))',
-  success: 'rgb(var(--color-success))',
-  successForeground: 'rgb(var(--color-success-foreground))',
-  warning: 'rgb(var(--color-warning))',
-  warningForeground: 'rgb(var(--color-warning-foreground))',
-  danger: 'rgb(var(--color-danger))',
-  dangerForeground: 'rgb(var(--color-danger-foreground))',
-  info: 'rgb(var(--color-info))',
-  infoForeground: 'rgb(var(--color-info-foreground))',
-  focusRing: 'rgb(var(--color-focus-ring))',
-  overlay: 'rgb(var(--color-overlay))',
-  overlay40: 'rgb(var(--color-overlay) / 0.4)',
-  overlay60: 'rgb(var(--color-overlay) / 0.6)'
+  primary: 'rgb(var(--ttb-primary))',
+  primaryForeground: 'rgb(var(--ttb-primary-foreground))',
+  secondary: 'rgb(var(--ttb-secondary))',
+  secondaryForeground: 'rgb(var(--ttb-secondary-foreground))',
+  accent: 'rgb(var(--ttb-accent))',
+  accentForeground: 'rgb(var(--ttb-accent-foreground))',
+  background: 'rgb(var(--ttb-background))',
+  surface: 'rgb(var(--ttb-surface))',
+  surfaceElevated: 'rgb(var(--ttb-surface-elevated))',
+  foreground: 'rgb(var(--ttb-foreground))',
+  muted: 'rgb(var(--ttb-muted))',
+  subtle: 'rgb(var(--ttb-subtle))',
+  inverse: 'rgb(var(--ttb-inverse))',
+  border: 'rgb(var(--ttb-border))',
+  borderStrong: 'rgb(var(--ttb-border-strong))',
+  success: 'rgb(var(--ttb-success))',
+  successForeground: 'rgb(var(--ttb-success-foreground))',
+  warning: 'rgb(var(--ttb-warning))',
+  warningForeground: 'rgb(var(--ttb-warning-foreground))',
+  danger: 'rgb(var(--ttb-danger))',
+  dangerForeground: 'rgb(var(--ttb-danger-foreground))',
+  info: 'rgb(var(--ttb-info))',
+  infoForeground: 'rgb(var(--ttb-info-foreground))',
+  focusRing: 'rgb(var(--ttb-focus-ring))',
+  overlay: 'rgb(var(--ttb-overlay))',
+  overlay40: 'rgb(var(--ttb-overlay) / 0.4)',
+  overlay60: 'rgb(var(--ttb-overlay) / 0.6)'
 } as const;
 
 export const TTB_RADIUS = {
-  sm: 'var(--radius-sm)',
-  md: 'var(--radius-md)',
-  lg: 'var(--radius-lg)',
-  xl: 'var(--radius-xl)'
+  sm: 'var(--ttb-radius-sm)',
+  md: 'var(--ttb-radius-md)',
+  lg: 'var(--ttb-radius-lg)',
+  xl: 'var(--ttb-radius-xl)'
 } as const;
 
 export const TTB_FONT = {
-  sans: 'var(--font-sans)',
-  display: 'var(--font-display)',
-  mono: 'var(--font-mono)',
+  sans: 'var(--ttb-font-sans)',
+  display: 'var(--ttb-font-display)',
+  mono: 'var(--ttb-font-mono)',
   sizeBody: 'var(--font-size-body)',
   sizeBodySm: 'var(--font-size-body-sm)',
   sizeCaption: 'var(--font-size-caption)',

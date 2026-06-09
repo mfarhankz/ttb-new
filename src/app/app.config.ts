@@ -22,7 +22,11 @@ export const appConfig: ApplicationConfig = {
       theme: {
         preset: TTBPreset,
         options: {
-          darkModeSelector: '[data-theme="dark"]'
+          darkModeSelector: '[data-theme="dark"]',
+          cssLayer: {
+            name: 'primeng',
+            order: 'theme, base, primeng'
+          }
         }
       }
     }),

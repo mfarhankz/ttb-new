@@ -13,10 +13,10 @@ export const SAVED_NET_SHEETS_FILTER_FIELD_OPTIONS: SavedNetSheetFilterFieldOpti
 ];
 
 export const SAVED_NET_SHEETS_COLUMNS: DataTableColumn[] = [
-  { key: 'actions', label: '', variant: 'actions', sortable: false, align: 'center', width: 'w-16 min-w-[4.5rem]' },
+  { key: 'actions', label: '', variant: 'actions', sortable: false, align: 'center', width: 'w-16 min-w-18' },
   { key: 'propertyAddress', label: 'Property Address', sortType: 'text', truncate: true, width: 'min-w-[16rem]' },
-  { key: 'netsheetType', label: 'Net Sheet', sortType: 'text', width: 'min-w-[8rem]' },
-  { key: 'lastSaved', label: 'Last saved', sortType: 'date', width: 'min-w-[9rem]', nowrap: true }
+  { key: 'netsheetType', label: 'Net Sheet', sortType: 'text', width: 'min-w-32' },
+  { key: 'lastSaved', label: 'Last saved', sortType: 'date', width: 'min-w-36', nowrap: true }
 ];
 
 export const SAVED_NET_SHEETS_DEFAULT_PAGE_SIZE = 100;

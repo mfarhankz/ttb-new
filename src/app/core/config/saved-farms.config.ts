@@ -28,8 +28,8 @@ export const SAVED_FARMS_FILTER_FIELD_OPTIONS: SavedFarmFilterFieldOption[] = [
 ];
 
 export const SAVED_FARMS_COLUMNS: DataTableColumn[] = [
-  { key: 'actions', label: '', variant: 'actions', sortable: false, align: 'center', width: 'w-16 min-w-[4.5rem]' },
-  { key: 'name', label: 'Farm Name', sortType: 'text', truncate: true, width: 'min-w-[14rem]' },
+  { key: 'actions', label: '', variant: 'actions', sortable: false, align: 'center', width: 'w-16 min-w-18' },
+  { key: 'name', label: 'Farm Name', sortType: 'text', truncate: true, width: 'min-w-56' },
   {
     key: 'propertyCount',
     label: '# of Properties',
@@ -39,7 +39,7 @@ export const SAVED_FARMS_COLUMNS: DataTableColumn[] = [
     width: 'w-36',
     nowrap: true
   },
-  { key: 'createdOn', label: 'Created on', sortType: 'date', width: 'min-w-[9rem]', nowrap: true }
+  { key: 'createdOn', label: 'Created on', sortType: 'date', width: 'min-w-36', nowrap: true }
 ];
 
 /** Legacy farms pipeline used 100 records per page. */

@@ -5,7 +5,7 @@
 >
   <!-- Brand header -->
   <div
-    class="relative flex items-center gap-3 px-4 py-3 border-b border-sidebar-border min-h-[4.5rem]"
+    class="relative flex items-center gap-3 px-4 py-3 border-b border-sidebar-border min-h-18"
     [class.justify-center]="isCollapsed"
     [class.px-3]="isCollapsed"
   >
@@ -22,7 +22,7 @@
 
     <button
       type="button"
-      class="absolute -right-3 top-[4.5em] -translate-y-1/2 w-5 h-5 rounded-md bg-surface border border-border flex items-center justify-center cursor-pointer z-[41] text-muted shadow-sm transition-colors hover:text-foreground"
+      class="absolute -right-3 top-[4.5em] -translate-y-1/2 w-5 h-5 rounded-md bg-surface border border-border flex items-center justify-center cursor-pointer z-41 text-muted shadow-sm transition-colors hover:text-foreground"
       (click)="toggleCollapsed()"
       [attr.aria-label]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
     >
@@ -60,11 +60,11 @@
             [class.font-medium]="isParentActive(item)"
             (click)="toggleMenu(item, $event)"
           >
-            <i [class]="item.icon" class="!text-lg flex-shrink-0"></i>
+            <i [class]="item.icon" class="text-lg! shrink-0"></i>
             <span class="truncate flex-1 !font-lg font-semibold" [class.hidden]="isCollapsed">{{ item.label }}</span>
             @if (!isCollapsed) {
               <i
-                class="pi flex-shrink-0 !text-[0.8rem] transition-transform duration-200"
+                class="pi shrink-0 text-[0.8rem]! transition-transform duration-200"
                 [class.pi-chevron-up]="isMenuExpanded(item.label)"
                 [class.pi-chevron-down]="!isMenuExpanded(item.label)"
               ></i>
@@ -89,11 +89,11 @@
           <!-- Collapsed: hover flyout submenu (pl-2 bridges gap to parent icon) -->
           @if (isCollapsed && isFlyoutOpen(item.label)) {
             <div
-              class="absolute left-full top-0 pl-2 z-[60]"
+              class="absolute left-full top-0 pl-2 z-60"
               (mouseenter)="showFlyout(item.label)"
               (mouseleave)="hideFlyout(item.label)"
             >
-              <div class="min-w-[11rem] bg-surface border border-border rounded-xl shadow-lg py-2">
+              <div class="min-w-44 bg-surface border border-border rounded-xl shadow-lg py-2">
                 <div class="px-3 py-1.5 text-overline uppercase text-muted border-b border-border mb-1">
                   {{ item.label }}
                 </div>
@@ -119,7 +119,7 @@
               [class.px-2]="isCollapsed"
               (click)="onNavAction(item)"
             >
-              <i [class]="item.icon" class="text-lg flex-shrink-0"></i>
+              <i [class]="item.icon" class="text-lg shrink-0"></i>
               <span class="truncate flex-1" [class.hidden]="isCollapsed">{{ item.label }}</span>
               @if (item.badge && !isCollapsed) {
                 <span class="text-caption bg-success text-success-foreground px-1.5 py-0.5 rounded">{{ item.badge }}</span>
@@ -143,7 +143,7 @@
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
             >
-              <i [class]="item.icon" class="text-lg flex-shrink-0"></i>
+              <i [class]="item.icon" class="text-lg shrink-0"></i>
               <span class="truncate flex-1" [class.hidden]="isCollapsed">{{ item.label }}</span>
               @if (item.badge && !isCollapsed) {
                 <span class="text-caption bg-success text-success-foreground px-1.5 py-0.5 rounded">{{ item.badge }}</span>
@@ -175,7 +175,7 @@
             [routerLink]="item.route"
             routerLinkActive="active"
           >
-            <i [class]="item.icon" class="text-lg flex-shrink-0"></i>
+            <i [class]="item.icon" class="text-lg shrink-0"></i>
             <span class="truncate" [class.hidden]="isCollapsed">{{ item.label }}</span>
           </a>
         } @else if (item.action === 'logout') {
@@ -186,7 +186,7 @@
             [class.px-2]="isCollapsed"
             (click)="onNavAction(item)"
           >
-            <i [class]="item.icon" class="text-lg flex-shrink-0"></i>
+            <i [class]="item.icon" class="text-lg shrink-0"></i>
             <span class="truncate" [class.hidden]="isCollapsed">{{ item.label }}</span>
           </button>
         }
@@ -205,7 +205,7 @@
 
   <!-- User block -->
   <div
-    class="flex items-center gap-3 px-4 py-3 border-t border-sidebar-border flex-shrink-0"
+    class="flex items-center gap-3 px-4 py-3 border-t border-sidebar-border shrink-0"
     [class.justify-center]="isCollapsed"
     [class.px-3]="isCollapsed"
   >
@@ -213,12 +213,12 @@
       <img
         [src]="userPicture()"
         [alt]="name()"
-        class="w-10 h-10 rounded-full object-cover flex-shrink-0"
+        class="w-10 h-10 rounded-full object-cover shrink-0"
         onerror="this.style.display='none'"
       />
     } @else {
       <div
-        class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-body-sm font-semibold bg-sidebar-active text-sidebar-foreground"
+        class="w-10 h-10 rounded-full shrink-0 flex items-center justify-center text-body-sm font-semibold bg-sidebar-active text-sidebar-foreground"
       >
         {{ name().charAt(0) }}
       </div>

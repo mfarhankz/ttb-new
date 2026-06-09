@@ -24,7 +24,7 @@ export class ButtonComponent {
 
   getButtonClasses(): string {
     const baseClasses =
-      'inline-flex items-center justify-center whitespace-nowrap font-medium rounded-md border-2 border-transparent box-border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+      'inline-flex items-center justify-center whitespace-nowrap font-medium rounded-md border-2 border-transparent box-border transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
     const sizeClasses = {
       sm: 'px-3 py-1.5 text-sm',

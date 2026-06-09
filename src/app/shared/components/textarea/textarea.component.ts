@@ -42,7 +42,7 @@ export class TextareaComponent implements ControlValueAccessor {
   }
 
   getTextareaClasses(): string {
-    const baseClasses = 'block w-full rounded-md border shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 resize-y';
+    const baseClasses = 'block w-full rounded-md border shadow-sm transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-0 resize-y';
     
     const sizeClasses = {
       sm: 'px-3 py-1.5 text-sm',

@@ -4,7 +4,7 @@
  * Conventions:
  * - Use semantic Tailwind classes in app code (text-foreground, bg-primary, text-h1).
  * - Do NOT use raw palette classes (gray-*, blue-*, etc.) in components.
- * - Colors are space-separated RGB triplets for use with rgb(var(--token) / <alpha>).
+ * - Raw tokens use --ttb-* (space-separated RGB triplets). Tailwind @theme maps them to utilities.
  */
 
 export type ThemeMode = 'light' | 'dark';
@@ -12,56 +12,56 @@ export type ThemeBrand = 'default' | 'acme';
 
 export interface ThemeTokens {
   // Brand
-  '--color-primary': string;
-  '--color-primary-foreground': string;
-  '--color-secondary': string;
-  '--color-secondary-foreground': string;
-  '--color-accent': string;
-  '--color-accent-foreground': string;
+  '--ttb-primary': string;
+  '--ttb-primary-foreground': string;
+  '--ttb-secondary': string;
+  '--ttb-secondary-foreground': string;
+  '--ttb-accent': string;
+  '--ttb-accent-foreground': string;
   // Surfaces
-  '--color-background': string;
-  '--color-surface': string;
-  '--color-surface-elevated': string;
-  '--color-overlay': string;
+  '--ttb-background': string;
+  '--ttb-surface': string;
+  '--ttb-surface-elevated': string;
+  '--ttb-overlay': string;
   // Text
-  '--color-foreground': string;
-  '--color-muted': string;
-  '--color-subtle': string;
-  '--color-inverse': string;
+  '--ttb-foreground': string;
+  '--ttb-muted': string;
+  '--ttb-subtle': string;
+  '--ttb-inverse': string;
   // Borders
-  '--color-border': string;
-  '--color-border-strong': string;
+  '--ttb-border': string;
+  '--ttb-border-strong': string;
   // States
-  '--color-success': string;
-  '--color-success-foreground': string;
-  '--color-warning': string;
-  '--color-warning-foreground': string;
-  '--color-danger': string;
-  '--color-danger-foreground': string;
-  '--color-info': string;
-  '--color-info-foreground': string;
+  '--ttb-success': string;
+  '--ttb-success-foreground': string;
+  '--ttb-warning': string;
+  '--ttb-warning-foreground': string;
+  '--ttb-danger': string;
+  '--ttb-danger-foreground': string;
+  '--ttb-info': string;
+  '--ttb-info-foreground': string;
   // Focus
-  '--color-focus-ring': string;
+  '--ttb-focus-ring': string;
   // Sidebar
   '--sidebar-width': string;
   '--sidebar-width-collapsed': string;
-  '--color-sidebar': string;
-  '--color-sidebar-foreground': string;
-  '--color-sidebar-muted': string;
-  '--color-sidebar-active': string;
-  '--color-sidebar-hover': string;
-  '--color-sidebar-border': string;
-  '--color-sidebar-tooltip': string;
-  '--color-sidebar-tooltip-foreground': string;
+  '--ttb-sidebar': string;
+  '--ttb-sidebar-foreground': string;
+  '--ttb-sidebar-muted': string;
+  '--ttb-sidebar-active': string;
+  '--ttb-sidebar-hover': string;
+  '--ttb-sidebar-border': string;
+  '--ttb-sidebar-tooltip': string;
+  '--ttb-sidebar-tooltip-foreground': string;
   // Typography
-  '--font-sans': string;
-  '--font-display': string;
-  '--font-mono': string;
+  '--ttb-font-sans': string;
+  '--ttb-font-display': string;
+  '--ttb-font-mono': string;
   // Radius (used via Tailwind theme, also available as CSS vars)
-  '--radius-sm': string;
-  '--radius-md': string;
-  '--radius-lg': string;
-  '--radius-xl': string;
+  '--ttb-radius-sm': string;
+  '--ttb-radius-md': string;
+  '--ttb-radius-lg': string;
+  '--ttb-radius-xl': string;
 }
 
 export const THEME_STORAGE_KEY = 'ttb-theme-mode';
@@ -71,107 +71,107 @@ const sharedLayout: Pick<
   ThemeTokens,
   | '--sidebar-width'
   | '--sidebar-width-collapsed'
-  | '--font-sans'
-  | '--font-display'
-  | '--font-mono'
-  | '--radius-sm'
-  | '--radius-md'
-  | '--radius-lg'
-  | '--radius-xl'
+  | '--ttb-font-sans'
+  | '--ttb-font-display'
+  | '--ttb-font-mono'
+  | '--ttb-radius-sm'
+  | '--ttb-radius-md'
+  | '--ttb-radius-lg'
+  | '--ttb-radius-xl'
 > = {
   '--sidebar-width': '260px',
   '--sidebar-width-collapsed': '72px',
-  '--font-sans': 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  '--font-display': 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  '--font-mono': 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-  '--radius-sm': '0.25rem',
-  '--radius-md': '0.375rem',
-  '--radius-lg': '0.5rem',
-  '--radius-xl': '0.75rem'
+  '--ttb-font-sans': 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  '--ttb-font-display': 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  '--ttb-font-mono': 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+  '--ttb-radius-sm': '0.25rem',
+  '--ttb-radius-md': '0.375rem',
+  '--ttb-radius-lg': '0.5rem',
+  '--ttb-radius-xl': '0.75rem'
 };
 
 export const defaultLight: ThemeTokens = {
   ...sharedLayout,
-  '--color-primary': '37 99 235',
-  '--color-primary-foreground': '255 255 255',
-  '--color-secondary': '75 85 99',
-  '--color-secondary-foreground': '255 255 255',
-  '--color-accent': '59 130 246',
-  '--color-accent-foreground': '255 255 255',
-  '--color-background': '249 250 251',
-  '--color-surface': '255 255 255',
-  '--color-surface-elevated': '255 255 255',
-  '--color-overlay': '0 0 0',
-  '--color-foreground': '17 24 39',
-  '--color-muted': '75 85 99',
-  '--color-subtle': '107 114 128',
-  '--color-inverse': '255 255 255',
-  '--color-border': '229 231 235',
-  '--color-border-strong': '209 213 219',
-  '--color-success': '22 163 74',
-  '--color-success-foreground': '255 255 255',
-  '--color-warning': '202 138 4',
-  '--color-warning-foreground': '255 255 255',
-  '--color-danger': '220 38 38',
-  '--color-danger-foreground': '255 255 255',
-  '--color-info': '37 99 235',
-  '--color-info-foreground': '255 255 255',
-  '--color-focus-ring': '59 130 246',
-  '--color-sidebar': '255 255 255',
-  '--color-sidebar-foreground': '55 65 81',
-  '--color-sidebar-muted': '107 114 128',
-  '--color-sidebar-active': '243 244 246',
-  '--color-sidebar-hover': '249 250 251',
-  '--color-sidebar-border': '229 231 235',
-  '--color-sidebar-tooltip': '31 41 55',
-  '--color-sidebar-tooltip-foreground': '255 255 255'
+  '--ttb-primary': '37 99 235',
+  '--ttb-primary-foreground': '255 255 255',
+  '--ttb-secondary': '75 85 99',
+  '--ttb-secondary-foreground': '255 255 255',
+  '--ttb-accent': '59 130 246',
+  '--ttb-accent-foreground': '255 255 255',
+  '--ttb-background': '249 250 251',
+  '--ttb-surface': '255 255 255',
+  '--ttb-surface-elevated': '255 255 255',
+  '--ttb-overlay': '0 0 0',
+  '--ttb-foreground': '17 24 39',
+  '--ttb-muted': '75 85 99',
+  '--ttb-subtle': '107 114 128',
+  '--ttb-inverse': '255 255 255',
+  '--ttb-border': '229 231 235',
+  '--ttb-border-strong': '209 213 219',
+  '--ttb-success': '22 163 74',
+  '--ttb-success-foreground': '255 255 255',
+  '--ttb-warning': '202 138 4',
+  '--ttb-warning-foreground': '255 255 255',
+  '--ttb-danger': '220 38 38',
+  '--ttb-danger-foreground': '255 255 255',
+  '--ttb-info': '37 99 235',
+  '--ttb-info-foreground': '255 255 255',
+  '--ttb-focus-ring': '59 130 246',
+  '--ttb-sidebar': '255 255 255',
+  '--ttb-sidebar-foreground': '55 65 81',
+  '--ttb-sidebar-muted': '107 114 128',
+  '--ttb-sidebar-active': '243 244 246',
+  '--ttb-sidebar-hover': '249 250 251',
+  '--ttb-sidebar-border': '229 231 235',
+  '--ttb-sidebar-tooltip': '31 41 55',
+  '--ttb-sidebar-tooltip-foreground': '255 255 255'
 };
 
 export const defaultDark: ThemeTokens = {
   ...sharedLayout,
-  '--color-primary': '96 165 250',
-  '--color-primary-foreground': '15 23 42',
-  '--color-secondary': '148 163 184',
-  '--color-secondary-foreground': '15 23 42',
-  '--color-accent': '59 130 246',
-  '--color-accent-foreground': '255 255 255',
-  '--color-background': '15 23 42',
-  '--color-surface': '30 41 59',
-  '--color-surface-elevated': '51 65 85',
-  '--color-overlay': '0 0 0',
-  '--color-foreground': '241 245 249',
-  '--color-muted': '148 163 184',
-  '--color-subtle': '100 116 139',
-  '--color-inverse': '15 23 42',
-  '--color-border': '51 65 85',
-  '--color-border-strong': '71 85 105',
-  '--color-success': '34 197 94',
-  '--color-success-foreground': '15 23 42',
-  '--color-warning': '234 179 8',
-  '--color-warning-foreground': '15 23 42',
-  '--color-danger': '248 113 113',
-  '--color-danger-foreground': '15 23 42',
-  '--color-info': '96 165 250',
-  '--color-info-foreground': '15 23 42',
-  '--color-focus-ring': '96 165 250',
-  '--color-sidebar': '15 23 42',
-  '--color-sidebar-foreground': '241 245 249',
-  '--color-sidebar-muted': '148 163 184',
-  '--color-sidebar-active': '30 41 59',
-  '--color-sidebar-hover': '30 41 59',
-  '--color-sidebar-border': '51 65 85',
-  '--color-sidebar-tooltip': '241 245 249',
-  '--color-sidebar-tooltip-foreground': '15 23 42'
+  '--ttb-primary': '96 165 250',
+  '--ttb-primary-foreground': '15 23 42',
+  '--ttb-secondary': '148 163 184',
+  '--ttb-secondary-foreground': '15 23 42',
+  '--ttb-accent': '59 130 246',
+  '--ttb-accent-foreground': '255 255 255',
+  '--ttb-background': '15 23 42',
+  '--ttb-surface': '30 41 59',
+  '--ttb-surface-elevated': '51 65 85',
+  '--ttb-overlay': '0 0 0',
+  '--ttb-foreground': '241 245 249',
+  '--ttb-muted': '148 163 184',
+  '--ttb-subtle': '100 116 139',
+  '--ttb-inverse': '15 23 42',
+  '--ttb-border': '51 65 85',
+  '--ttb-border-strong': '71 85 105',
+  '--ttb-success': '34 197 94',
+  '--ttb-success-foreground': '15 23 42',
+  '--ttb-warning': '234 179 8',
+  '--ttb-warning-foreground': '15 23 42',
+  '--ttb-danger': '248 113 113',
+  '--ttb-danger-foreground': '15 23 42',
+  '--ttb-info': '96 165 250',
+  '--ttb-info-foreground': '15 23 42',
+  '--ttb-focus-ring': '96 165 250',
+  '--ttb-sidebar': '15 23 42',
+  '--ttb-sidebar-foreground': '241 245 249',
+  '--ttb-sidebar-muted': '148 163 184',
+  '--ttb-sidebar-active': '30 41 59',
+  '--ttb-sidebar-hover': '30 41 59',
+  '--ttb-sidebar-border': '51 65 85',
+  '--ttb-sidebar-tooltip': '241 245 249',
+  '--ttb-sidebar-tooltip-foreground': '15 23 42'
 };
 
 /** Sample white-label brand — override primary/accent only */
 export const brandAcme: Partial<ThemeTokens> = {
-  '--color-primary': '124 58 237',
-  '--color-primary-foreground': '255 255 255',
-  '--color-accent': '139 92 246',
-  '--color-accent-foreground': '255 255 255',
-  '--color-focus-ring': '139 92 246',
-  '--color-info': '124 58 237'
+  '--ttb-primary': '124 58 237',
+  '--ttb-primary-foreground': '255 255 255',
+  '--ttb-accent': '139 92 246',
+  '--ttb-accent-foreground': '255 255 255',
+  '--ttb-focus-ring': '139 92 246',
+  '--ttb-info': '124 58 237'
 };
 
 export const THEME_PRESETS: Record<ThemeMode, ThemeTokens> = {
@@ -217,22 +217,22 @@ export function tenantOverrideToCssVars(override: TenantThemeOverride): Record<s
   if (override.primaryColor) {
     const rgb = hexToRgbTriplet(override.primaryColor);
     if (rgb) {
-      vars['--color-primary'] = rgb;
-      vars['--color-focus-ring'] = rgb;
-      vars['--color-info'] = rgb;
+      vars['--ttb-primary'] = rgb;
+      vars['--ttb-focus-ring'] = rgb;
+      vars['--ttb-info'] = rgb;
     }
   }
   if (override.secondaryColor) {
     const rgb = hexToRgbTriplet(override.secondaryColor);
-    if (rgb) vars['--color-secondary'] = rgb;
+    if (rgb) vars['--ttb-secondary'] = rgb;
   }
   if (override.accentColor) {
     const rgb = hexToRgbTriplet(override.accentColor);
-    if (rgb) vars['--color-accent'] = rgb;
+    if (rgb) vars['--ttb-accent'] = rgb;
   }
   if (override.fontFamily) {
-    vars['--font-sans'] = override.fontFamily;
-    vars['--font-display'] = override.fontFamily;
+    vars['--ttb-font-sans'] = override.fontFamily;
+    vars['--ttb-font-display'] = override.fontFamily;
   }
   return vars;
 }

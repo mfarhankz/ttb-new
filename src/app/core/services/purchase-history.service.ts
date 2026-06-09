@@ -8,10 +8,10 @@ import { DataTableColumn } from '@app/shared/components/data-table/data-table.ty
 export const PURCHASE_HISTORY_COLUMNS: DataTableColumn[] = [
   { key: 'purchaseId', label: 'Purchase ID', variant: 'numeric', sortType: 'number', width: 'w-28', nowrap: true },
   { key: 'product', label: 'Product', truncate: true, sortType: 'text' },
-  { key: 'orderPlaced', label: 'Order Placed', sortType: 'date', width: 'min-w-[9rem]', nowrap: true },
+  { key: 'orderPlaced', label: 'Order Placed', sortType: 'date', width: 'min-w-36', nowrap: true },
   { key: 'price', label: 'Price', align: 'right', variant: 'numeric', sortType: 'number', width: 'w-24', nowrap: true },
   { key: 'status', label: 'Status', align: 'center', variant: 'badge', width: 'w-28' },
-  { key: 'paymentMethod', label: 'Payment Method', variant: 'muted', width: 'min-w-[9rem]', nowrap: true }
+  { key: 'paymentMethod', label: 'Payment Method', variant: 'muted', width: 'min-w-36', nowrap: true }
 ];
 
 const SEARCH_DEBOUNCE_MS = 320;

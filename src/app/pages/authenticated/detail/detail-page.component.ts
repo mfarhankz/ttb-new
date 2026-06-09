@@ -64,7 +64,7 @@ const DETAIL_ACTIONS_COLUMN: DataTableColumn = {
   variant: 'actions',
   sortable: false,
   align: 'center',
-  width: 'w-20 min-w-[5.5rem]'
+  width: 'w-20 min-w-22'
 };
 
 @Component({
@@ -105,13 +105,13 @@ const DETAIL_ACTIONS_COLUMN: DataTableColumn = {
 })
 export class DetailPageComponent implements OnInit, OnDestroy {
   readonly toolbarBtnClass =
-    'inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-border bg-transparent px-3 text-sm font-medium text-muted transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus disabled:pointer-events-none disabled:opacity-40';
+    'inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-border bg-transparent px-3 text-sm font-medium text-muted transition-colors hover:bg-primary/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus disabled:pointer-events-none disabled:opacity-40';
 
   readonly toolbarBtnPrimaryClass =
-    'inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus disabled:pointer-events-none disabled:opacity-40';
+    'inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus disabled:pointer-events-none disabled:opacity-40';
 
   readonly toolbarBtnIconClass =
-    'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-transparent text-muted transition-colors hover:bg-sidebar-active hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus disabled:pointer-events-none disabled:opacity-40';
+    'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-transparent text-muted transition-colors hover:bg-sidebar-active hover:text-foreground focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus disabled:pointer-events-none disabled:opacity-40';
 
   @ViewChild('deleteConfirmModal') private deleteConfirmModal?: ModalComponent;
   @ViewChild('saveSearchModal') private saveSearchModal?: ModalComponent;

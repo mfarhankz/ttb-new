@@ -2,7 +2,7 @@
  * TTB PrimeNG theme preset — extends Aura.
  *
  * Colors, radius, typography, and form spacing reference CSS variables from
- * src/styles.css (same source as tailwind.config.js). Edit styles.css to
+ * src/styles.css (@theme + design tokens). Edit styles.css to
  * change the look site-wide.
  */
 import { definePreset } from '@primeuix/themes';

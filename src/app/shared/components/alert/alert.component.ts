@@ -72,7 +72,7 @@ export class AlertComponent {
       warning: 'text-warning hover:bg-warning/10 focus:ring-warning',
       info: 'text-info hover:bg-info/10 focus:ring-info'
     };
-    return `inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 ${typeClasses[this.type]}`;
+    return `inline-flex rounded-md p-1.5 focus:outline-hidden focus:ring-2 focus:ring-offset-2 ${typeClasses[this.type]}`;
   }
 }
 

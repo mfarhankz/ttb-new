@@ -23,7 +23,7 @@
   @if (panelOpen() && showPanel()) {
     <ul
       #panelEl
-      class="z-[10050] max-h-56 overflow-y-auto rounded-md border border-border bg-surface py-1 shadow-lg"
+      class="z-10050 max-h-56 overflow-y-auto rounded-md border border-border bg-surface py-1 shadow-lg"
       [class.fixed]="appendTo() === 'body'"
       [class.absolute]="appendTo() === 'self'"
       role="listbox"

@@ -320,7 +320,7 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
       return `${base} w-0 max-w-0 overflow-hidden border-l-0`;
     }
 
-    return `${base} w-[510px] max-w-[40vw] max-md:fixed max-md:inset-0 max-md:z-40 max-md:!w-full max-md:!max-w-full`;
+    return `${base} w-[510px] max-w-[40vw] max-md:fixed max-md:inset-0 max-md:z-40 max-md:w-full! max-md:max-w-full!`;
   }
 
   toggleQueriesPanel(): void {

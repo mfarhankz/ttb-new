@@ -10,11 +10,11 @@ import {
 import { DataTableColumn } from '@app/shared/components/data-table/data-table.types';
 
 export const ORDER_HISTORY_COLUMNS: DataTableColumn[] = [
-  { key: 'orderedBy', label: 'Ordered By', sortType: 'text', truncate: true, width: 'min-w-[10rem]' },
-  { key: 'officeName', label: 'Office Name', sortType: 'text', truncate: true, width: 'min-w-[10rem]' },
-  { key: 'address', label: 'Address', sortType: 'text', truncate: true, width: 'min-w-[14rem]' },
-  { key: 'reportDate', label: 'Report Date', sortType: 'date', width: 'min-w-[9rem]', nowrap: true },
-  { key: 'reportType', label: 'Report Type', sortType: 'text', truncate: true, width: 'min-w-[12rem]' }
+  { key: 'orderedBy', label: 'Ordered By', sortType: 'text', truncate: true, width: 'min-w-40' },
+  { key: 'officeName', label: 'Office Name', sortType: 'text', truncate: true, width: 'min-w-40' },
+  { key: 'address', label: 'Address', sortType: 'text', truncate: true, width: 'min-w-56' },
+  { key: 'reportDate', label: 'Report Date', sortType: 'date', width: 'min-w-36', nowrap: true },
+  { key: 'reportType', label: 'Report Type', sortType: 'text', truncate: true, width: 'min-w-48' }
 ];
 
 @Injectable({ providedIn: 'root' })

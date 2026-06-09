@@ -11,7 +11,7 @@
           </p>
         </div>
       }
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="!mt-0">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mt-0!">
         <div>
           <app-input
             id="email"
@@ -48,7 +48,7 @@
           <app-alert type="error" [title]="errorMessage()" [dismissible]="true" (onDismiss)="errorMessage.set('')" />
         }
 
-        <div class="!mt-4">
+        <div class="mt-4!">
         <app-button
           type="submit"
           variant="primary"

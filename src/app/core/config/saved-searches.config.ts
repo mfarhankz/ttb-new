@@ -14,11 +14,11 @@ export const SAVED_SEARCHES_FILTER_FIELD_OPTIONS: SavedSearchFilterFieldOption[]
 ];
 
 export const SAVED_SEARCHES_COLUMNS: DataTableColumn[] = [
-  { key: 'actions', label: '', variant: 'actions', sortable: false, align: 'center', width: 'w-16 min-w-[4.5rem]' },
-  { key: 'name', label: 'Query Name', sortType: 'text', truncate: true, width: 'min-w-[14rem]' },
-  { key: 'createdBy', label: 'Created By', sortType: 'text', truncate: true, width: 'min-w-[10rem]' },
-  { key: 'sharedTo', label: 'Shared To', sortType: 'text', truncate: true, width: 'min-w-[10rem]' },
-  { key: 'createdOn', label: 'Created on', sortType: 'date', width: 'min-w-[9rem]', nowrap: true }
+  { key: 'actions', label: '', variant: 'actions', sortable: false, align: 'center', width: 'w-16 min-w-18' },
+  { key: 'name', label: 'Query Name', sortType: 'text', truncate: true, width: 'min-w-56' },
+  { key: 'createdBy', label: 'Created By', sortType: 'text', truncate: true, width: 'min-w-40' },
+  { key: 'sharedTo', label: 'Shared To', sortType: 'text', truncate: true, width: 'min-w-40' },
+  { key: 'createdOn', label: 'Created on', sortType: 'date', width: 'min-w-36', nowrap: true }
 ];
 
 export const SAVED_SEARCHES_DEFAULT_PAGE_SIZE = 100;

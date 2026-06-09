@@ -15,7 +15,7 @@ import { AreaSearchCriteriaChip } from '@app/core/utils/area-search-criteria.uti
           @if (removable) {
             <button
               type="button"
-              class="inline-flex h-[1.125rem] w-[1.125rem] cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-danger hover:bg-danger/10"
+              class="inline-flex h-4.5 w-4.5 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-danger hover:bg-danger/10"
               (click)="remove.emit(chip.fieldName)"
               [attr.aria-label]="'Remove ' + chip.label"
             >

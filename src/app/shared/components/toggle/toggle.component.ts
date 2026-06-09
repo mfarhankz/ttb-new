@@ -31,7 +31,7 @@ export class ToggleComponent implements ControlValueAccessor {
 
   getTrackClasses(): string {
     const base =
-      'relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2';
+      'relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2';
 
     if (this.disabled) {
       return `${base} cursor-not-allowed bg-border/80`;

@@ -23,18 +23,18 @@ export const ADMIN_OFFICES_COLUMNS: DataTableColumn[] = [
     badgesLayout: 'stacked',
     sortable: false,
     truncate: true,
-    width: 'min-w-[12rem]'
+    width: 'min-w-48'
   },
-  { key: 'address', label: 'Address', sortType: 'text', truncate: true, width: 'min-w-[14rem]' },
-  { key: 'phone', label: 'Phone', sortType: 'text', variant: 'muted', width: 'min-w-[9rem]' },
-  { key: 'email', label: 'Email', sortType: 'text', truncate: true, width: 'min-w-[12rem]' },
+  { key: 'address', label: 'Address', sortType: 'text', truncate: true, width: 'min-w-56' },
+  { key: 'phone', label: 'Phone', sortType: 'text', variant: 'muted', width: 'min-w-36' },
+  { key: 'email', label: 'Email', sortType: 'text', truncate: true, width: 'min-w-48' },
   {
     key: 'officeInfo',
     label: 'Office Info',
     sortType: 'text',
     variant: 'muted',
     truncate: true,
-    width: 'min-w-[14rem]'
+    width: 'min-w-56'
   }
 ];
 

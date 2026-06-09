@@ -45,7 +45,7 @@ export class SelectComponent implements ControlValueAccessor {
   }
 
   getSelectClasses(): string {
-    const baseClasses = 'block w-full rounded-md border shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 appearance-none bg-surface text-foreground';
+    const baseClasses = 'block w-full rounded-md border shadow-sm transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-0 appearance-none bg-surface text-foreground';
     
     const sizeClasses = {
       sm: 'px-3 py-1.5 text-sm',

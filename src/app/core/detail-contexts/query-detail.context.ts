@@ -13,6 +13,12 @@ import { AreaSearchFieldsService } from '../services/area-search-fields.service'
 import { buildSelectedCriteria } from '../utils/area-search-criteria.util';
 import { payloadToFormData } from '../utils/area-search-form.util';
 
+export const QUERY_SESSION_EXPIRED_ERROR = 'Query session expired. Please run Area Search again.';
+
+export function isQuerySessionExpiredError(error: unknown): boolean {
+  return error instanceof Error && error.message === QUERY_SESSION_EXPIRED_ERROR;
+}
+
 @Injectable({ providedIn: 'root' })
 export class QueryDetailContext implements DetailContext {
   readonly source = 'query';
@@ -47,7 +53,7 @@ export class QueryDetailContext implements DetailContext {
   ): Observable<DetailContextLoadResult> {
     const session = this.sessionService.getSession(sessionId);
     if (!session) {
-      return throwError(() => new Error('Query session expired. Please run Area Search again.'));
+      return throwError(() => new Error(QUERY_SESSION_EXPIRED_ERROR));
     }
 
     const geometry = session.criteria.geometry as SavedFarmGeometry | undefined;

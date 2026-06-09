@@ -214,7 +214,7 @@ export class DataTableComponent {
   }
 
   sortIconClass(column: DataTableColumn): string {
-    const base = 'pi shrink-0 !text-[0.875rem]';
+    const base = 'pi shrink-0 text-[0.875rem]!';
 
     if (!this.isSorted(column)) {
       return `${base} pi-sort-alt text-subtle/80`;
@@ -335,7 +335,7 @@ export class DataTableComponent {
     const classes = ['font-medium text-foreground'];
 
     if (column.truncate) {
-      classes.push('max-w-[16rem] truncate xl:max-w-[22rem]');
+      classes.push('max-w-[16rem] truncate xl:max-w-88');
     }
 
     return classes.join(' ');
@@ -349,7 +349,7 @@ export class DataTableComponent {
     }
 
     if (column.truncate) {
-      classes.push('max-w-[16rem] xl:max-w-[22rem]');
+      classes.push('max-w-[16rem] xl:max-w-88');
     }
 
     if (column.nowrap) {
@@ -597,7 +597,7 @@ export class DataTableComponent {
     const tierColor = DataTableComponent.SCORE_TIER_COLORS[band] ?? DataTableComponent.SCORE_TIER_COLORS[1];
 
     return [
-      'inline-block h-[0.4375rem] w-2.5 shrink-0 rounded',
+      'inline-block h-1.75 w-2.5 shrink-0 rounded',
       filled ? 'opacity-100' : 'opacity-20',
       tierColor
     ].join(' ');

@@ -1,4 +1,4 @@
-<div class="fixed inset-y-0 right-0 z-10 bg-background transition-[left] duration-200 left-[var(--sidebar-width)]">
+<div class="fixed inset-y-0 right-0 z-10 bg-background transition-[left] duration-200 left-(--sidebar-width)">
   <app-map-table-pipeline
     class="block h-full min-h-0 w-full"
     [config]="pipelineConfig"
@@ -6,7 +6,7 @@
     <div mapTablePipelineToolbar class="flex flex-wrap items-center gap-2">
       <button
         type="button"
-        class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-border bg-transparent px-3 text-sm font-medium text-muted transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus disabled:pointer-events-none disabled:opacity-40"
+        class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-border bg-transparent px-3 text-sm font-medium text-muted transition-colors hover:bg-primary/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus disabled:pointer-events-none disabled:opacity-40"
         [disabled]="loading()"
         (click)="refreshList()"
       >
@@ -15,7 +15,7 @@
       </button>
       <button
         type="button"
-        class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border px-3 text-sm font-medium transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus"
+        class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border px-3 text-sm font-medium transition-colors hover:bg-primary/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus"
         [class.border-primary]="filtersOpen() || hasActiveFilters()"
         [class.bg-primary/10]="hasActiveFilters()"
         [class.text-primary]="filtersOpen() || hasActiveFilters()"

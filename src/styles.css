@@ -1,57 +1,205 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@plugin 'tailwindcss-primeui';
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --color-primary: rgb(var(--ttb-primary));
+  --color-primary-foreground: rgb(var(--ttb-primary-foreground));
+
+  --color-secondary: rgb(var(--ttb-secondary));
+  --color-secondary-foreground: rgb(var(--ttb-secondary-foreground));
+
+  --color-accent: rgb(var(--ttb-accent));
+  --color-accent-foreground: rgb(var(--ttb-accent-foreground));
+
+  --color-background: rgb(var(--ttb-background));
+
+  --color-surface: rgb(var(--ttb-surface));
+  --color-surface-elevated: rgb(var(--ttb-surface-elevated));
+
+  --color-overlay: rgb(var(--ttb-overlay));
+  --color-foreground: rgb(var(--ttb-foreground));
+  --color-muted: rgb(var(--ttb-muted));
+  --color-subtle: rgb(var(--ttb-subtle));
+  --color-inverse: rgb(var(--ttb-inverse));
+
+  --color-border: rgb(var(--ttb-border));
+  --color-border-strong: rgb(var(--ttb-border-strong));
+
+  --color-success: rgb(var(--ttb-success));
+  --color-success-foreground: rgb(var(--ttb-success-foreground));
+
+  --color-warning: rgb(var(--ttb-warning));
+  --color-warning-foreground: rgb(var(--ttb-warning-foreground));
+
+  --color-danger: rgb(var(--ttb-danger));
+  --color-danger-foreground: rgb(var(--ttb-danger-foreground));
+
+  --color-info: rgb(var(--ttb-info));
+  --color-info-foreground: rgb(var(--ttb-info-foreground));
+
+  --color-focus: rgb(var(--ttb-focus-ring));
+
+  --color-sidebar: rgb(var(--ttb-sidebar));
+  --color-sidebar-foreground: rgb(var(--ttb-sidebar-foreground));
+  --color-sidebar-muted: rgb(var(--ttb-sidebar-muted));
+  --color-sidebar-active: rgb(var(--ttb-sidebar-active));
+  --color-sidebar-hover: rgb(var(--ttb-sidebar-hover));
+  --color-sidebar-border: rgb(var(--ttb-sidebar-border));
+  --color-sidebar-tooltip: rgb(var(--ttb-sidebar-tooltip));
+  --color-sidebar-tooltip-foreground: rgb(
+    var(--ttb-sidebar-tooltip-foreground)
+  );
+
+  --font-sans: var(--ttb-font-sans);
+  --font-display: var(--ttb-font-display);
+  --font-mono: var(--ttb-font-mono);
+
+  --text-display: 2.25rem;
+  --text-display--line-height: 2.5rem;
+  --text-display--font-weight: 700;
+  --text-h1: 1.875rem;
+  --text-h1--line-height: 2.25rem;
+  --text-h1--font-weight: 700;
+  --text-h2: 1.5rem;
+  --text-h2--line-height: 2rem;
+  --text-h2--font-weight: 600;
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.75rem;
+  --text-h3--font-weight: 600;
+  --text-h4: 1.125rem;
+  --text-h4--line-height: 1.5rem;
+  --text-h4--font-weight: 600;
+  --text-body: var(--font-size-body);
+  --text-body--line-height: var(--line-height-body);
+  --text-body-sm: var(--font-size-body-sm);
+  --text-body-sm--line-height: var(--line-height-body-sm);
+  --text-caption: var(--font-size-caption);
+  --text-caption--line-height: var(--line-height-caption);
+  --text-overline: 0.65rem;
+  --text-overline--line-height: 1rem;
+  --text-overline--letter-spacing: 0.08em;
+  --text-overline--font-weight: 600;
+
+  --radius-sm: var(--ttb-radius-sm);
+  --radius-md: var(--ttb-radius-md);
+  --radius-lg: var(--ttb-radius-lg);
+  --radius-xl: var(--ttb-radius-xl);
+
+  --spacing-sidebar: var(--sidebar-width);
+  --spacing-sidebar-collapsed: var(--sidebar-width-collapsed);
+
+  --width-sidebar: var(--sidebar-width);
+  --width-sidebar-collapsed: var(--sidebar-width-collapsed);
+
+  --margin-sidebar: var(--sidebar-width);
+  --margin-sidebar-collapsed: var(--sidebar-width-collapsed);
+
+  --z-index-sidebar: 40;
+  --z-index-toolbar: 10;
+  --z-index-modal: 50;
+  --z-index-tooltip: 50;
+
+  --shadow-sm: 0 1px 2px 0 rgb(var(--ttb-overlay) / 0.05);
+  --shadow-md:
+    0 4px 6px -1px rgb(var(--ttb-overlay) / 0.1),
+    0 2px 4px -2px rgb(var(--ttb-overlay) / 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgb(var(--ttb-overlay) / 0.1),
+    0 4px 6px -4px rgb(var(--ttb-overlay) / 0.1);
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility map-pin {
+  display: inline-flex;
+  height: 1.8125rem;
+  width: 1.5625rem;
+  align-items: flex-start;
+  justify-content: center;
+  background: url('/assets/images/_pin.png') no-repeat center center;
+  background-size: 22px 28px;
+  padding-top: 0.25rem;
+  padding-right: 0.1875rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+}
+
+@utility map-pin--owner {
+  background-image: url('/assets/images/_map-pin-green.png');
+}
 
 /*
  * Design token source of truth for the app.
- * Tailwind (tailwind.config.js) and PrimeNG (core/theme/ttb-preset.ts) both reference
+ * Tailwind (@theme in this file) and PrimeNG (core/theme/ttb-preset.ts) both reference
  * these CSS variables. Change colors / typography / form spacing here.
  */
 @layer base {
   :root,
   [data-theme='light'] {
-    --color-primary: 37 99 235;
-    --color-primary-foreground: 255 255 255;
-    --color-secondary: 75 85 99;
-    --color-secondary-foreground: 255 255 255;
-    --color-accent: 59 130 246;
-    --color-accent-foreground: 255 255 255;
-    --color-background: 249 250 251;
-    --color-surface: 255 255 255;
-    --color-surface-elevated: 255 255 255;
-    --color-overlay: 0 0 0;
-    --color-foreground: 17 24 39;
-    --color-muted: 75 85 99;
-    --color-subtle: 107 114 128;
-    --color-inverse: 255 255 255;
-    --color-border: 229 231 235;
-    --color-border-strong: 209 213 219;
-    --color-success: 22 163 74;
-    --color-success-foreground: 255 255 255;
-    --color-warning: 202 138 4;
-    --color-warning-foreground: 255 255 255;
-    --color-danger: 220 38 38;
-    --color-danger-foreground: 255 255 255;
-    --color-info: 37 99 235;
-    --color-info-foreground: 255 255 255;
-    --color-focus-ring: 59 130 246;
+    --ttb-primary: 37 99 235;
+    --ttb-primary-foreground: 255 255 255;
+    --ttb-secondary: 75 85 99;
+    --ttb-secondary-foreground: 255 255 255;
+    --ttb-accent: 59 130 246;
+    --ttb-accent-foreground: 255 255 255;
+    --ttb-background: 249 250 251;
+    --ttb-surface: 255 255 255;
+    --ttb-surface-elevated: 255 255 255;
+    --ttb-overlay: 0 0 0;
+    --ttb-foreground: 17 24 39;
+    --ttb-muted: 75 85 99;
+    --ttb-subtle: 107 114 128;
+    --ttb-inverse: 255 255 255;
+    --ttb-border: 229 231 235;
+    --ttb-border-strong: 209 213 219;
+    --ttb-success: 22 163 74;
+    --ttb-success-foreground: 255 255 255;
+    --ttb-warning: 202 138 4;
+    --ttb-warning-foreground: 255 255 255;
+    --ttb-danger: 220 38 38;
+    --ttb-danger-foreground: 255 255 255;
+    --ttb-info: 37 99 235;
+    --ttb-info-foreground: 255 255 255;
+    --ttb-focus-ring: 59 130 246;
     --sidebar-width: 260px;
     --sidebar-width-collapsed: 72px;
-    --color-sidebar: 255 255 255;
-    --color-sidebar-foreground: 55 65 81;
-    --color-sidebar-muted: 107 114 128;
-    --color-sidebar-active: 243 244 246;
-    --color-sidebar-hover: 249 250 251;
-    --color-sidebar-border: 229 231 235;
-    --color-sidebar-tooltip: 31 41 55;
-    --color-sidebar-tooltip-foreground: 255 255 255;
-    --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-display: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    --radius-sm: 0.25rem;
-    --radius-md: 0.375rem;
-    --radius-lg: 0.5rem;
-    --radius-xl: 0.75rem;
+    --ttb-sidebar: 255 255 255;
+    --ttb-sidebar-foreground: 55 65 81;
+    --ttb-sidebar-muted: 107 114 128;
+    --ttb-sidebar-active: 243 244 246;
+    --ttb-sidebar-hover: 249 250 251;
+    --ttb-sidebar-border: 229 231 235;
+    --ttb-sidebar-tooltip: 31 41 55;
+    --ttb-sidebar-tooltip-foreground: 255 255 255;
+    --ttb-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --ttb-font-display: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --ttb-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    --ttb-radius-sm: 0.25rem;
+    --ttb-radius-md: 0.375rem;
+    --ttb-radius-lg: 0.5rem;
+    --ttb-radius-xl: 0.75rem;
     /* Typography — shared by Tailwind + PrimeNG (core/theme/ttb-preset.ts) */
     --font-size-body: 1rem;
     --font-size-body-sm: 0.875rem;
@@ -69,48 +217,48 @@
   }
 
   [data-theme='dark'] {
-    --color-primary: 96 165 250;
-    --color-primary-foreground: 15 23 42;
-    --color-secondary: 148 163 184;
-    --color-secondary-foreground: 15 23 42;
-    --color-accent: 59 130 246;
-    --color-accent-foreground: 255 255 255;
-    --color-background: 15 23 42;
-    --color-surface: 30 41 59;
-    --color-surface-elevated: 51 65 85;
-    --color-overlay: 0 0 0;
-    --color-foreground: 241 245 249;
-    --color-muted: 148 163 184;
-    --color-subtle: 100 116 139;
-    --color-inverse: 15 23 42;
-    --color-border: 51 65 85;
-    --color-border-strong: 71 85 105;
-    --color-success: 34 197 94;
-    --color-success-foreground: 15 23 42;
-    --color-warning: 234 179 8;
-    --color-warning-foreground: 15 23 42;
-    --color-danger: 248 113 113;
-    --color-danger-foreground: 15 23 42;
-    --color-info: 96 165 250;
-    --color-info-foreground: 15 23 42;
-    --color-focus-ring: 96 165 250;
-    --color-sidebar: 15 23 42;
-    --color-sidebar-foreground: 241 245 249;
-    --color-sidebar-muted: 148 163 184;
-    --color-sidebar-active: 30 41 59;
-    --color-sidebar-hover: 30 41 59;
-    --color-sidebar-border: 51 65 85;
-    --color-sidebar-tooltip: 241 245 249;
-    --color-sidebar-tooltip-foreground: 15 23 42;
+    --ttb-primary: 96 165 250;
+    --ttb-primary-foreground: 15 23 42;
+    --ttb-secondary: 148 163 184;
+    --ttb-secondary-foreground: 15 23 42;
+    --ttb-accent: 59 130 246;
+    --ttb-accent-foreground: 255 255 255;
+    --ttb-background: 15 23 42;
+    --ttb-surface: 30 41 59;
+    --ttb-surface-elevated: 51 65 85;
+    --ttb-overlay: 0 0 0;
+    --ttb-foreground: 241 245 249;
+    --ttb-muted: 148 163 184;
+    --ttb-subtle: 100 116 139;
+    --ttb-inverse: 15 23 42;
+    --ttb-border: 51 65 85;
+    --ttb-border-strong: 71 85 105;
+    --ttb-success: 34 197 94;
+    --ttb-success-foreground: 15 23 42;
+    --ttb-warning: 234 179 8;
+    --ttb-warning-foreground: 15 23 42;
+    --ttb-danger: 248 113 113;
+    --ttb-danger-foreground: 15 23 42;
+    --ttb-info: 96 165 250;
+    --ttb-info-foreground: 15 23 42;
+    --ttb-focus-ring: 96 165 250;
+    --ttb-sidebar: 15 23 42;
+    --ttb-sidebar-foreground: 241 245 249;
+    --ttb-sidebar-muted: 148 163 184;
+    --ttb-sidebar-active: 30 41 59;
+    --ttb-sidebar-hover: 30 41 59;
+    --ttb-sidebar-border: 51 65 85;
+    --ttb-sidebar-tooltip: 241 245 249;
+    --ttb-sidebar-tooltip-foreground: 15 23 42;
   }
 
   [data-brand='acme'] {
-    --color-primary: 124 58 237;
-    --color-primary-foreground: 255 255 255;
-    --color-accent: 139 92 246;
-    --color-accent-foreground: 255 255 255;
-    --color-focus-ring: 139 92 246;
-    --color-info: 124 58 237;
+    --ttb-primary: 124 58 237;
+    --ttb-primary-foreground: 255 255 255;
+    --ttb-accent: 139 92 246;
+    --ttb-accent-foreground: 255 255 255;
+    --ttb-focus-ring: 139 92 246;
+    --ttb-info: 124 58 237;
   }
 
   body {
@@ -118,51 +266,29 @@
   }
 }
 
-@media print {
-  body.is-printing * {
-    visibility: hidden;
-  }
+@layer utilities {
+  @media print {
+    body.is-printing * {
+      visibility: hidden;
+    }
 
-  body.is-printing .print-element,
-  body.is-printing .print-element * {
-    visibility: visible;
-  }
+    body.is-printing .print-element,
+    body.is-printing .print-element * {
+      visibility: visible;
+    }
 
-  body.is-printing .print-element {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    padding: 1rem;
-  }
+    body.is-printing .print-element {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      padding: 1rem;
+    }
 
-  body.is-printing .print-hide {
-    display: none !important;
-    visibility: hidden !important;
+    body.is-printing .print-hide {
+      display: none !important;
+      visibility: hidden !important;
+    }
   }
-}
-
-@layer components {
-  .map-pin {
-    display: inline-flex;
-    height: 1.8125rem;
-    width: 1.5625rem;
-    align-items: flex-start;
-    justify-content: center;
-    background: url('/assets/images/_pin.png') no-repeat center center;
-    background-size: 22px 28px;
-    padding-top: 0.25rem;
-    padding-right: 0.1875rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    line-height: 1;
-    color: #fff;
-    text-align: center;
-  }
-
-  .map-pin--owner {
-    background-image: url('/assets/images/_map-pin-green.png');
-  }
-
 }
 
 /* Outside @layer so these beat PrimeNG menu item hover/focus (unlayered theme CSS). */
@@ -191,12 +317,12 @@
 }
 
 .detail-overflow-menu .p-menu-item.detail-overflow-menu-item--danger:not(.p-disabled) > .p-menu-item-content {
-  color: rgb(var(--color-danger));
+  color: rgb(var(--ttb-danger));
   font-weight: 500;
 }
 
 .detail-overflow-menu .p-menu-item.detail-overflow-menu-item--danger:not(.p-disabled) > .p-menu-item-content:hover,
 .detail-overflow-menu .p-menu-item.detail-overflow-menu-item--danger.p-focus > .p-menu-item-content {
-  background-color: rgb(var(--color-danger) / 0.1);
-  color: rgb(var(--color-danger));
+  background-color: rgb(var(--ttb-danger) / 0.1);
+  color: rgb(var(--ttb-danger));
 }

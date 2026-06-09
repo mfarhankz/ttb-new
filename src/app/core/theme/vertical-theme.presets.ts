@@ -6,43 +6,43 @@ import type { ThemeTokens } from './theme.config';
  */
 export type VerticalColorPreset = Pick<
   ThemeTokens,
-  | '--color-primary'
-  | '--color-primary-foreground'
-  | '--color-secondary'
-  | '--color-accent'
-  | '--color-focus-ring'
-  | '--color-info'
-  | '--font-sans'
+  | '--ttb-primary'
+  | '--ttb-primary-foreground'
+  | '--ttb-secondary'
+  | '--ttb-accent'
+  | '--ttb-focus-ring'
+  | '--ttb-info'
+  | '--ttb-font-sans'
 >;
 
 export const VERTICAL_COLOR_PRESETS: Record<string, VerticalColorPreset> = {
   demo: {
-    '--color-primary': '37 99 235',
-    '--color-primary-foreground': '255 255 255',
-    '--color-secondary': '75 85 99',
-    '--color-accent': '59 130 246',
-    '--color-focus-ring': '59 130 246',
-    '--color-info': '37 99 235',
-    '--font-sans':
+    '--ttb-primary': '37 99 235',
+    '--ttb-primary-foreground': '255 255 255',
+    '--ttb-secondary': '75 85 99',
+    '--ttb-accent': '59 130 246',
+    '--ttb-focus-ring': '59 130 246',
+    '--ttb-info': '37 99 235',
+    '--ttb-font-sans':
       '"Open Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
   },
   ota: {
-    '--color-primary': '20 31 109',
-    '--color-primary-foreground': '255 255 255',
-    '--color-secondary': '228 138 60',
-    '--color-accent': '20 31 109',
-    '--color-focus-ring': '20 31 109',
-    '--color-info': '20 31 109',
-    '--font-sans': 'DINOT, "Open Sans", ui-sans-serif, system-ui, sans-serif'
+    '--ttb-primary': '20 31 109',
+    '--ttb-primary-foreground': '255 255 255',
+    '--ttb-secondary': '228 138 60',
+    '--ttb-accent': '20 31 109',
+    '--ttb-focus-ring': '20 31 109',
+    '--ttb-info': '20 31 109',
+    '--ttb-font-sans': 'DINOT, "Open Sans", ui-sans-serif, system-ui, sans-serif'
   },
   rebogateway: {
-    '--color-primary': '20 31 109',
-    '--color-primary-foreground': '255 255 255',
-    '--color-secondary': '228 138 60',
-    '--color-accent': '20 31 109',
-    '--color-focus-ring': '20 31 109',
-    '--color-info': '20 31 109',
-    '--font-sans': 'DINOT, "Open Sans", ui-sans-serif, system-ui, sans-serif'
+    '--ttb-primary': '20 31 109',
+    '--ttb-primary-foreground': '255 255 255',
+    '--ttb-secondary': '228 138 60',
+    '--ttb-accent': '20 31 109',
+    '--ttb-focus-ring': '20 31 109',
+    '--ttb-info': '20 31 109',
+    '--ttb-font-sans': 'DINOT, "Open Sans", ui-sans-serif, system-ui, sans-serif'
   }
 };
 

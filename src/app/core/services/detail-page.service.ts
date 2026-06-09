@@ -1,11 +1,15 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { DetailContext, DetailContextInitState } from '../detail-contexts/detail-context.interface';
 import {
   FarmDetailContext,
   isUnsupportedDetailSource
 } from '../detail-contexts/farm-detail.context';
-import { QueryDetailContext } from '../detail-contexts/query-detail.context';
+import {
+  QueryDetailContext,
+  isQuerySessionExpiredError
+} from '../detail-contexts/query-detail.context';
 import { SearchDetailContext } from '../detail-contexts/search-detail.context';
 import {
   DETAIL_PAGE_DEFAULT_FILTER,
@@ -21,6 +25,7 @@ export class DetailPageService {
   private readonly farmDetailContext = inject(FarmDetailContext);
   private readonly searchDetailContext = inject(SearchDetailContext);
   private readonly queryDetailContext = inject(QueryDetailContext);
+  private readonly router = inject(Router);
 
   private readonly _source = signal<string | null>(null);
   private readonly _sourceId = signal<string | null>(null);
@@ -93,11 +98,7 @@ export class DetailPageService {
     context.load(sourceId, initState).subscribe({
       next: (result) => this.applyLoadResult(result),
       error: (err: Error) => {
-        this._loading.set(false);
-        this._error.set(err.message ?? 'Failed to load detail records.');
-        this._allRows.set([]);
-        this._rows.set([]);
-        this._totalCount.set(0);
+        this.handleLoadError(source, err, 'Failed to load detail records.');
       }
     });
   }
@@ -116,8 +117,7 @@ export class DetailPageService {
     context.refresh(sourceId, this._activeFilter(), this._initState()).subscribe({
       next: (result) => this.applyLoadResult(result),
       error: (err: Error) => {
-        this._loading.set(false);
-        this._error.set(err.message ?? 'Failed to refresh detail records.');
+        this.handleLoadError(source, err, 'Failed to refresh detail records.');
       }
     });
   }
@@ -137,11 +137,7 @@ export class DetailPageService {
     context.setFilter(sourceId, filter, this._initState()).subscribe({
       next: (result) => this.applyLoadResult(result),
       error: (err: Error) => {
-        this._loading.set(false);
-        this._error.set(err.message ?? 'Failed to load filtered records.');
-        this._allRows.set([]);
-        this._rows.set([]);
-        this._totalCount.set(0);
+        this.handleLoadError(source, err, 'Failed to load filtered records.');
       }
     });
   }
@@ -241,6 +237,20 @@ export class DetailPageService {
     }
 
     throw new Error(`Unsupported detail source: ${source}`);
+  }
+
+  private handleLoadError(source: string, err: Error, fallbackMessage: string): void {
+    if (source === 'query' && isQuerySessionExpiredError(err)) {
+      this._loading.set(false);
+      void this.router.navigate(['/farming/area-search']);
+      return;
+    }
+
+    this._loading.set(false);
+    this._error.set(err.message ?? fallbackMessage);
+    this._allRows.set([]);
+    this._rows.set([]);
+    this._totalCount.set(0);
   }
 
   private applyLoadResult(result: {
