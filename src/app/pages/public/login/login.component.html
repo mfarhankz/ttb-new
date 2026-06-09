@@ -1,6 +1,6 @@
 @if (currentView() === 'login') {
   <div [class]="modalMode ? 'w-full' : 'min-h-[calc(100vh-8rem)] flex items-center justify-center'">
-    <div [class]="modalMode ? 'w-full space-y-6' : 'max-w-md w-full space-y-8 p-8 bg-surface rounded-lg shadow-md'">
+    <div [class]="modalMode ? 'w-full flex flex-col gap-6' : 'max-w-md w-full flex flex-col gap-8 p-8 bg-surface rounded-lg shadow-md'">
       @if (!modalMode || sessionExpired) {
         <div [class]="modalMode ? 'mb-4 text-left' : ''">
           <h2 [class]="modalMode ? 'text-h3 font-semibold text-foreground' : 'text-h1 font-bold text-center text-foreground'">

@@ -10,7 +10,7 @@
     <div class="xl:col-span-7">
       <h3 class="text-body font-semibold text-foreground mb-4">Profile Information</h3>
 
-      <form class="space-y-4" [formGroup]="profileForm" (ngSubmit)="onProfileSubmit()">
+      <form class="flex flex-col gap-4" [formGroup]="profileForm" (ngSubmit)="onProfileSubmit()">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <app-input
             id="account-username"
@@ -141,7 +141,7 @@
       </form>
     </div>
 
-    <div class="xl:col-span-5 space-y-8">
+    <div class="xl:col-span-5 flex flex-col gap-8">
       <section>
         <h3 class="text-body font-semibold text-foreground mb-4">Profile Picture</h3>
 
@@ -205,7 +205,7 @@
         <h3 class="text-body font-semibold text-foreground mb-4">Change Password</h3>
 
         @if (grayOutPrimaryFields()) {
-          <div class="space-y-4" aria-disabled="true">
+          <div class="flex flex-col gap-4" aria-disabled="true">
             <div class="grid grid-cols-1 gap-4">
               <app-input
                 id="account-password-disabled"
@@ -231,7 +231,7 @@
             </div>
           </div>
         } @else {
-          <form class="space-y-4" [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
+          <form class="flex flex-col gap-4" [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
             <div class="grid grid-cols-1 gap-2">
               <app-input
                 id="account-password"

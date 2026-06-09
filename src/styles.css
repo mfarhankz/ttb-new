@@ -97,11 +97,21 @@
   --margin-sidebar: var(--sidebar-width);
   --margin-sidebar-collapsed: var(--sidebar-width-collapsed);
 
+  --spacing-18: 4.5rem;
+
   --z-index-sidebar: 40;
+  --z-index-41: 41;
   --z-index-toolbar: 10;
   --z-index-modal: 50;
   --z-index-tooltip: 50;
 
+  --color-score-tier-1: #e83030;
+  --color-score-tier-2: #f9851f;
+  --color-score-tier-3: #ffd500;
+  --color-score-tier-4: #afdf20;
+  --color-score-tier-5: #21c45d;
+
+  --shadow-xs: 0 1px 2px 0 rgb(var(--ttb-overlay) / 0.05);
   --shadow-sm: 0 1px 2px 0 rgb(var(--ttb-overlay) / 0.05);
   --shadow-md:
     0 4px 6px -1px rgb(var(--ttb-overlay) / 0.1),

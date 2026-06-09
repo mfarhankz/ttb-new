@@ -1,5 +1,5 @@
 <nav
-  class="fixed top-0 left-0 bottom-0 z-sidebar flex flex-col mr-0 bg-sidebar border border-sidebar-border shadow-sm transition-[width] duration-200 overflow-visible"
+  class="fixed top-0 left-0 bottom-0 z-sidebar flex flex-col mr-0 bg-sidebar border border-sidebar-border shadow-xs transition-[width] duration-200 overflow-visible"
   [class.w-sidebar]="!isCollapsed"
   [class.w-sidebar-collapsed]="isCollapsed"
 >
@@ -22,7 +22,7 @@
 
     <button
       type="button"
-      class="absolute -right-3 top-[4.5em] -translate-y-1/2 w-5 h-5 rounded-md bg-surface border border-border flex items-center justify-center cursor-pointer z-41 text-muted shadow-sm transition-colors hover:text-foreground"
+      class="absolute -right-3 top-[4.5em] -translate-y-1/2 w-5 h-5 rounded-md bg-surface border border-border flex items-center justify-center cursor-pointer z-41 text-muted shadow-xs transition-colors hover:text-foreground"
       (click)="toggleCollapsed()"
       [attr.aria-label]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
     >

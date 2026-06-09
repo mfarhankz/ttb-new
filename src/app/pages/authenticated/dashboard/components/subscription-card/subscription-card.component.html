@@ -43,7 +43,7 @@
           [class.min-h-0]="heightLocked()"
         >
           <div
-            class="subscription-scroll space-y-2.5 pr-0.5"
+            class="subscription-scroll flex flex-col gap-2.5 pr-0.5"
             [class.flex-1]="heightLocked()"
             [class.min-h-0]="heightLocked()"
             [class.overflow-y-auto]="heightLocked()"
@@ -53,7 +53,7 @@
                 class="group rounded-xl border overflow-hidden transition-all duration-200"
                 [class.border-border]="!isExpanded(subscription.profile_id)"
                 [class.border-primary/25]="isExpanded(subscription.profile_id)"
-                [class.shadow-sm]="isExpanded(subscription.profile_id)"
+                [class.shadow-xs]="isExpanded(subscription.profile_id)"
                 [class.ring-1]="isExpanded(subscription.profile_id)"
                 [class.ring-primary/10]="isExpanded(subscription.profile_id)"
               >

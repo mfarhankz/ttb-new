@@ -27,7 +27,7 @@ interface ContactChoiceCard {
   template: `
     <div class="flex w-full flex-col gap-5">
       <div>
-        <h2 class="text-body font-semibold text-[#8a6d3b]">Phones / Emails</h2>
+        <h2 class="text-body font-semibold text-warning">Phones / Emails</h2>
         <p class="mt-1 text-body-sm text-subtle">
           Third party vendor providing phones and/or email addresses on your selected property group.
         </p>
@@ -81,7 +81,7 @@ interface ContactChoiceCard {
         <p-accordion-panel value="pricing-details">
           <p-accordion-header>Pricing &amp; Billing Details</p-accordion-header>
           <p-accordion-content>
-            <div class="space-y-3 text-body-sm leading-relaxed text-[#8a6d3b]">
+            <div class="flex flex-col gap-3 text-body-sm leading-relaxed text-warning">
               <p>
                 They tend to match phones to property addresses on
                 <strong class="font-semibold">{{ pricing().phoneMatchPercent }}%</strong> of a list and charge
@@ -119,7 +119,7 @@ interface ContactChoiceCard {
             </span>
           </p-accordion-header>
           <p-accordion-content>
-            <p class="text-body-sm leading-relaxed text-[#a94442]">
+            <p class="text-body-sm leading-relaxed text-danger">
               This vendor's phone numbers are NOT scrubbed against the "Do Not Call" registry.
               @if (pricing().useExtendedDncNote) {
                 It is your responsibility to confirm that the phone numbers provided are not on any Federal, State, or
@@ -157,7 +157,7 @@ export class AreaSearchContactFieldComponent {
       EM: { icon: 'pi pi-envelope', iconClass: 'text-success', priceLabel: `${emailCents}¢ / email` },
       $: {
         icon: 'pi pi-users',
-        iconClass: 'text-[#8a6d3b]',
+        iconClass: 'text-warning',
         priceLabel: `${phoneCents}¢ + ${emailCents}¢`
       }
     };

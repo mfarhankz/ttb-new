@@ -20,9 +20,9 @@ import { AreaSearchControlStyles } from './area-search-control.styles';
           <p-accordion-header>Please Note</p-accordion-header>
           <p-accordion-content>
             @if (premierNote.groupId === 4) {
-              <p class="text-body-sm leading-relaxed text-[#8a6d3b]">
+              <p class="text-body-sm leading-relaxed text-warning">
                 Mortgage and valuation records are available for purchase at
-                <strong class="font-semibold text-[#8a6d3b]">{{ premierNote.mortgageCents }} cents</strong> per record.
+                <strong class="font-semibold text-warning">{{ premierNote.mortgageCents }} cents</strong> per record.
                 Records are acquired by credit card purchase and will be saved to your Title Toolbox account when the
                 purchase is completed. ( To view a sample of the exported data,
                 <button type="button" class="text-primary underline hover:no-underline" (click)="openSampleModal()">
@@ -31,10 +31,10 @@ import { AreaSearchControlStyles } from './area-search-control.styles';
                 )
               </p>
             } @else {
-              <p class="text-body-sm leading-relaxed text-[#8a6d3b]">
+              <p class="text-body-sm leading-relaxed text-warning">
                 “Life Event” leads are available for purchase at
-                <strong class="font-semibold text-[#8a6d3b]">{{ premierNote.leadsMinCents }} cents</strong> to
-                <strong class="font-semibold text-[#8a6d3b]">{{ premierNote.leadsMaxCents }} cents</strong> per record.
+                <strong class="font-semibold text-warning">{{ premierNote.leadsMinCents }} cents</strong> to
+                <strong class="font-semibold text-warning">{{ premierNote.leadsMaxCents }} cents</strong> per record.
                 ( <button type="button" class="text-primary underline hover:no-underline" (click)="openPriceModal()">
                   Click here for full price list
                 </button>

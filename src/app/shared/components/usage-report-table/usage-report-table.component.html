@@ -1,4 +1,4 @@
-<div class="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
+<div class="overflow-hidden rounded-xl border border-border bg-surface shadow-xs">
   @if (loading) {
     <div class="flex flex-col items-center justify-center gap-3 px-6 py-16 text-body-sm text-muted">
       <i class="pi pi-spin pi-spinner text-2xl text-primary" aria-hidden="true"></i>
@@ -12,7 +12,7 @@
   } @else if (!details) {
     <div class="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
       <i class="pi pi-inbox text-3xl text-subtle" aria-hidden="true"></i>
-      <div class="max-w-md space-y-1">
+      <div class="max-w-md flex flex-col gap-1">
         <p class="text-body font-medium text-foreground">No download activity yet</p>
         <p class="text-body-sm text-muted">Your report downloads and usage summary will appear here once you start using reports.</p>
       </div>

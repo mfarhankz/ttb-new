@@ -52,7 +52,7 @@ export class InputComponent implements ControlValueAccessor {
   }
 
   getInputClasses(): string {
-    const baseClasses = 'block w-full rounded-md border shadow-sm transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-0';
+    const baseClasses = 'block w-full rounded-md border shadow-xs transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-0';
 
     const sizeClasses = {
       sm: 'px-3 py-1.5 text-sm',

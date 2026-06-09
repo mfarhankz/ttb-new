@@ -544,11 +544,11 @@ export class DataTableComponent {
   readonly scoreSteps = [0, 1, 2, 3, 4] as const;
 
   private static readonly SCORE_TIER_COLORS: Record<number, string> = {
-    1: 'bg-[#e83030]',
-    2: 'bg-[#f9851f]',
-    3: 'bg-[#ffd500]',
-    4: 'bg-[#afdf20]',
-    5: 'bg-[#21c45d]'
+    1: 'bg-score-tier-1',
+    2: 'bg-score-tier-2',
+    3: 'bg-score-tier-3',
+    4: 'bg-score-tier-4',
+    5: 'bg-score-tier-5'
   };
 
   scorePercent(row: Record<string, unknown>, column: DataTableColumn): number | null {
@@ -648,7 +648,7 @@ export class DataTableComponent {
 
     switch (badge.tone) {
       case 'user':
-        return `${base} bg-emerald-100 text-emerald-800`;
+        return `${base} bg-success/10 text-success`;
       case 'info':
       case 'primary':
         return `${base} bg-primary/10 text-primary`;

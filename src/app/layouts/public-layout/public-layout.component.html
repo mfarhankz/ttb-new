@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-background flex flex-col">
-  <header class="bg-surface shadow-sm">
+  <header class="bg-surface shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <a routerLink="/" class="flex items-center gap-3 min-w-0">
@@ -10,7 +10,7 @@
             [ngStyle]="vertical.publicLogoStyle()"
           />
         </a>
-        <nav class="flex space-x-4">
+        <nav class="flex gap-4">
           <a routerLink="/" class="text-muted hover:text-foreground">Home</a>
           <a routerLink="/login" class="text-muted hover:text-foreground">Login</a>
         </nav>

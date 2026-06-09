@@ -1,5 +1,5 @@
 <div
-  class="overflow-hidden border border-border bg-surface rounded-lg shadow-sm"
+  class="overflow-hidden border border-border bg-surface rounded-lg shadow-xs"
   [class.flex]="fillHeight"
   [class.flex-col]="fillHeight"
   [class.h-full]="fillHeight"
@@ -27,7 +27,7 @@
       [class.flex-1]="fillHeight"
     >
       <i class="pi pi-inbox text-3xl text-subtle" aria-hidden="true"></i>
-      <div class="max-w-md space-y-1">
+      <div class="max-w-md flex flex-col gap-1">
         <p class="text-body font-medium text-foreground">{{ resolvedEmptyTitle() }}</p>
         <p class="text-body-sm text-muted">{{ resolvedEmptyDescription() }}</p>
       </div>

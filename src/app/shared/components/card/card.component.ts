@@ -24,7 +24,7 @@ export class CardComponent {
     const fillClass = this.fillHeight ? 'h-full flex flex-col min-h-0' : '';
     const shadowClasses = {
       none: '',
-      sm: 'shadow-sm',
+      sm: 'shadow-xs',
       md: 'shadow-md',
       lg: 'shadow-lg'
     };

@@ -44,7 +44,7 @@ export class ToggleComponent implements ControlValueAccessor {
 
   getThumbClasses(): string {
     const base =
-      'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out';
+      'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out';
 
     return this.checked ? `${base} translate-x-6` : `${base} translate-x-1`;
   }

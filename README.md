@@ -23,57 +23,59 @@ Title Toolbox New is a comprehensive Angular-based application for title managem
 ## 🛠 Technology Stack
 
 ### Core Framework
-- **Angular**: `21.1.4` - Modern web application framework
-- **TypeScript**: `5.9.3` - Typed superset of JavaScript
-- **Node.js**: `v24.5.0` - JavaScript runtime
-- **npm**: `11.5.1` - Package manager
+- **Angular**: `^21.2.16` - Modern web application framework
+- **TypeScript**: `~5.9.3` - Typed superset of JavaScript
+- **Node.js**: `v20.19.0+` recommended (`v24.x` supported)
+- **npm**: `11.10.0` (see `packageManager` in `package.json`)
 
 ### Angular Packages
-- `@angular/animations`: `^21.1.4` - Animation library
-- `@angular/common`: `^21.1.4` - Common utilities
-- `@angular/compiler`: `^21.1.4` - Template compiler
-- `@angular/core`: `^21.1.4` - Core framework
-- `@angular/forms`: `^21.1.4` - Forms module
-- `@angular/platform-browser`: `^21.1.4` - Browser platform
-- `@angular/router`: `^21.1.4` - Routing module
-- `@angular/cli`: `^21.1.4` - Command-line interface
-- `@angular/build`: `^21.1.4` - Build system
-- `@angular/compiler-cli`: `^21.1.4` - Compiler CLI
+- `@angular/animations`: `^21.2.16` - Animation library
+- `@angular/common`: `^21.2.16` - Common utilities
+- `@angular/compiler`: `^21.2.16` - Template compiler
+- `@angular/core`: `^21.2.16` - Core framework
+- `@angular/forms`: `^21.2.16` - Forms module
+- `@angular/platform-browser`: `^21.2.16` - Browser platform
+- `@angular/router`: `^21.2.16` - Routing module
+- `@angular/cli`: `^21.2.14` - Command-line interface
+- `@angular/build`: `^21.2.14` - Build system
+- `@angular/compiler-cli`: `^21.2.16` - Compiler CLI
 
 ### UI Libraries
-- **PrimeNG**: `^21.1.1` - UI component library
+- **PrimeNG**: `^21.1.9` - UI component library
+- **@primeuix/themes**: `^2.0.3` - PrimeNG theme presets (Aura-based TTB preset)
 - **PrimeIcons**: `^7.0.0` - Icon library
-- **TailwindCSS**: `^3.4.19` - Utility-first CSS framework
-- **tailwindcss-primeui**: `^0.6.1` - TailwindCSS integration for PrimeUI
+- **Tailwind CSS**: `^4.3.0` - Utility-first CSS framework (CSS-first config)
+- **tailwindcss-primeui**: `^0.6.1` - PrimeUI Tailwind plugin
+- **OpenLayers (ol)**: `^10.9.0` - Map rendering
 
 ### Styling & Build Tools
-- **PostCSS**: `^8.5.6` - CSS transformation tool
-- **Autoprefixer**: `^10.4.24` - CSS vendor prefixer
+- **@tailwindcss/postcss**: `^4.3.0` - Tailwind v4 PostCSS plugin (required for `ng build` / `ng serve`)
+- **PostCSS**: `^8.5.15` - CSS transformation tool
 
 ### Reactive Programming
 - **RxJS**: `~7.8.0` - Reactive extensions for JavaScript
 
 ### Testing
-- **Vitest**: `^4.0.18` - Fast unit test framework
+- **Vitest**: `^4.1.8` - Fast unit test framework
 - **jsdom**: `^28.1.0` - DOM implementation for Node.js
 
 ### Utilities
-- **tslib**: `^2.8.1` - TypeScript runtime library
+- **tslib**: `^2.8.0` - TypeScript runtime library
 
 ## 📦 Prerequisites
 
 Before you begin, ensure you have the following installed:
 
 - **Node.js**: `v20.19.0` or higher (recommended: `v24.5.0`)
-- **npm**: `11.5.1` or higher
-- **Angular CLI**: `21.1.4` (installed globally or via npx)
+- **npm**: `11.10.0` or higher
+- **Angular CLI**: `^21.2.14` (installed globally or via npx)
 
 ### Verify Installation
 
 ```bash
 node --version    # Should be v20.19.0 or higher
 npm --version     # Should be 11.5.1 or higher
-ng version        # Should be 21.1.4
+ng version        # Should be 21.2.x
 ```
 
 ## 🚀 Installation
@@ -216,9 +218,8 @@ titletoolbox-new/
 │   └── main.ts                     # Application bootstrap
 ├── public/                          # Static assets
 ├── angular.json                    # Angular configuration
+├── .postcssrc.json                 # PostCSS config (Angular reads JSON only)
 ├── package.json                    # Dependencies & scripts
-├── tailwind.config.js             # TailwindCSS configuration
-├── postcss.config.js               # PostCSS configuration
 ├── tsconfig.json                   # TypeScript configuration
 └── README.md                       # This file
 ```
@@ -238,9 +239,11 @@ titletoolbox-new/
 - **Modern Layout**: Clean, professional interface
 
 ### 🎨 Styling
-- **TailwindCSS**: Utility-first CSS framework
-- **PrimeNG Integration**: Seamless integration with PrimeNG components
-- **Custom Components**: Abstraction layer for easy UI library swapping
+- **Tailwind CSS v4**: CSS-first setup in `src/styles.css` (`@import`, `@theme`, `@plugin`)
+- **Design tokens**: Raw `--ttb-*` variables in `styles.css`; Tailwind utilities map via `@theme`
+- **PrimeNG integration**: `tailwindcss-primeui` plugin + `cssLayer` in `app.config.ts`
+- **White-label theming**: `ThemeService` and `theme.config.ts` override `--ttb-*` tokens at runtime
+- **Custom components**: Abstraction layer for easy UI library swapping
 
 ### 🔄 State Management
 - **Angular Signals**: Reactive state management
@@ -291,25 +294,60 @@ export const SKIP_PHONE_REGISTER_IN_DEV = false; // Auto-register phone
 
 ### Map (OpenLayers + Google Maps)
 
-The map is implemented like the existing Title Toolbox app:
+- **Libraries**: OpenLayers (`ol` npm package) for the main map; Google Maps JavaScript API v3 with Places for geocoding and address autocomplete.
+- **Load order**: Google Maps loads first (async); OpenLayers follows. Maps initialize only after both are ready (`MapScriptsLoaderService.whenReady()`).
+- **Config**: Defaults (center, zoom, etc.) live in `src/app/core/config/map.config.ts`. Set `MAP_CONFIG.googleMapsApiKey` or `window.__GOOGLE_MAPS_API_KEY__` for geocoding/Places.
 
-- **Libraries**: OpenLayers (ol) v7.4.0 from CDN for the main map; Google Maps JavaScript API v3 with Places for geocoding and address autocomplete.
-- **Load order**: Google Maps is loaded first (async); when its callback runs, OpenLayers is loaded. The app does not initialize the main map until both are loaded (`mapScriptsLoaded` / `MapScriptsLoaderService.whenReady()`).
-- **Config**: Map defaults (center Irvine CA, zoom 12, etc.) are in `src/app/core/config/map.config.ts`. To enable Google Maps geocoding/Places, set a Google API key: in `map.config.ts` set `MAP_CONFIG.googleMapsApiKey` or set `window.__GOOGLE_MAPS_API_KEY__` before the app loads.
+### Tailwind CSS v4 Configuration
 
-### TailwindCSS Configuration
+Tailwind uses a **CSS-first** setup. There is no `tailwind.config.js`.
 
-TailwindCSS is configured in `tailwind.config.js`:
+**PostCSS** (`.postcssrc.json` — Angular only loads JSON PostCSS configs):
 
-```javascript
-const primeui = require('tailwindcss-primeui');
-
-module.exports = {
-  content: ["./src/**/*.{html,ts}"],
-  theme: { extend: {} },
-  plugins: [primeui],
+```json
+{
+  "plugins": {
+    "@tailwindcss/postcss": {}
+  }
 }
 ```
+
+**Global styles** (`src/styles.css`):
+
+```css
+@import 'tailwindcss';
+@plugin 'tailwindcss-primeui';
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --color-primary: rgb(var(--ttb-primary));
+  /* ...semantic colors, typography, spacing... */
+}
+```
+
+**Design tokens**
+
+| Layer | Purpose | Example |
+|-------|---------|---------|
+| `--ttb-*` in `:root` | Raw RGB channels / fonts / radius (runtime theme overrides) | `--ttb-primary: 37 99 235` |
+| `@theme` | Tailwind utility tokens | `bg-primary` → `var(--color-primary)` |
+| `theme.config.ts` | Light/dark/brand presets applied by `ThemeService` | Sets `--ttb-*` on `documentElement` |
+
+PrimeNG layer order is set in `src/app/app.config.ts`:
+
+```typescript
+providePrimeNG({
+  theme: {
+    preset: TTBPreset,
+    options: {
+      darkModeSelector: '[data-theme="dark"]',
+      cssLayer: { name: 'primeng', order: 'theme, base, primeng' }
+    }
+  }
+})
+```
+
+Use semantic utilities in templates (`text-foreground`, `bg-primary`, `text-body-sm`) — not raw palette classes (`gray-*`, `blue-*`).
 
 ## 📚 Code Scaffolding
 
@@ -379,6 +417,6 @@ For support and questions, please contact the development team.
 
 ---
 
-**Last Updated**: February 2025  
+**Last Updated**: June 2025  
 **Version**: 0.0.0  
-**Angular Version**: 21.1.4
+**Angular Version**: 21.2.x · **Tailwind CSS**: 4.3.x
