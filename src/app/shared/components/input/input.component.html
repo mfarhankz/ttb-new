@@ -15,7 +15,7 @@
     }
     <input
       [id]="id"
-      [type]="type"
+      [type]="inputType"
       [placeholder]="placeholder"
       [disabled]="isDisabled"
       [readonly]="readonly"
@@ -26,7 +26,18 @@
       (blur)="onBlur()"
       (focus)="onFocus()"
     />
-    @if (suffixIcon) {
+    @if (showPasswordToggle) {
+      <button
+        type="button"
+        class="absolute inset-y-0 right-0 flex w-10 cursor-pointer items-center justify-center border-0 bg-transparent text-subtle transition-colors hover:text-foreground focus:outline-hidden focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        [disabled]="isDisabled"
+        [attr.aria-label]="passwordVisible ? 'Hide password' : 'Show password'"
+        [attr.aria-pressed]="passwordVisible"
+        (click)="togglePasswordVisibility()"
+      >
+        <i [class]="passwordVisible ? 'pi pi-eye-slash' : 'pi pi-eye'" aria-hidden="true"></i>
+      </button>
+    } @else if (suffixIcon) {
       <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
         <i [class]="suffixIcon" class="text-subtle"></i>
       </div>

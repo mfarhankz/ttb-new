@@ -38,6 +38,7 @@ export class InputComponent implements ControlValueAccessor {
   @Input() wrapperClass = '';
 
   value = '';
+  passwordVisible = false;
   private inputDisabled = false;
   private cvaDisabled = false;
   private onChange = (value: string) => {};
@@ -45,6 +46,14 @@ export class InputComponent implements ControlValueAccessor {
 
   get isDisabled(): boolean {
     return this.inputDisabled || this.cvaDisabled;
+  }
+
+  get showPasswordToggle(): boolean {
+    return this.type === 'password';
+  }
+
+  get inputType(): string {
+    return this.showPasswordToggle && this.passwordVisible ? 'text' : this.type;
   }
 
   get labelClass(): string {
@@ -60,7 +69,8 @@ export class InputComponent implements ControlValueAccessor {
       lg: 'px-4 py-3 text-base'
     };
 
-    const paddingClass = this.icon ? 'pl-10' : this.suffixIcon ? 'pr-10' : '';
+    const hasTrailingControl = this.suffixIcon || this.showPasswordToggle;
+    const paddingClass = `${this.icon ? 'pl-10' : ''} ${hasTrailingControl ? 'pr-10' : ''}`.trim();
     const errorClass = this.error ? 'border-danger focus:ring-danger' : 'border-border focus:ring-focus focus:border-primary';
     const disabledClass = this.isDisabled
       ? 'bg-background text-muted cursor-not-allowed opacity-80'
@@ -82,6 +92,14 @@ export class InputComponent implements ControlValueAccessor {
 
   onFocus(): void {
     // Can be extended for focus handling
+  }
+
+  togglePasswordVisibility(): void {
+    if (!this.showPasswordToggle || this.isDisabled) {
+      return;
+    }
+
+    this.passwordVisible = !this.passwordVisible;
   }
 
   // ControlValueAccessor implementation

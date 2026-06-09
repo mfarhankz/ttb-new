@@ -25,6 +25,7 @@ import { AreaSearchFieldLabelComponent } from './area-search-field-label.compone
 
       <div class="grid grid-cols-2 gap-2">
         <p-select
+          size="small"
           [inputId]="field.field_name + '_match'"
           [options]="matchOptions"
           optionLabel="label"

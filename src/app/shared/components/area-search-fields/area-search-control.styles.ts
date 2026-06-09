@@ -8,10 +8,11 @@ export const AreaSearchControlStyles = {
   fieldLabel,
   input: `box-border w-full text-body-sm leading-5 ${height}`,
   select: [
-    'w-full min-w-0 text-body-sm',
+    'w-full min-w-0',
     height,
     '[&_.p-select-label]:flex [&_.p-select-label]:items-center',
     '[&_.p-select-label]:min-h-[calc(2.375rem-2px)] [&_.p-select-label]:px-2.5',
+    '[&_.p-select-label]:text-sm! [&_.p-select-label]:leading-5',
     '[&_.p-select-dropdown]:w-8'
   ].join(' '),
   multiSelect: [
@@ -79,11 +80,11 @@ export const AreaSearchControlStyles = {
     '[&_.p-accordionpanel[data-p-active="true"]_.p-accordionheader]:border-warning/30',
     '[&_.p-accordionpanel:not([data-p-active="true"])_.p-accordionheader]:border-b-0!',
     '[&_.p-accordionpanel:not([data-p-active="true"])_.p-accordionheader]:rounded-b',
-    '[&_.p-accordionheader]:bg-warning/10! [&_.p-accordionheader]:px-3',
+    '[&_.p-accordionheader]:bg-transparent! [&_.p-accordionheader]:px-3',
     '[&_.p-accordionheader]:py-2 [&_.p-accordionheader]:text-body-sm',
     '[&_.p-accordionheader]:font-semibold [&_.p-accordionheader]:text-warning!',
     '[&_.p-accordionheader_.p-accordionheader-toggle-icon]:text-warning!',
-    '[&_.p-accordioncontent]:bg-warning/10! [&_.p-accordioncontent]:px-3',
+    '[&_.p-accordioncontent]:bg-transparent! [&_.p-accordioncontent]:px-3',
     '[&_.p-accordioncontent[data-p-active="true"]]:pt-3 [&_.p-accordioncontent[data-p-active="true"]]:pb-4',
     '[&_.p-accordioncontent]:text-warning!',
     '[&_.p-accordioncontent:not([data-p-active="true"])]:h-0!',
@@ -92,11 +93,16 @@ export const AreaSearchControlStyles = {
     '[&_.p-accordioncontent:not([data-p-active="true"])]:p-0!',
     '[&_.p-accordioncontent:not([data-p-active="true"])]:m-0!',
     '[&_.p-accordioncontent:not([data-p-active="true"])_.p-motion]:hidden!',
-    '**:[[class*="accordioncontent-content-wrapper"]]:bg-warning/10!',
-    '**:[[class*="accordioncontent-content"]]:bg-warning/10!',
+    '**:[[class*="accordioncontent-content-wrapper"]]:bg-transparent!',
+    '**:[[class*="accordioncontent-content-wrapper"]]:[background-color:transparent!important]',
+    '**:[[class*="accordioncontent-content"]]:bg-transparent!',
+    '**:[[class*="accordioncontent-content"]]:[background-color:transparent!important]',
     '**:[[class*="accordioncontent-content"]]:p-0!',
-    '**:[[class*="accordioncontent-content"]]:text-warning!',
-    '**:[[class*="accordioncontent-content"]]:shadow-none!'
+    '**:[[class*="accordioncontent-content"]]:text-inherit!',
+    '**:[[class*="accordioncontent-content"]]:shadow-none!',
+    '[&_.p-accordioncontent]:[background-color:transparent!important]',
+    '[&_.p-accordioncontent_.p-motion]:bg-transparent!',
+    '[&_.p-accordioncontent_p]:bg-transparent [&_.p-accordioncontent_div]:bg-transparent'
   ].join(' '),
   /** Danger note accordion — semantic danger tokens. */
   dangerNoteAccordion: [
@@ -107,11 +113,11 @@ export const AreaSearchControlStyles = {
     '[&_.p-accordionpanel[data-p-active="true"]_.p-accordionheader]:border-danger/30',
     '[&_.p-accordionpanel:not([data-p-active="true"])_.p-accordionheader]:border-b-0!',
     '[&_.p-accordionpanel:not([data-p-active="true"])_.p-accordionheader]:rounded-b',
-    '[&_.p-accordionheader]:bg-danger/10! [&_.p-accordionheader]:px-3',
+    '[&_.p-accordionheader]:bg-transparent! [&_.p-accordionheader]:px-3',
     '[&_.p-accordionheader]:py-2 [&_.p-accordionheader]:text-body-sm',
     '[&_.p-accordionheader]:font-semibold [&_.p-accordionheader]:text-danger!',
     '[&_.p-accordionheader_.p-accordionheader-toggle-icon]:text-danger!',
-    '[&_.p-accordioncontent]:bg-danger/10! [&_.p-accordioncontent]:px-3',
+    '[&_.p-accordioncontent]:bg-transparent! [&_.p-accordioncontent]:px-3',
     '[&_.p-accordioncontent[data-p-active="true"]]:pt-3 [&_.p-accordioncontent[data-p-active="true"]]:pb-4',
     '[&_.p-accordioncontent]:text-danger!',
     '[&_.p-accordioncontent:not([data-p-active="true"])]:h-0!',
@@ -120,10 +126,15 @@ export const AreaSearchControlStyles = {
     '[&_.p-accordioncontent:not([data-p-active="true"])]:p-0!',
     '[&_.p-accordioncontent:not([data-p-active="true"])]:m-0!',
     '[&_.p-accordioncontent:not([data-p-active="true"])_.p-motion]:hidden!',
-    '**:[[class*="accordioncontent-content-wrapper"]]:bg-danger/10!',
-    '**:[[class*="accordioncontent-content"]]:bg-danger/10!',
+    '**:[[class*="accordioncontent-content-wrapper"]]:bg-transparent!',
+    '**:[[class*="accordioncontent-content-wrapper"]]:[background-color:transparent!important]',
+    '**:[[class*="accordioncontent-content"]]:bg-transparent!',
+    '**:[[class*="accordioncontent-content"]]:[background-color:transparent!important]',
     '**:[[class*="accordioncontent-content"]]:p-0!',
-    '**:[[class*="accordioncontent-content"]]:text-danger!',
-    '**:[[class*="accordioncontent-content"]]:shadow-none!'
+    '**:[[class*="accordioncontent-content"]]:text-inherit!',
+    '**:[[class*="accordioncontent-content"]]:shadow-none!',
+    '[&_.p-accordioncontent]:[background-color:transparent!important]',
+    '[&_.p-accordioncontent_.p-motion]:bg-transparent!',
+    '[&_.p-accordioncontent_p]:bg-transparent [&_.p-accordioncontent_div]:bg-transparent'
   ].join(' ')
 } as const;

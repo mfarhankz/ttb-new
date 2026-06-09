@@ -41,6 +41,7 @@ import { AreaSearchChoiceOption, mapFieldChoices } from './area-search-field.uti
         [class.opacity-60]="controlDisabled()"
       >
         <p-select
+          size="small"
           [inputId]="field.field_name"
           [options]="options()"
           optionLabel="label"
