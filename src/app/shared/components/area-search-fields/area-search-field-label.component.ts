@@ -17,7 +17,7 @@ import { splitFieldLabel } from './area-search-field.utils';
         }
       </legend>
     } @else {
-      <label [attr.for]="htmlFor || null" [class]="labelClass">
+      <label [attr.id]="labelId || null" [attr.for]="htmlFor || null" [class]="labelClass">
         @if (secondary(); as suffix) {
           {{ primary() }}
           <span class="text-caption font-normal text-subtle">{{ suffix }}</span>
@@ -32,7 +32,10 @@ export class AreaSearchFieldLabelComponent {
   protected readonly labelClass = AreaSearchControlStyles.fieldLabel;
 
   @Input({ required: true }) label!: string;
+  /** Native input id — use only with real input/textarea controls. */
   @Input() htmlFor?: string;
+  /** Label element id — use with ariaLabelledBy on PrimeNG custom controls. */
+  @Input() labelId?: string;
   @Input() tag: 'label' | 'legend' = 'label';
 
   private readonly parts = computed(() => splitFieldLabel(this.label));

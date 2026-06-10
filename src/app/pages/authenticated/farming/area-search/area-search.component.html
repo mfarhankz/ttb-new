@@ -84,34 +84,38 @@
             </ul>
           </nav>
 
-          <div class="search-options-fields mt-auto border-t border-border bg-surface/60 p-3">
-            <label class="mb-3 flex cursor-pointer items-start gap-2 text-sm">
+          <div class="search-options-fields mt-auto flex flex-col gap-3 border-t border-border bg-surface/60 p-3">
+            <label class="flex cursor-pointer items-start gap-2 text-body-sm text-foreground">
               <p-checkbox
+                class="mt-0.5 shrink-0"
                 [binary]="true"
                 [ngModel]="formData().omit_saved_records?.value"
                 (ngModelChange)="onFieldChange('omit_saved_records', { value: $event })"
               />
-              <span>Suppress/Omit records already saved</span>
+              <span class="leading-snug">Suppress/Omit records already saved</span>
             </label>
 
-            <label class="mb-2 flex cursor-pointer items-center gap-2 text-sm">
-              <p-checkbox
-                [binary]="true"
-                [ngModel]="formData().max_limit?.check"
-                (ngModelChange)="onFieldChange('max_limit', { check: $event, value: formData().max_limit?.value })"
+            <div class="flex items-center gap-2">
+              <label class="flex shrink-0 cursor-pointer items-center gap-2 text-body-sm text-foreground">
+                <p-checkbox
+                  class="shrink-0"
+                  [binary]="true"
+                  [ngModel]="formData().max_limit?.check"
+                  (ngModelChange)="onFieldChange('max_limit', { check: $event, value: formData().max_limit?.value })"
+                />
+                <span class="whitespace-nowrap">Limit Records</span>
+              </label>
+              <input
+                pInputText
+                type="number"
+                class="box-border h-9.5 min-h-9.5 min-w-0 flex-1 text-body-sm leading-5"
+                [disabled]="!formData().max_limit?.check"
+                [ngModel]="formData().max_limit?.value"
+                (click)="enableLimitRecords()"
+                (ngModelChange)="onFieldChange('max_limit', { value: $event, check: true })"
+                placeholder="E.g. 1000"
               />
-              <span>Limit Records</span>
-            </label>
-            <input
-              pInputText
-              type="number"
-              [class]="controlStyles.input"
-              [disabled]="!formData().max_limit?.check"
-              [ngModel]="formData().max_limit?.value"
-              (click)="enableLimitRecords()"
-              (ngModelChange)="onFieldChange('max_limit', { value: $event, check: true })"
-              placeholder="E.g. 1000"
-            />
+            </div>
           </div>
         </aside>
 

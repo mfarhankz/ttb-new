@@ -12,7 +12,9 @@ import { AreaSearchControlStyles } from './area-search-control.styles';
   standalone: true,
   imports: [Accordion, AccordionPanel, AccordionHeader, AccordionContent, ModalComponent],
   host: {
-    class: 'block mb-6'
+    '[class.block]': 'note()',
+    '[class.mb-6]': 'note()',
+    '[class.hidden]': '!note()'
   },
   template: `
     @if (note(); as premierNote) {

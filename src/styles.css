@@ -372,6 +372,19 @@
   padding: 0;
 }
 
+/* Area search multiselect — match 38px control height; keep overflow visible for overlay panel. */
+.p-multiselect.h-9\.5 {
+  box-sizing: border-box;
+  height: 2.375rem !important;
+  min-height: 2.375rem !important;
+  overflow: visible !important;
+}
+
+.p-multiselect.h-9\.5 .p-multiselect-label-container {
+  height: calc(2.375rem - 2px) !important;
+  padding-block: 0 !important;
+}
+
 /* PrimeNG accordion content — equal padding on all sides (default token sets top to 0). */
 .p-accordioncontent-content {
   --p-accordion-content-padding: 1.125rem;

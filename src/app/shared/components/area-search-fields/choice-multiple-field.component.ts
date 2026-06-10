@@ -28,7 +28,11 @@ import {
 } from '@app/core/config/area-search-fields.config';
 import { AreaSearchControlStyles } from './area-search-control.styles';
 import { AreaSearchFieldLabelComponent } from './area-search-field-label.component';
-import { AreaSearchChoiceOption, mapFieldChoices } from './area-search-field.utils';
+import {
+  AreaSearchChoiceOption,
+  areaSearchFieldLabelId,
+  mapFieldChoices
+} from './area-search-field.utils';
 
 @Component({
   selector: 'app-area-search-choice-multiple-field',
@@ -37,7 +41,11 @@ import { AreaSearchChoiceOption, mapFieldChoices } from './area-search-field.uti
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-0.5">
-      <app-area-search-field-label [label]="field.label" [htmlFor]="field.field_name" />
+      <app-area-search-field-label
+        [label]="field.label"
+        [labelId]="fieldLabelId"
+        [htmlFor]="isAutocomplete ? field.field_name : undefined"
+      />
 
       @if (isAutocomplete) {
         <app-autocomplete
@@ -60,6 +68,7 @@ import { AreaSearchChoiceOption, mapFieldChoices } from './area-search-field.uti
           [class.opacity-60]="controlDisabled()"
         >
           <p-multiselect
+            [ariaLabelledBy]="fieldLabelId"
             [inputId]="field.field_name"
             [options]="options()"
             optionLabel="label"
@@ -82,7 +91,7 @@ import { AreaSearchChoiceOption, mapFieldChoices } from './area-search-field.uti
           />
           @if (loadingOptions()) {
             <i
-              class="pi pi-spinner pi-spin pointer-events-none absolute right-9 top-3 text-sm text-subtle"
+              class="pi pi-spinner pi-spin pointer-events-none absolute right-9 top-2.5 text-sm text-subtle"
               aria-hidden="true"
             ></i>
           }
@@ -97,6 +106,10 @@ import { AreaSearchChoiceOption, mapFieldChoices } from './area-search-field.uti
 })
 export class AreaSearchChoiceMultipleFieldComponent implements OnChanges, OnDestroy {
   protected readonly controlStyles = AreaSearchControlStyles;
+
+  get fieldLabelId(): string {
+    return areaSearchFieldLabelId(this.field.field_name);
+  }
   private readonly destroyRef = inject(DestroyRef);
   private readonly formService = inject(AreaSearchFormService);
   private readonly dynamicChoices = inject(AreaSearchDynamicChoicesService);

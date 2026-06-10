@@ -14,7 +14,11 @@ import { AreaSearchFieldMeta, AreaSearchFormFieldValue } from '@app/core/interfa
 import { AreaSearchControlStyles } from './area-search-control.styles';
 import { AreaSearchFieldLabelComponent } from './area-search-field-label.component';
 import { resolveChoiceTreeDefaultValue } from '@app/core/utils/area-search-field-meta.util';
-import { AreaSearchTreeOptionGroup, mapTreeChoiceGroups } from './area-search-field.utils';
+import {
+  AreaSearchTreeOptionGroup,
+  areaSearchFieldLabelId,
+  mapTreeChoiceGroups
+} from './area-search-field.utils';
 
 @Component({
   selector: 'app-area-search-choice-tree-field',
@@ -23,8 +27,10 @@ import { AreaSearchTreeOptionGroup, mapTreeChoiceGroups } from './area-search-fi
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-0.5">
-      <app-area-search-field-label [label]="field.label" />
+      <app-area-search-field-label [label]="field.label" [labelId]="fieldLabelId" />
       <p-multiselect
+        [ariaLabelledBy]="fieldLabelId"
+        [inputId]="field.field_name"
         [group]="true"
         [options]="optionGroups()"
         optionGroupLabel="label"
@@ -54,6 +60,10 @@ import { AreaSearchTreeOptionGroup, mapTreeChoiceGroups } from './area-search-fi
 })
 export class AreaSearchChoiceTreeFieldComponent implements OnChanges {
   protected readonly controlStyles = AreaSearchControlStyles;
+
+  get fieldLabelId(): string {
+    return areaSearchFieldLabelId(this.field.field_name);
+  }
   @Input({ required: true }) field!: AreaSearchFieldMeta;
   @Input() value?: AreaSearchFormFieldValue;
   @Output() valueChange = new EventEmitter<Partial<AreaSearchFormFieldValue>>();

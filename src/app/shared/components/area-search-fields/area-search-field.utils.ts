@@ -11,6 +11,11 @@ export interface AreaSearchFieldLabelParts {
   secondary?: string;
 }
 
+/** Id for a field label element — pair with ariaLabelledBy on PrimeNG selects/multiselects. */
+export function areaSearchFieldLabelId(fieldName: string): string {
+  return `as-label-${fieldName.replace(/_/g, '-')}`;
+}
+
 /** Split "Title ( extra detail )" so parenthetical text can use smaller typography. */
 export function splitFieldLabel(label: string): AreaSearchFieldLabelParts {
   const index = label.indexOf('(');

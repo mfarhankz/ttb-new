@@ -25,7 +25,11 @@ import { US_STATE_AREA_SEARCH_OPTIONS } from '@app/core/config/us-states.config'
 import { fieldHasBlankChoice } from '@app/core/utils/area-search-field-meta.util';
 import { AreaSearchControlStyles } from './area-search-control.styles';
 import { AreaSearchFieldLabelComponent } from './area-search-field-label.component';
-import { AreaSearchChoiceOption, mapFieldChoices } from './area-search-field.utils';
+import {
+  AreaSearchChoiceOption,
+  areaSearchFieldLabelId,
+  mapFieldChoices
+} from './area-search-field.utils';
 
 @Component({
   selector: 'app-area-search-choice-field',
@@ -34,7 +38,7 @@ import { AreaSearchChoiceOption, mapFieldChoices } from './area-search-field.uti
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-0.5">
-      <app-area-search-field-label [label]="field.label" [htmlFor]="field.field_name" />
+      <app-area-search-field-label [label]="field.label" [labelId]="fieldLabelId" />
       <div
         class="relative"
         [class.pointer-events-none]="controlDisabled()"
@@ -42,6 +46,7 @@ import { AreaSearchChoiceOption, mapFieldChoices } from './area-search-field.uti
       >
         <p-select
           size="small"
+          [ariaLabelledBy]="fieldLabelId"
           [inputId]="field.field_name"
           [options]="options()"
           optionLabel="label"
@@ -66,6 +71,11 @@ import { AreaSearchChoiceOption, mapFieldChoices } from './area-search-field.uti
 })
 export class AreaSearchChoiceFieldComponent implements OnChanges, OnDestroy {
   protected readonly controlStyles = AreaSearchControlStyles;
+
+  get fieldLabelId(): string {
+    return areaSearchFieldLabelId(this.field.field_name);
+  }
+
   private readonly formService = inject(AreaSearchFormService);
   private readonly dynamicChoices = inject(AreaSearchDynamicChoicesService);
   readonly controlDisabled = signal(false);
