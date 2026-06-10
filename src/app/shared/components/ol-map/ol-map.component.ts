@@ -21,7 +21,17 @@ declare const ol: any;
   host: {
     class: 'block w-full h-full'
   },
-  template: `<div #mapEl class="w-full h-full min-h-[320px]"></div>`,
+  template: `
+    <div class="relative h-full w-full">
+      <div #mapEl class="h-full w-full min-h-[320px]"></div>
+      <div #popupHost class="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div #popupEl class="ol-popup sm-search-popup hidden">
+          <button #popupCloser type="button" class="ol-popup-closer" aria-label="Close"></button>
+          <div #popupContent class="ol-popup-content"></div>
+        </div>
+      </div>
+    </div>
+  `,
   styles: [
     `
       :host ::ng-deep .ol-viewport {
@@ -33,6 +43,9 @@ declare const ol: any;
 })
 export class OlMapComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mapEl', { static: false }) mapEl!: ElementRef<HTMLDivElement>;
+  @ViewChild('popupEl', { static: false }) popupEl!: ElementRef<HTMLDivElement>;
+  @ViewChild('popupContent', { static: false }) popupContent!: ElementRef<HTMLDivElement>;
+  @ViewChild('popupCloser', { static: false }) popupCloser!: ElementRef<HTMLButtonElement>;
 
   /** Merged with map defaults. */
   @Input() options: Record<string, any> = {};
@@ -141,6 +154,10 @@ export class OlMapComponent implements AfterViewInit, OnDestroy {
       refs.resetMapHandler = (r, setCenterReset) => {
         this.olMapService.clearMap(r, setCenterReset !== false);
       };
+
+      refs.popupElement = this.popupEl?.nativeElement;
+      refs.popupContentElement = this.popupContent?.nativeElement;
+      refs.popupCloserElement = this.popupCloser?.nativeElement;
 
       Object.assign(this.mapObject, refs);
       this.map?.updateSize?.();

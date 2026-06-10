@@ -110,7 +110,7 @@ export class FarmingComponent implements OnInit, OnDestroy {
     const lat = details.location?.lat;
     const lng = details.location?.lng;
     if (Number.isFinite(lat) && Number.isFinite(lng)) {
-      this.olMapService.centerMapOnCoordinates(this.mapObject, lng!, lat!);
+      this.olMapService.showSearchAddressMarker(this.mapObject, lng!, lat!, details);
       return;
     }
 
@@ -130,7 +130,12 @@ export class FarmingComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.olMapService.centerMapOnCoordinates(this.mapObject, Number(hit.lon), Number(hit.lat));
+        this.olMapService.showSearchAddressMarker(
+          this.mapObject,
+          Number(hit.lon),
+          Number(hit.lat),
+          details
+        );
       })
       .catch(() => this.searchError.set('Failed to search address.'));
   }

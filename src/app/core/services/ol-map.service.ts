@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MAP_DEFAULTS, DEFAULT_LON_LAT } from '../config/map.config';
+import { SmartyAddressDetails } from '../interfaces/smarty.interface';
+import { formatSearchAddressMarkup } from '../utils/map-search-address.util';
 
 const METERS_PER_MILE = 1609.344;
 /** Legacy olFactory.et() — Web Mercator circle display adjustment. */
@@ -36,6 +38,10 @@ export interface MapObjectRefs {
   popupOverlay?: any;
   tooltipOverlay?: any;
   prePopupRecord?: any;
+  popupElement?: HTMLElement;
+  popupContentElement?: HTMLElement;
+  popupCloserElement?: HTMLElement;
+  searchAddressPopupTimer?: ReturnType<typeof setTimeout>;
   [key: string]: any;
 }
 
@@ -105,9 +111,7 @@ export class OlMapService {
       );
       refs.map.getView().setZoom(refs.options.zoom ?? MAP_DEFAULTS.zoom);
     }
-    if (refs.popupOverlay && refs.map.getOverlays().length) {
-      refs.map.removeOverlay(refs.popupOverlay);
-    }
+    this.hideSearchAddressPopup(refs);
     if (refs.vectorLayer?.getSource()) refs.vectorLayer.getSource().clear();
     if (refs.shapesLayer?.getSource()) refs.shapesLayer.getSource().clear();
     if (refs.prePopupRecord) refs.prePopupRecord = {};
@@ -233,6 +237,120 @@ export class OlMapService {
     const proj = this.getProjections();
     refs.map.getView().setCenter(ol.proj.transform([lon, lat], proj.geographic, proj.proj3857));
     refs.map.getView().setZoom(zoom);
+  }
+
+  /** Legacy clearMarkerPopup — remove search/address pins and hide popup. */
+  clearSearchAddressMarker(refs: MapObjectRefs): void {
+    if (refs.searchAddressPopupTimer) {
+      clearTimeout(refs.searchAddressPopupTimer);
+      refs.searchAddressPopupTimer = undefined;
+    }
+
+    refs.vectorLayer?.getSource()?.clear();
+    this.hideSearchAddressPopup(refs);
+  }
+
+  /** Show green pin + address details popup after autocomplete selection. */
+  showSearchAddressMarker(
+    refs: MapObjectRefs,
+    lon: number,
+    lat: number,
+    details: SmartyAddressDetails,
+    zoom = 14
+  ): void {
+    if (!refs.map || !refs.vectorLayer || !Number.isFinite(lon) || !Number.isFinite(lat)) {
+      return;
+    }
+
+    this.clearSearchAddressMarker(refs);
+
+    const proj = this.getProjections();
+    const coord = ol.proj.transform([lon, lat], proj.geographic, proj.proj3857);
+    const markup = formatSearchAddressMarkup(details);
+    const feature = new ol.Feature({
+      geometry: new ol.geom.Point(coord),
+      html: markup,
+      isSearchAddress: true
+    });
+
+    feature.setId('search-address-pin');
+    feature.setStyle(this.createSearchPinStyle());
+    refs.vectorLayer.getSource().addFeature(feature);
+
+    this.centerMapOnCoordinates(refs, lon, lat, zoom);
+    this.scheduleSearchAddressPopup(refs, coord, markup);
+  }
+
+  private createSearchPinStyle(): any {
+    return new ol.style.Style({
+      image: new ol.style.Icon({
+        anchor: [0.5, 46],
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'pixels',
+        src: '/assets/images/_map-pin-green.png'
+      })
+    });
+  }
+
+  private scheduleSearchAddressPopup(refs: MapObjectRefs, coordinate: number[], markup: string): void {
+    refs.searchAddressPopupTimer = setTimeout(() => {
+      refs.searchAddressPopupTimer = undefined;
+      this.openSearchAddressPopup(refs, coordinate, markup);
+    }, 300);
+  }
+
+  private openSearchAddressPopup(refs: MapObjectRefs, coordinate: number[], markup: string): void {
+    const overlay = this.ensurePopupOverlay(refs);
+    const popup = refs.popupElement;
+    const content = refs.popupContentElement;
+
+    if (!overlay || !popup || !content) {
+      return;
+    }
+
+    content.innerHTML = markup;
+    popup.classList.remove('lg-dash-popup', 'lg-PH-EM-popup', 'lg-footer-popup');
+    popup.classList.add('sm-search-popup');
+    overlay.setPosition(coordinate);
+    popup.classList.remove('hidden');
+
+    const closer = refs.popupCloserElement;
+    if (closer && !closer.dataset['bound']) {
+      closer.dataset['bound'] = 'true';
+      closer.addEventListener('click', (event) => {
+        event.preventDefault();
+        this.hideSearchAddressPopup(refs);
+      });
+    }
+
+    overlay.panIntoView?.({ margin: 15, animation: { duration: 0 } });
+  }
+
+  private ensurePopupOverlay(refs: MapObjectRefs): any {
+    if (!refs.map || !refs.popupElement) {
+      return null;
+    }
+
+    let overlay = refs.popupOverlay ?? refs.map.getOverlayById?.('popupOverlay');
+    if (!overlay) {
+      overlay = new ol.Overlay({
+        element: refs.popupElement,
+        id: 'popupOverlay',
+        positioning: 'bottom-center',
+        stopEvent: true,
+        offset: [0, -12]
+      });
+      refs.map.addOverlay(overlay);
+      refs.popupOverlay = overlay;
+    }
+
+    return overlay;
+  }
+
+  private hideSearchAddressPopup(refs: MapObjectRefs): void {
+    refs.popupOverlay?.setPosition(undefined);
+    refs.popupElement?.classList.add('hidden');
+    refs.popupContentElement && (refs.popupContentElement.innerHTML = '');
   }
 
   private serializeDrawnFeature(feature: any, shape: 'circle' | 'polygon'): MapDrawnGeometry | null {
