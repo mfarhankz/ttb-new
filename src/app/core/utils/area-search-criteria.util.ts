@@ -21,6 +21,12 @@ export interface AreaSearchCriteriaChip {
   fieldName: string;
   label: string;
   displayValue: string;
+  viewable?: boolean;
+}
+
+function formatGeometryDisplayValue(geometry: { match?: string }): string {
+  const match = String(geometry.match ?? '').toLowerCase();
+  return match === 'circle' ? 'Radius' : 'Boundary';
 }
 
 const SKIP_PAYLOAD_KEYS = new Set(['searchOptions', 'customFilters', 'geometry']);
@@ -265,16 +271,14 @@ function collectPayloadCriteria(
   }
 
   if (payload.geometry && typeof payload.geometry === 'object') {
-    const geometryField = fieldsInfo['geometry'];
-    if (geometryField) {
-      const displayValue = formatPayloadStructured(geometryField, payload.geometry);
-      if (displayValue) {
-        chips.push({
-          fieldName: 'geometry',
-          label: geometryField.label ?? 'Geography',
-          displayValue
-        });
-      }
+    const geometryPayload = payload.geometry as { match?: string; value?: unknown };
+    if (geometryPayload.match && geometryPayload.value != null && geometryPayload.value !== '') {
+      chips.push({
+        fieldName: 'geometry',
+        label: 'Geometry Type',
+        displayValue: formatGeometryDisplayValue(geometryPayload),
+        viewable: true
+      });
     }
   }
 

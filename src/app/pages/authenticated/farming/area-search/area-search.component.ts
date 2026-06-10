@@ -39,6 +39,7 @@ import { PropertyRecordRaw } from '@app/core/interfaces/property-record.interfac
 import { AreaSearchFieldGroup } from '@app/core/interfaces/area-search-field.interface';
 import { AreaSearchControlStyles } from '@app/shared/components/area-search-fields/area-search-control.styles';
 import { AreaSearchCriteriaChipsComponent } from '@app/shared/components/area-search-fields/area-search-criteria-chips.component';
+import { AreaSearchGeometryPreviewComponent } from '@app/shared/components/area-search-fields/area-search-geometry-preview.component';
 import { AreaSearchAccordionStateService } from '@app/core/services/area-search-accordion-state.service';
 import { PayNowModalService } from '@app/core/services/pay-now-modal.service';
 import { SavedFarmsService } from '@app/core/services/saved-farms.service';
@@ -65,7 +66,8 @@ import { SavedFarmRecord } from '@app/core/interfaces/saved-farm.interface';
     AreaSearchPremierNoteComponent,
     RecentQueriesPanelComponent,
     CommonQueriesPanelComponent,
-    AreaSearchCriteriaChipsComponent
+    AreaSearchCriteriaChipsComponent,
+    AreaSearchGeometryPreviewComponent
   ],
   templateUrl: './area-search.component.html'
 })
@@ -76,6 +78,7 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('shareModal') private shareModal?: ModalComponent;
   @ViewChild('geographyModal') private geographyModal?: ModalComponent;
   @ViewChild('almModal') private almModal?: ModalComponent;
+  @ViewChild('geometryPreview') private geometryPreview?: AreaSearchGeometryPreviewComponent;
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -345,8 +348,21 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.formService.resetArrangements();
   }
 
+  viewCriteria(fieldName: string): void {
+    if (fieldName !== 'geometry') {
+      return;
+    }
+
+    this.geometryPreview?.open(this.formData().geometry);
+  }
+
   removeCriteria(fieldName: string): void {
     if (this.searchBusy()) {
+      return;
+    }
+
+    if (fieldName === 'geometry') {
+      this.formService.clearGeometry();
       return;
     }
 
@@ -670,6 +686,7 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private applyEntrySources(): void {
     const geometry = this.stateService.consumePendingGeometry();
+    const runGetCount = this.stateService.consumeRunGetCountOnEntry();
     if (geometry) {
       this.formService.setGeometry({
         match: geometry.match,
@@ -690,6 +707,10 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.route.snapshot.queryParamMap.get('edit') === 'true' && editCriteria) {
       return;
+    }
+
+    if (runGetCount && geometry) {
+      this.getCount();
     }
   }
 

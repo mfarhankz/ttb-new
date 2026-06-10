@@ -125,7 +125,7 @@ export class OlMapComponent implements AfterViewInit, OnDestroy {
         map: this.map,
         mapNode,
         options: opts,
-        geometry: {},
+        geometry: undefined,
         showSearchBox: false,
         showSearchPopup: false,
         showDragBtn: false,

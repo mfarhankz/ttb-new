@@ -45,6 +45,7 @@ export class AutocompleteComponent<T = unknown> {
   readonly error = input(false);
   readonly noMatch = input(false);
   readonly appendTo = input<'self' | 'body'>('body');
+  readonly itemIcon = input<string | null>(null);
 
   readonly queryChange = output<string>();
   readonly itemSelect = output<AutocompleteItem<T>>();

@@ -43,11 +43,16 @@
         <li>
           <button
             type="button"
-            class="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-body-sm transition-colors hover:bg-muted/60"
-            [class.bg-muted/60]="index === selectedIndex()"
+            class="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-body-sm transition-colors hover:bg-primary/10"
+            [class.bg-primary/10]="index === selectedIndex()"
             (mousedown)="onItemSelect(item)"
           >
-            <span class="text-foreground">{{ item.label }}</span>
+            <span class="flex min-w-0 flex-1 items-center gap-2">
+              @if (itemIcon()) {
+                <i [class]="itemIcon() + ' shrink-0 text-muted'" aria-hidden="true"></i>
+              }
+              <span class="truncate text-foreground">{{ item.label }}</span>
+            </span>
             @if (item.hint) {
               <span class="shrink-0 text-info">{{ item.hint }}</span>
             }

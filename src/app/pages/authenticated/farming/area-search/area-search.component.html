@@ -274,6 +274,7 @@
             [chips]="selectedCriteria()"
             [removable]="true"
             (remove)="removeCriteria($event)"
+            (view)="viewCriteria($event)"
           />
         }
 
@@ -377,6 +378,8 @@
     <app-button variant="ghost" (onClick)="closeGeographyModal()">Close</app-button>
   </div>
 </app-modal>
+
+<app-area-search-geometry-preview #geometryPreview />
 
 <app-modal #almModal title="Dynamic Stats" [showFooter]="false">
   <p class="text-sm text-subtle">Configure live query automation for this search criteria.</p>

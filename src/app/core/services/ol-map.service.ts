@@ -8,6 +8,16 @@ const LEGACY_CIRCLE_RADIUS_ADJUST = 1.195;
 /** OpenLayers global (loaded from CDN v7.4.0). */
 declare const ol: any;
 
+export interface MapDrawnGeometry {
+  match: 'circle' | 'polygon';
+  value: {
+    center_lng?: string;
+    center_lat?: string;
+    radius?: string;
+    wkt?: string;
+  };
+}
+
 export interface MapObjectRefs {
   map?: any;
   mapNode?: HTMLElement;
@@ -15,17 +25,22 @@ export interface MapObjectRefs {
   shapesLayer?: any;
   options?: any;
   resetMapHandler?: (refs: MapObjectRefs, setCenterReset?: boolean) => void;
-  geometry?: { match?: string; value?: any };
+  geometry?: MapDrawnGeometry;
   showSearchBox?: boolean;
   showSearchPopup?: boolean;
   showDragBtn?: boolean;
   showRadiusBtn?: boolean;
   shapeAlertMessage?: boolean | string;
+  topPolygonLength?: string;
   hovers?: { hoverOnTract?: boolean; hoverOnFarm?: boolean };
   popupOverlay?: any;
   tooltipOverlay?: any;
   prePopupRecord?: any;
   [key: string]: any;
+}
+
+export interface CreateShapeFeatureOptions {
+  onDrawComplete?: (geometry: MapDrawnGeometry, label: string) => void;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -155,28 +170,110 @@ export class OlMapService {
   createShapeFeature(
     refs: MapObjectRefs,
     shape: 'circle' | 'polygon',
-    _pipelineObj?: any,
-    _tractsMode?: boolean,
-    _options?: any
+    options: CreateShapeFeatureOptions = {}
   ): void {
     if (!refs.map || !refs.shapesLayer) return;
-    const prevDraw = (refs as any).drawInteraction;
-    if (prevDraw) {
-      refs.map.removeInteraction(prevDraw);
-      (refs as any).drawInteraction = null;
-    }
+    this.removeDrawInteraction(refs);
     const source = refs.shapesLayer.getSource();
     const geometryType = shape === 'circle' ? 'Circle' : 'Polygon';
     const draw = new ol.interaction.Draw({
       source,
       type: geometryType
     });
-    draw.on('drawend', (e: any) => {
-      const feat = e.feature;
-      if (refs.geometry) refs.geometry = { match: shape, value: feat };
+
+    draw.on('drawstart', () => {
+      source.clear();
+      refs.geometry = undefined;
+      refs.shapeAlertMessage = false;
+      refs.topPolygonLength = '';
     });
+
+    draw.on('drawend', (e: any) => {
+      const feature = e.feature;
+      feature.setId(shape === 'circle' ? 'circle' : 'polygon');
+      this.removeDrawInteraction(refs);
+
+      const geometry = this.serializeDrawnFeature(feature, shape);
+      if (!geometry) {
+        return;
+      }
+
+      const label =
+        shape === 'circle'
+          ? `Selected Radius : ${geometry.value.radius} miles`
+          : 'Selected Boundary';
+
+      refs.geometry = geometry;
+      refs.shapeAlertMessage = label;
+      refs.topPolygonLength = shape === 'circle' ? label : '';
+      refs.showSearchBox = false;
+      refs.showRadiusBtn = shape === 'circle';
+
+      options.onDrawComplete?.(geometry, label);
+      this.fitMapToShapes(refs);
+    });
+
     refs.map.addInteraction(draw);
     (refs as any).drawInteraction = draw;
+  }
+
+  removeDrawInteraction(refs: MapObjectRefs): void {
+    const prevDraw = (refs as any).drawInteraction;
+    if (prevDraw && refs.map) {
+      refs.map.removeInteraction(prevDraw);
+      (refs as any).drawInteraction = null;
+    }
+  }
+
+  centerMapOnCoordinates(refs: MapObjectRefs, lon: number, lat: number, zoom = 14): void {
+    if (!refs.map || !Number.isFinite(lon) || !Number.isFinite(lat)) {
+      return;
+    }
+
+    const proj = this.getProjections();
+    refs.map.getView().setCenter(ol.proj.transform([lon, lat], proj.geographic, proj.proj3857));
+    refs.map.getView().setZoom(zoom);
+  }
+
+  private serializeDrawnFeature(feature: any, shape: 'circle' | 'polygon'): MapDrawnGeometry | null {
+    const geometry = feature?.getGeometry?.();
+    if (!geometry) {
+      return null;
+    }
+
+    if (shape === 'circle') {
+      const value = this.serializeCircleGeometry(geometry);
+      return value ? { match: 'circle', value } : null;
+    }
+
+    const value = this.serializePolygonGeometry(geometry);
+    return value ? { match: 'polygon', value } : null;
+  }
+
+  private serializeCircleGeometry(circleGeom: any): MapDrawnGeometry['value'] | null {
+    const proj = this.getProjections();
+    const center = ol.proj.transform(circleGeom.getCenter(), proj.proj3857, proj.geographic);
+    const radiusMeters = Number(circleGeom.getRadius());
+    if (!Number.isFinite(radiusMeters) || radiusMeters <= 0) {
+      return null;
+    }
+
+    const radiusMiles = radiusMeters / LEGACY_CIRCLE_RADIUS_ADJUST / METERS_PER_MILE;
+    return {
+      center_lng: String(center[0]),
+      center_lat: String(center[1]),
+      radius: String(Number(radiusMiles.toFixed(3)))
+    };
+  }
+
+  private serializePolygonGeometry(polygonGeom: any): MapDrawnGeometry['value'] | null {
+    const proj = this.getProjections();
+    const cloned = polygonGeom.clone();
+    cloned.transform(proj.proj3857, proj.geographic);
+    const wktFormat = new ol.format.WKT();
+    const feature = new ol.Feature({ geometry: cloned });
+    const wkt = wktFormat.writeFeature(feature);
+    return wkt ? { wkt } : null;
   }
 
   /** Draw multiple polygons (e.g. tracts) from WKT or geometries. */

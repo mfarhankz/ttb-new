@@ -13,6 +13,7 @@ export class AreaSearchStateService {
   private readonly _activeQueriesTab = signal<0 | 1>(1);
   private readonly _queryId = signal<string | null>(null);
   private readonly _queryName = signal<string | null>(null);
+  private readonly _runGetCountOnEntry = signal(false);
 
   readonly pendingGeometry = this._pendingGeometry.asReadonly();
   readonly editCriteria = this._editCriteria.asReadonly();
@@ -21,14 +22,21 @@ export class AreaSearchStateService {
   readonly queryId = this._queryId.asReadonly();
   readonly queryName = this._queryName.asReadonly();
 
-  setPendingGeometry(geometry: AreaSearchPendingGeometry | null): void {
+  setPendingGeometry(geometry: AreaSearchPendingGeometry | null, runGetCount = false): void {
     this._pendingGeometry.set(geometry);
+    this._runGetCountOnEntry.set(runGetCount);
   }
 
   consumePendingGeometry(): AreaSearchPendingGeometry | null {
     const geometry = this._pendingGeometry();
     this._pendingGeometry.set(null);
     return geometry;
+  }
+
+  consumeRunGetCountOnEntry(): boolean {
+    const run = this._runGetCountOnEntry();
+    this._runGetCountOnEntry.set(false);
+    return run;
   }
 
   setEditCriteria(criteria: AreaSearchPayload | null): void {

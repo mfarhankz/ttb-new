@@ -63,6 +63,32 @@ describe('area-search-criteria.util', () => {
     }
   ];
 
+  it('shows geometry criteria chip with radius label', () => {
+    const formData: AreaSearchFormData = {
+      omit_saved_records: { value: false },
+      max_limit: { check: false },
+      geometry: {
+        search_type: 'geometry',
+        match: 'circle',
+        value: {
+          center_lng: '-117.84',
+          center_lat: '33.68',
+          radius: '2.5'
+        }
+      }
+    };
+
+    const chips = buildSelectedCriteria(formData, fieldsInfo, fieldGroups);
+    const geometryChip = chips.find((chip) => chip.fieldName === 'geometry');
+
+    expect(geometryChip).toEqual({
+      fieldName: 'geometry',
+      label: 'Geometry Type',
+      displayValue: 'Radius',
+      viewable: true
+    });
+  });
+
   it('shows only user-selected searchable values', () => {
     const formData: AreaSearchFormData = {
       omit_saved_records: { value: false },
