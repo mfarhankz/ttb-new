@@ -163,6 +163,7 @@ export class SavedFarmsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearFarmHoverNow();
     if (this.autoCollapsedNavForSplit) {
       this.layoutService.requestSidebarCollapse(false);
     }
@@ -204,7 +205,7 @@ export class SavedFarmsComponent implements OnInit, OnDestroy {
     this.pipelineViewMode.set(mode);
 
     if (mode === 'list') {
-      this.onFarmHoverEnd();
+      this.clearFarmHoverNow();
     }
 
     if (mode === 'both' && previousMode === 'list') {
@@ -244,11 +245,19 @@ export class SavedFarmsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.mapTableSync.showFarmGeometry(this.mapObject, geometry);
-    this.mapTableSync.scheduleMapResize(this.mapObject, attempt === 0 ? 220 : 120);
+    // Legacy onFarmMouseEnter: clear, redraw, instant fit on every row (no animation).
+    this.mapTableSync.showFarmGeometry(this.mapObject, geometry, {
+      fit: true,
+      fitDuration: 0,
+      updateInPlace: false
+    });
   }
 
   onFarmHoverEnd(): void {
+    this.clearFarmHoverNow();
+  }
+
+  private clearFarmHoverNow(): void {
     if (!this.hoverActive) {
       return;
     }
@@ -257,7 +266,6 @@ export class SavedFarmsComponent implements OnInit, OnDestroy {
     if (this.mapObject.hovers) {
       this.mapObject.hovers.hoverOnFarm = false;
     }
-
     this.mapTableSync.clearFarmGeometry(this.mapObject);
   }
 

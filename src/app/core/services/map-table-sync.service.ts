@@ -6,8 +6,16 @@ import { SavedFarmGeometry } from '../interfaces/saved-farm.interface';
 export class MapTableSyncService {
   private readonly olMapService = inject(OlMapService);
 
-  showFarmGeometry(mapObject: MapObjectRefs, geometry: unknown): void {
-    this.olMapService.drawGeometries(mapObject, geometry as SavedFarmGeometry | SavedFarmGeometry[]);
+  showFarmGeometry(
+    mapObject: MapObjectRefs,
+    geometry: unknown,
+    options?: { fit?: boolean; fitDuration?: number; updateInPlace?: boolean }
+  ): void {
+    this.olMapService.drawGeometries(
+      mapObject,
+      geometry as SavedFarmGeometry | SavedFarmGeometry[],
+      options
+    );
   }
 
   /** Alias for context geometry (farm boundary, search area, etc.). */

@@ -207,10 +207,16 @@ export class OlMapService {
   }
 
   /** Draw legacy farm/search geometry objects on the shapes layer. */
-  drawGeometries(refs: MapObjectRefs, geometryInput: unknown): void {
+  drawGeometries(
+    refs: MapObjectRefs,
+    geometryInput: unknown,
+    options: { fit?: boolean; fitDuration?: number; updateInPlace?: boolean } = {}
+  ): void {
     if (!refs.shapesLayer || geometryInput == null) {
       return;
     }
+
+    const { fit = true, fitDuration = 350, updateInPlace = true } = options;
 
     // Legacy onFarmMouseEnter unwraps single-item geometry arrays.
     let normalizedInput = geometryInput;
@@ -218,20 +224,76 @@ export class OlMapService {
       normalizedInput = geometryInput[0];
     }
 
-    this.clearShapesLayer(refs);
-
     const geometries = this.normalizeGeometries(normalizedInput);
+
+    if (updateInPlace && geometries.length === 1 && this.updateRadiusCircle(refs, geometries[0])) {
+      if (refs.map?.updateSize) {
+        refs.map.updateSize();
+      }
+      if (fit) {
+        this.scheduleFitToShapes(refs, fitDuration);
+      }
+      return;
+    }
+
+    this.clearShapesLayer(refs);
     geometries.forEach((geometry) => this.drawSingleGeometry(refs, geometry));
 
     if (refs.map?.updateSize) {
       refs.map.updateSize();
     }
 
-    this.fitMapToShapes(refs);
+    if (fit) {
+      this.scheduleFitToShapes(refs, fitDuration);
+    }
+  }
+
+  /** Legacy setCenterOnMap — defer fit one tick so the shape is rendered first. */
+  private scheduleFitToShapes(refs: MapObjectRefs, duration: number): void {
+    setTimeout(() => this.fitMapToShapes(refs, duration), 0);
+  }
+
+  /** Update an existing preview circle in place (smooth farm row hover). */
+  private updateRadiusCircle(refs: MapObjectRefs, geometry: Record<string, unknown>): boolean {
+    const shapeType = String(geometry['match'] ?? geometry['type'] ?? '').toLowerCase();
+    if (shapeType !== 'circle') {
+      return false;
+    }
+
+    const value = geometry['value'] as Record<string, unknown> | undefined;
+    if (!value) {
+      return false;
+    }
+
+    const source = refs.shapesLayer?.getSource();
+    if (!source) {
+      return false;
+    }
+
+    const circleFeature = source
+      .getFeatures()
+      .find((feature: any) => feature.getId() === 'circle');
+    if (!circleFeature) {
+      return false;
+    }
+
+    const centerLng = Number(value['center_lng']);
+    const centerLat = Number(value['center_lat']);
+    const radiusMiles = Number(value['radius'] ?? 0);
+    if (!Number.isFinite(centerLng) || !Number.isFinite(centerLat)) {
+      return false;
+    }
+
+    const proj = this.getProjections();
+    const center = ol.proj.transform([centerLng, centerLat], proj.geographic, proj.proj3857);
+    const geom = circleFeature.getGeometry();
+    geom.setCenter(center);
+    geom.setRadius(this.milesToMapRadius(radiusMiles));
+    return true;
   }
 
   /** Fit map view to current shape features. */
-  fitMapToShapes(refs: MapObjectRefs): void {
+  fitMapToShapes(refs: MapObjectRefs, duration = 350): void {
     const source = refs.shapesLayer?.getSource();
     if (!refs.map || !source) {
       return;
@@ -247,7 +309,14 @@ export class OlMapService {
       return;
     }
 
-    refs.map.getView().fit(extent, { padding: [40, 40, 40, 40], maxZoom: 16, duration: 250 });
+    // Legacy setCenterOnMap uses view.fit(extent) with no padding when snapping on hover.
+    const fitOptions: { duration: number; padding?: number[]; maxZoom?: number } = { duration };
+    if (duration > 0) {
+      fitOptions.padding = [40, 40, 40, 40];
+      fitOptions.maxZoom = 16;
+    }
+
+    refs.map.getView().fit(extent, fitOptions);
   }
 
   private normalizeGeometries(input: unknown): Array<Record<string, unknown>> {
