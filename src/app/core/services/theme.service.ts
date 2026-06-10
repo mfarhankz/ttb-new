@@ -3,27 +3,35 @@ import { isPlatformBrowser } from '@angular/common';
 import {
   BRAND_PRESETS,
   BRAND_STORAGE_KEY,
+  FONT_FAMILY_STORAGE_KEY,
   THEME_STORAGE_KEY,
   VARIANT_PRESETS,
   VARIANT_STORAGE_KEY,
+  VALID_FONT_FAMILIES,
   TenantThemeOverride,
   ThemeBrand,
+  ThemeFontFamily,
   ThemeMode,
   ThemeVariant,
   ThemeTokens,
+  fontFamilyToCssVars,
+  getFontFamilyOption,
   tenantOverrideToCssVars,
   tokensToCssVars
 } from '../theme/theme.config';
 
 const VALID_VARIANTS = new Set<ThemeVariant>(['light', 'dark', 'main']);
+const THEME_FONT_LINK_ID = 'ttb-theme-font';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private readonly platformId = inject(PLATFORM_ID);
   private runtimeOverrides: Record<string, string> = {};
   private readonly _variant = signal<ThemeVariant>('main');
+  private readonly _fontFamily = signal<ThemeFontFamily>('default');
 
   readonly variant = this._variant.asReadonly();
+  readonly fontFamily = this._fontFamily.asReadonly();
 
   init(): void {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -42,8 +50,16 @@ export class ThemeService {
     const brand: ThemeBrand =
       storedBrand && (storedBrand === 'default' || storedBrand === 'acme') ? storedBrand : 'default';
 
+    const storedFont = localStorage.getItem(FONT_FAMILY_STORAGE_KEY) as ThemeFontFamily | null;
+    if (storedFont && VALID_FONT_FAMILIES.has(storedFont)) {
+      this._fontFamily.set(storedFont);
+    } else if (storedFont) {
+      localStorage.removeItem(FONT_FAMILY_STORAGE_KEY);
+    }
+
     this.applyVariant(variant, false);
     this.applyBrand(brand, false);
+    this.reapplyUserFontPreference();
   }
 
   getMode(): ThemeMode {
@@ -78,11 +94,24 @@ export class ThemeService {
     this.applyBrand(brand, true);
   }
 
+  setFontFamily(fontFamily: ThemeFontFamily): void {
+    if (!VALID_FONT_FAMILIES.has(fontFamily)) {
+      return;
+    }
+
+    this._fontFamily.set(fontFamily);
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem(FONT_FAMILY_STORAGE_KEY, fontFamily);
+    }
+    this.reapplyUserFontPreference();
+  }
+
   applyTenantTheme(override: TenantThemeOverride): void {
     if (!isPlatformBrowser(this.platformId)) return;
     const vars = tenantOverrideToCssVars(override);
     this.runtimeOverrides = { ...this.runtimeOverrides, ...vars };
     this.applyCssVars(vars);
+    this.reapplyUserFontPreference();
   }
 
   /** Apply arbitrary design-token CSS variables (used by VerticalService presets). */
@@ -94,15 +123,41 @@ export class ThemeService {
     }
   }
 
+  /** Re-apply a user-selected font after theme or vertical token updates. */
+  reapplyUserFontPreference(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const fontFamily = this._fontFamily();
+    if (fontFamily === 'default') {
+      this.removeWebFont();
+      return;
+    }
+
+    const vars = fontFamilyToCssVars(fontFamily);
+    if (vars) {
+      this.applyCssVars(vars);
+    }
+
+    const option = getFontFamilyOption(fontFamily);
+    if (option.googleFontsUrl) {
+      this.loadWebFont(option.googleFontsUrl);
+    } else {
+      this.removeWebFont();
+    }
+  }
+
   resetToDefault(): void {
     if (!isPlatformBrowser(this.platformId)) return;
     this.runtimeOverrides = {};
+    this._fontFamily.set('default');
+    localStorage.removeItem(FONT_FAMILY_STORAGE_KEY);
     const variant = this.getVariant();
     const brand = this.getBrand();
     this.applyTokens(VARIANT_PRESETS[variant].tokens);
     if (brand !== 'default') {
       this.applyCssVars(tokensToCssVars(BRAND_PRESETS[brand]));
     }
+    this.removeWebFont();
   }
 
   private applyVariant(variant: ThemeVariant, persist: boolean): void {
@@ -118,6 +173,7 @@ export class ThemeService {
       this.applyCssVars(tokensToCssVars(BRAND_PRESETS[brand]));
     }
     this.applyCssVars(this.runtimeOverrides);
+    this.reapplyUserFontPreference();
 
     if (persist) {
       localStorage.setItem(VARIANT_STORAGE_KEY, variant);
@@ -134,6 +190,7 @@ export class ThemeService {
       this.applyCssVars(tokensToCssVars(BRAND_PRESETS[brand]));
     }
     this.applyCssVars(this.runtimeOverrides);
+    this.reapplyUserFontPreference();
     if (persist) {
       localStorage.setItem(BRAND_STORAGE_KEY, brand);
     }
@@ -141,5 +198,22 @@ export class ThemeService {
 
   private applyTokens(tokens: ThemeTokens): void {
     this.applyCssVars(tokensToCssVars(tokens));
+  }
+
+  private loadWebFont(url: string): void {
+    let link = document.getElementById(THEME_FONT_LINK_ID) as HTMLLinkElement | null;
+    if (!link) {
+      link = document.createElement('link');
+      link.id = THEME_FONT_LINK_ID;
+      link.rel = 'stylesheet';
+      document.head.appendChild(link);
+    }
+    if (link.href !== url) {
+      link.href = url;
+    }
+  }
+
+  private removeWebFont(): void {
+    document.getElementById(THEME_FONT_LINK_ID)?.remove();
   }
 }

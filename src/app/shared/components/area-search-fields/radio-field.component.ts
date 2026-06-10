@@ -10,7 +10,7 @@ import { mapFieldChoices } from './area-search-field.utils';
   standalone: true,
   imports: [FormsModule, RadioButton, AreaSearchFieldLabelComponent],
   template: `
-    <fieldset class="m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0">
+    <fieldset class="m-0 flex min-w-0 flex-col gap-0.5 border-0 p-0">
       <app-area-search-field-label tag="legend" [label]="field.label" />
       @for (option of options; track option.value) {
         <label class="inline-flex items-center gap-2 text-sm">

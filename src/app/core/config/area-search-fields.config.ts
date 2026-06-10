@@ -87,12 +87,13 @@ export const AREA_SEARCH_VALIDATION_FLAGGED_FIELDS = [
 ] as const;
 
 export const AREA_SEARCH_TAB_ICONS: Record<string, string> = {
-  basic: 'pi pi-home',
-  location: 'pi pi-map-marker',
+  general: 'pi pi-sliders-h',
   property: 'pi pi-building',
+  assessment: 'pi pi-percentage',
   mortgage: 'pi pi-dollar',
-  leads: 'pi pi-bolt',
+  other: 'pi pi-th-large',
   custom: 'pi pi-filter',
+  leads: 'pi pi-bolt',
   phones: 'pi pi-phone'
 };
 

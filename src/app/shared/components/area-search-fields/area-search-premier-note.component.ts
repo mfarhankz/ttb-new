@@ -2,6 +2,7 @@ import { Component, ViewChild, computed, inject, input } from '@angular/core';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
 import { ModalComponent } from '@app/shared/components/modal/modal.component';
 import { AreaSearchFieldsService } from '@app/core/services/area-search-fields.service';
+import { AreaSearchAccordionStateService } from '@app/core/services/area-search-accordion-state.service';
 import { VerticalService } from '@app/core/services/vertical.service';
 import { buildAreaSearchPremierNote } from '@app/core/utils/area-search-premier-note.util';
 import { AreaSearchControlStyles } from './area-search-control.styles';
@@ -15,43 +16,49 @@ import { AreaSearchControlStyles } from './area-search-control.styles';
   },
   template: `
     @if (note(); as premierNote) {
-      <p-accordion [class]="controlStyles.premierNoteAccordion" [multiple]="true" [value]="['premier-note']">
-        <p-accordion-panel value="premier-note">
-          <p-accordion-header>Please Note</p-accordion-header>
-          <p-accordion-content>
-            @if (premierNote.groupId === 4) {
-              <p class="text-body-sm leading-relaxed text-warning">
-                Mortgage and valuation records are available for purchase at
-                <strong class="font-semibold text-warning">{{ premierNote.mortgageCents }} cents</strong> per record.
-                Records are acquired by credit card purchase and will be saved to your Title Toolbox account when the
-                purchase is completed. ( To view a sample of the exported data,
-                <button type="button" class="text-primary underline hover:no-underline" (click)="openSampleModal()">
-                  Please Click Here
-                </button>
-                )
-              </p>
-            } @else {
-              <p class="text-body-sm leading-relaxed text-warning">
-                “Life Event” leads are available for purchase at
-                <strong class="font-semibold text-warning">{{ premierNote.leadsMinCents }} cents</strong> to
-                <strong class="font-semibold text-warning">{{ premierNote.leadsMaxCents }} cents</strong> per record.
-                ( <button type="button" class="text-primary underline hover:no-underline" (click)="openPriceModal()">
-                  Click here for full price list
-                </button>
-                )
-                The price per lead will vary based upon the lead type selected. The price of leads will be provided
-                prior to purchase. Leads are acquired by credit card purchase and will be saved to your Title Toolbox
-                account when the purchase is completed.
-                ( To view a sample of the exported data,
-                <button type="button" class="text-primary underline hover:no-underline" (click)="openSampleModal()">
-                  Please Click Here
-                </button>
-                )
-              </p>
-            }
-          </p-accordion-content>
-        </p-accordion-panel>
-      </p-accordion>
+      <div [class]="controlStyles.contactPricingAccordion">
+        <p-accordion
+          [multiple]="false"
+          [value]="accordionState.panelValue('premier-note')"
+          (valueChange)="accordionState.onPanelChange('premier-note', $event)"
+        >
+          <p-accordion-panel value="premier-note">
+            <p-accordion-header>Please Note</p-accordion-header>
+            <p-accordion-content>
+              @if (premierNote.groupId === 4) {
+                <p class="text-body-sm leading-relaxed text-foreground">
+                  Mortgage and valuation records are available for purchase at
+                  <strong class="font-semibold">{{ premierNote.mortgageCents }} cents</strong> per record.
+                  Records are acquired by credit card purchase and will be saved to your Title Toolbox account when the
+                  purchase is completed. ( To view a sample of the exported data,
+                  <button type="button" class="text-primary underline hover:no-underline" (click)="openSampleModal()">
+                    Please Click Here
+                  </button>
+                  )
+                </p>
+              } @else {
+                <p class="text-body-sm leading-relaxed text-foreground">
+                  “Life Event” leads are available for purchase at
+                  <strong class="font-semibold">{{ premierNote.leadsMinCents }} cents</strong> to
+                  <strong class="font-semibold">{{ premierNote.leadsMaxCents }} cents</strong> per record.
+                  ( <button type="button" class="text-primary underline hover:no-underline" (click)="openPriceModal()">
+                    Click here for full price list
+                  </button>
+                  )
+                  The price per lead will vary based upon the lead type selected. The price of leads will be provided
+                  prior to purchase. Leads are acquired by credit card purchase and will be saved to your Title Toolbox
+                  account when the purchase is completed.
+                  ( To view a sample of the exported data,
+                  <button type="button" class="text-primary underline hover:no-underline" (click)="openSampleModal()">
+                    Please Click Here
+                  </button>
+                  )
+                </p>
+              }
+            </p-accordion-content>
+          </p-accordion-panel>
+        </p-accordion>
+      </div>
 
       <app-modal
         #sampleModal
@@ -93,6 +100,7 @@ export class AreaSearchPremierNoteComponent {
 
   private readonly verticalService = inject(VerticalService);
   private readonly fieldsService = inject(AreaSearchFieldsService);
+  protected readonly accordionState = inject(AreaSearchAccordionStateService);
 
   readonly note = computed(() => {
     const leadsChoices = this.fieldsService.getFieldsInfoSync()?.['leads_type']?.choices;

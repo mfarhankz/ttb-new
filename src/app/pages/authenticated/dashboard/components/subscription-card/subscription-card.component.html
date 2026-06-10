@@ -58,8 +58,7 @@
                 [class.ring-primary/10]="isExpanded(subscription.profile_id)"
               >
                 <div
-                  class="flex items-center gap-2 px-3 py-2.5 bg-surface transition-colors"
-                  [class.bg-background]="isExpanded(subscription.profile_id)"
+                  class="flex items-center gap-2 px-3 py-3.5 bg-background transition-colors "
                   [class.group-hover:bg-background]="!isExpanded(subscription.profile_id)"
                 >
                   <button
@@ -85,7 +84,7 @@
                           Active Subscription
                         </span>
                       </span>
-                      <span class="block text-body font-semibold text-foreground leading-snug truncate">
+                      <span class="block text-body font-semibold text-foreground leading-snug truncate py-1">
                         {{ planTitle(subscription) }}
                       </span>
                       @if (!isExpanded(subscription.profile_id)) {

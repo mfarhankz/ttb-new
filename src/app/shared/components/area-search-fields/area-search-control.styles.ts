@@ -4,7 +4,11 @@ const height = 'h-9.5 min-h-9.5';
 const fieldLabel =
   'min-h-5 text-body-sm font-medium leading-snug text-pretty text-foreground';
 
+/** Chip remove control — plain PrimeIcon (replaces default times-circle SVG). */
+const chipRemoveIcon = 'pi pi-times';
+
 export const AreaSearchControlStyles = {
+  chipRemoveIcon,
   fieldLabel,
   input: `box-border w-full text-body-sm leading-5 ${height}`,
   select: [
@@ -46,10 +50,16 @@ export const AreaSearchControlStyles = {
     '[&_.p-multiselect-label]:flex [&_.p-multiselect-label]:min-h-[calc(2.375rem-2px)]',
     '[&_.p-multiselect-label]:flex-wrap [&_.p-multiselect-label]:items-center [&_.p-multiselect-label]:gap-1',
     '[&_.p-multiselect-dropdown]:w-8 [&_.p-multiselect-dropdown]:self-start [&_.p-multiselect-dropdown]:mt-2',
-    '[&_.p-multiselect-chip-item]:inline-flex',
+    '[&_.p-multiselect-chip-item]:flex [&_.p-multiselect-chip-item]:items-center',
+    '[&_.p-multiselect-chip]:flex [&_.p-multiselect-chip]:items-center [&_.p-multiselect-chip]:gap-1',
     '[&_.p-multiselect-chip]:rounded-md [&_.p-multiselect-chip]:border [&_.p-multiselect-chip]:border-border',
     '[&_.p-multiselect-chip]:bg-surface [&_.p-multiselect-chip]:text-caption [&_.p-multiselect-chip]:text-foreground',
-    '[&_.p-multiselect-chip-icon]:text-subtle hover:[&_.p-multiselect-chip-icon]:text-foreground'
+    '[&_.p-chip-label]:flex [&_.p-chip-label]:items-center [&_.p-chip-label]:leading-snug',
+    '[&_.p-chip-remove-icon]:flex! [&_.p-chip-remove-icon]:items-center! [&_.p-chip-remove-icon]:justify-center!',
+    '[&_.p-chip-remove-icon]:size-[1em]! [&_.p-chip-remove-icon]:min-w-0! [&_.p-chip-remove-icon]:min-h-0!',
+    '[&_.p-chip-remove-icon]:self-center [&_.p-chip-remove-icon]:shrink-0 [&_.p-chip-remove-icon]:rounded-none!',
+    '[&_.p-chip-remove-icon]:text-[0.65rem]! [&_.p-chip-remove-icon]:leading-none!',
+    '[&_.p-chip-remove-icon]:text-subtle hover:[&_.p-chip-remove-icon]:text-foreground'
   ].join(' '),
   treeMultiSelectPanel: [
     '[&_.p-multiselect-option>.p-checkbox]:hidden! [&_.p-multiselect-option>p-checkbox]:hidden!',
@@ -66,9 +76,8 @@ export const AreaSearchControlStyles = {
   oafAccordion: [
     '[&_.p-accordionpanel]:overflow-hidden [&_.p-accordionpanel]:rounded-md',
     '[&_.p-accordionpanel]:border [&_.p-accordionpanel]:border-border',
-    '[&_.p-accordionheader]:flex [&_.p-accordionheader]:h-9.5',
-    '[&_.p-accordionheader]:min-h-9.5 [&_.p-accordionheader]:items-center',
-    '[&_.p-accordionheader]:px-3 [&_.p-accordionheader]:text-body-sm',
+    '[&_.p-accordionheader]:px-3 [&_.p-accordionheader]:py-3',
+    '[&_.p-accordionheader]:bg-primary/10 [&_.p-accordionheader]:hover:bg-primary/20',
     '[&_.p-accordionheader]:font-medium [&_.p-accordionheader]:leading-5'
   ].join(' '),
   /** Premier / warning note accordion — semantic warning tokens. */
@@ -136,5 +145,45 @@ export const AreaSearchControlStyles = {
     '[&_.p-accordioncontent]:[background-color:transparent!important]',
     '[&_.p-accordioncontent_.p-motion]:bg-transparent!',
     '[&_.p-accordioncontent_p]:bg-transparent [&_.p-accordioncontent_div]:bg-transparent'
+  ].join(' '),
+  contactPricingAccordion: [
+    '[&_.p-accordionpanel]:overflow-hidden [&_.p-accordionpanel]:rounded-md [&_.p-accordionpanel]:border [&_.p-accordionpanel]:border-warning/30',
+    '[&_.p-accordionpanel:not([data-p-active="true"])]:bg-warning/10!',
+    '[&_.p-accordionpanel[data-p-active="true"]]:bg-surface!',
+    '[&_.p-accordionpanel[data-p-active="true"]_.p-accordionheader]:border-b [&_.p-accordionpanel[data-p-active="true"]_.p-accordionheader]:border-warning/30',
+    '[&_.p-accordionpanel:not([data-p-active="true"])_.p-accordionheader]:border-b-0!',
+    '[&_.p-accordionpanel:not([data-p-active="true"])_.p-accordionheader]:rounded-b',
+    '[&_.p-accordionheader]:bg-warning/10! [&_.p-accordionheader]:px-4 [&_.p-accordionheader]:py-2',
+    '[&_.p-accordionheader]:text-body-sm [&_.p-accordionheader]:font-medium [&_.p-accordionheader]:text-foreground!',
+    '[&_.p-accordionheader_.p-accordionheader-toggle-icon]:text-subtle!',
+    '[&_.p-accordioncontent]:bg-surface!',
+    '[&_.p-accordioncontent]:text-foreground!',
+    '[&_.p-accordioncontent:not([data-p-active="true"])]:h-0!',
+    '[&_.p-accordioncontent:not([data-p-active="true"])]:min-h-0!',
+    '[&_.p-accordioncontent:not([data-p-active="true"])]:overflow-hidden!',
+    '[&_.p-accordioncontent:not([data-p-active="true"])]:p-0!',
+    '[&_.p-accordioncontent:not([data-p-active="true"])]:m-0!',
+    '[&_.p-accordioncontent:not([data-p-active="true"])_.p-motion]:hidden!',
+    '[&_.p-accordioncontent_.p-motion]:bg-surface!'
+  ].join(' '),
+  contactDncAccordion: [
+    '[&_.p-accordionpanel]:overflow-hidden [&_.p-accordionpanel]:rounded-md [&_.p-accordionpanel]:border [&_.p-accordionpanel]:border-danger/30',
+    '[&_.p-accordionpanel:not([data-p-active="true"])]:bg-danger/10!',
+    '[&_.p-accordionpanel[data-p-active="true"]]:bg-surface!',
+    '[&_.p-accordionpanel[data-p-active="true"]_.p-accordionheader]:border-b [&_.p-accordionpanel[data-p-active="true"]_.p-accordionheader]:border-danger/30',
+    '[&_.p-accordionpanel:not([data-p-active="true"])_.p-accordionheader]:border-b-0!',
+    '[&_.p-accordionpanel:not([data-p-active="true"])_.p-accordionheader]:rounded-b',
+    '[&_.p-accordionheader]:bg-danger/10! [&_.p-accordionheader]:px-4 [&_.p-accordionheader]:py-2',
+    '[&_.p-accordionheader]:text-body-sm [&_.p-accordionheader]:font-medium [&_.p-accordionheader]:text-danger!',
+    '[&_.p-accordionheader_.p-accordionheader-toggle-icon]:text-danger!',
+    '[&_.p-accordioncontent]:bg-surface!',
+    '[&_.p-accordioncontent]:text-danger!',
+    '[&_.p-accordioncontent:not([data-p-active="true"])]:h-0!',
+    '[&_.p-accordioncontent:not([data-p-active="true"])]:min-h-0!',
+    '[&_.p-accordioncontent:not([data-p-active="true"])]:overflow-hidden!',
+    '[&_.p-accordioncontent:not([data-p-active="true"])]:p-0!',
+    '[&_.p-accordioncontent:not([data-p-active="true"])]:m-0!',
+    '[&_.p-accordioncontent:not([data-p-active="true"])_.p-motion]:hidden!',
+    '[&_.p-accordioncontent_.p-motion]:bg-surface!'
   ].join(' ')
 } as const;

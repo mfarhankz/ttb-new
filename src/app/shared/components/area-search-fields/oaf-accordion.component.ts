@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Checkbox } from 'primeng/checkbox';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
 import { AreaSearchFieldMeta } from '@app/core/interfaces/area-search-field.interface';
+import { AreaSearchAccordionStateService } from '@app/core/services/area-search-accordion-state.service';
 import { AreaSearchControlStyles } from './area-search-control.styles';
 
 @Component({
@@ -14,7 +15,12 @@ import { AreaSearchControlStyles } from './area-search-control.styles';
   },
   template: `
     @if (availableFields.length) {
-      <p-accordion [multiple]="true" [class]="controlStyles.oafAccordion">
+      <p-accordion
+        [multiple]="false"
+        [class]="controlStyles.oafAccordion"
+        [value]="accordionState.panelValue('oaf')"
+        (valueChange)="accordionState.onPanelChange('oaf', $event)"
+      >
         <p-accordion-panel value="oaf">
           <p-accordion-header>Other Available Fields</p-accordion-header>
           <p-accordion-content>
@@ -38,6 +44,7 @@ import { AreaSearchControlStyles } from './area-search-control.styles';
 })
 export class AreaSearchOafAccordionComponent {
   protected readonly controlStyles = AreaSearchControlStyles;
+  protected readonly accordionState = inject(AreaSearchAccordionStateService);
   @Input() availableFields: AreaSearchFieldMeta[] = [];
   @Input() promotedFieldNames: ReadonlySet<string> = new Set();
   @Output() promote = new EventEmitter<AreaSearchFieldMeta>();

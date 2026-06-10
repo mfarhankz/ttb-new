@@ -22,7 +22,7 @@ import { AreaSearchTreeOptionGroup, mapTreeChoiceGroups } from './area-search-fi
   imports: [FormsModule, MultiSelect, AreaSearchFieldLabelComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="flex flex-col gap-1.5">
+    <div class="flex flex-col gap-0.5">
       <app-area-search-field-label [label]="field.label" />
       <p-multiselect
         [group]="true"
@@ -42,6 +42,7 @@ import { AreaSearchTreeOptionGroup, mapTreeChoiceGroups } from './area-search-fi
         placeholder="Select"
         scrollHeight="250px"
         [panelStyleClass]="controlStyles.treeMultiSelectPanel"
+        [chipIcon]="controlStyles.chipRemoveIcon"
         [class]="controlStyles.treeMultiSelect"
       >
         <ng-template #group let-group>

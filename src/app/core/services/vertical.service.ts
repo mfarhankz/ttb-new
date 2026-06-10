@@ -122,6 +122,7 @@ export class VerticalService {
       this._companyInfo.set(companyInfo);
 
       this.applyVerticalBranding(meta.vertical_name);
+      this.themeService.reapplyUserFontPreference();
       this.applyPageMeta(companyInfo);
 
       document.documentElement.setAttribute('data-vertical', meta.vertical_name);
@@ -132,6 +133,7 @@ export class VerticalService {
       console.error('VerticalService.init failed:', err);
       this._initError.set(err instanceof Error ? err.message : 'Failed to load vertical configuration');
       this.applyVerticalBranding(VERTICAL_CONFIG.defaultVerticalName);
+      this.themeService.reapplyUserFontPreference();
       this._initialized.set(true);
     }
   }

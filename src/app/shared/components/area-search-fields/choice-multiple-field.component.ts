@@ -36,7 +36,7 @@ import { AreaSearchChoiceOption, mapFieldChoices } from './area-search-field.uti
   imports: [FormsModule, MultiSelect, AutocompleteComponent, AreaSearchFieldLabelComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="flex flex-col gap-1.5">
+    <div class="flex flex-col gap-0.5">
       <app-area-search-field-label [label]="field.label" [htmlFor]="field.field_name" />
 
       @if (isAutocomplete) {
@@ -77,6 +77,7 @@ import { AreaSearchChoiceOption, mapFieldChoices } from './area-search-field.uti
             [placeholder]="displayPlaceholder"
             scrollHeight="250px"
             [panelStyleClass]="controlStyles.treeMultiSelectPanel"
+            [chipIcon]="controlStyles.chipRemoveIcon"
             [class]="controlStyles.treeMultiSelect + (loadingOptions() ? ' opacity-80' : '')"
           />
           @if (loadingOptions()) {

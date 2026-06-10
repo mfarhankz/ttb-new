@@ -20,7 +20,7 @@ import { AreaSearchFieldLabelComponent } from './area-search-field-label.compone
   imports: [FormsModule, InputText, Select, AreaSearchFieldLabelComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="flex flex-col gap-1.5">
+    <div class="flex flex-col gap-0.5">
       <app-area-search-field-label [label]="field.label" />
 
       <div class="grid grid-cols-2 gap-2">

@@ -17,7 +17,7 @@ import { AreaSearchFieldLabelComponent } from './area-search-field-label.compone
   standalone: true,
   imports: [FormsModule, InputText, AreaSearchFieldLabelComponent],
   template: `
-    <div class="flex flex-col gap-1.5">
+    <div class="flex flex-col gap-0.5">
       <app-area-search-field-label [label]="field.label" [htmlFor]="field.field_name" />
       <input
         pInputText

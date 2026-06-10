@@ -131,6 +131,41 @@ export const TTBPreset = definePreset(Aura, {
       root: {
         gap: TTB_FORM.paddingYSm
       }
+    },
+    chip: {
+      css: `
+        .p-multiselect .p-chip-remove-icon.pi {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 1em;
+          height: 1em;
+          border-radius: 0;
+          font-size: 0.65rem;
+          line-height: 1;
+        }
+      `
+    },
+    multiselect: {
+      css: `
+        .p-multiselect-chip.p-chip {
+          display: inline-flex;
+          align-items: center;
+        }
+        .p-multiselect-chip .p-chip-label {
+          display: flex;
+          align-items: center;
+        }
+        .p-multiselect-chip .p-chip-remove-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 1em;
+          height: 1em;
+          font-size: 0.65rem;
+          line-height: 1;
+        }
+      `
     }
   }
 });

@@ -5,6 +5,7 @@ import { RadioButton } from 'primeng/radiobutton';
 import { AreaSearchFieldMeta, AreaSearchFormFieldValue } from '@app/core/interfaces/area-search-field.interface';
 import { AREA_SEARCH_CONTACT_CHOICE_ORDER } from '@app/core/config/area-search-fields.config';
 import { VerticalService } from '@app/core/services/vertical.service';
+import { AreaSearchAccordionStateService } from '@app/core/services/area-search-accordion-state.service';
 import { readAreaSearchContactPricing } from '@app/core/utils/area-search-contact-note.util';
 import { mapFieldChoices } from './area-search-field.utils';
 import { AreaSearchControlStyles } from './area-search-control.styles';
@@ -73,64 +74,54 @@ interface ContactChoiceCard {
         }
       </div>
 
-      <p-accordion
-        [class]="controlStyles.premierNoteAccordion"
-        [multiple]="true"
-        [value]="['pricing-details']"
-      >
-        <p-accordion-panel value="pricing-details">
-          <p-accordion-header>Pricing &amp; Billing Details</p-accordion-header>
-          <p-accordion-content>
-            <div class="flex flex-col gap-3 text-body-sm leading-relaxed text-warning">
-              <p>
-                They tend to match phones to property addresses on
-                <strong class="font-semibold">{{ pricing().phoneMatchPercent }}%</strong> of a list and charge
-                <strong class="font-semibold">{{ pricing().phoneCents }} cents</strong> per phone number found. They
-                tend to find email addresses on
-                <strong class="font-semibold">{{ pricing().emailMatchPercent }}%</strong> of a property list and charge
-                <strong class="font-semibold">{{ pricing().emailCents }} cents</strong> per email.
-              </p>
-              <p>
-                These are estimates — the final email/phone count will not be known until after the purchase is made.
-                Credit cards will be authorized for phones and/or emails on
-                <strong class="font-semibold">100%</strong> of records submitted. Once the phone/email look-up is
-                complete, credit cards will be charged for the exact amount of the phones and/or email addresses that
-                were found on the properties that were submitted.
-              </p>
-              <p>
-                As this data comes from a third party vendor, we cannot guarantee the accuracy of all phone
-                numbers/email addresses provided. All purchases of phone/email data are final.
-              </p>
-            </div>
-          </p-accordion-content>
-        </p-accordion-panel>
-      </p-accordion>
+      <div class="flex flex-col gap-2">
+        <div [class]="controlStyles.contactPricingAccordion">
+          <p-accordion
+            [multiple]="false"
+            [value]="accordionState.panelValue('pricing-details')"
+            (valueChange)="accordionState.onPanelChange('pricing-details', $event)"
+          >
+            <p-accordion-panel value="pricing-details">
+              <p-accordion-header>Pricing &amp; Billing Details</p-accordion-header>
+              <p-accordion-content>
+                <p class="text-body-sm leading-relaxed text-foreground">
+                  These are estimates — the final count will not be known until after purchase. Credit cards will be
+                  authorized for <strong class="font-semibold">100%</strong> of records submitted and charged for the
+                  exact amount found. All purchases of phone/email data are final.
+                </p>
+              </p-accordion-content>
+            </p-accordion-panel>
+          </p-accordion>
+        </div>
 
-      <p-accordion
-        [class]="controlStyles.dangerNoteAccordion"
-        [multiple]="true"
-        [value]="['dnc-notice']"
-      >
-        <p-accordion-panel value="dnc-notice">
-          <p-accordion-header>
-            <span class="inline-flex items-center gap-2">
-              <i class="pi pi-exclamation-triangle"></i>
-              Important: Do Not Call Registry Notice
-            </span>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="text-body-sm leading-relaxed text-danger">
-              This vendor's phone numbers are NOT scrubbed against the "Do Not Call" registry.
-              @if (pricing().useExtendedDncNote) {
-                It is your responsibility to confirm that the phone numbers provided are not on any Federal, State, or
-                internal company Do Not Call registries.
-              } @else {
-                The use of the phone numbers that you purchase is your responsibility.
-              }
-            </p>
-          </p-accordion-content>
-        </p-accordion-panel>
-      </p-accordion>
+        <div [class]="controlStyles.contactDncAccordion">
+          <p-accordion
+            [multiple]="false"
+            [value]="accordionState.panelValue('dnc-notice')"
+            (valueChange)="accordionState.onPanelChange('dnc-notice', $event)"
+          >
+            <p-accordion-panel value="dnc-notice">
+              <p-accordion-header>
+                <span class="inline-flex items-center gap-2">
+                  <i class="pi pi-exclamation-triangle"></i>
+                  Important: Do Not Call Registry Notice
+                </span>
+              </p-accordion-header>
+              <p-accordion-content>
+                <p class="text-body-sm leading-relaxed text-danger">
+                  This vendor's phone numbers are NOT scrubbed against the "Do Not Call" registry.
+                  @if (pricing().useExtendedDncNote) {
+                    It is your responsibility to confirm that the phone numbers provided are not on any Federal,
+                    State, or internal company Do Not Call registries.
+                  } @else {
+                    The use of the phone numbers that you purchase is your responsibility.
+                  }
+                </p>
+              </p-accordion-content>
+            </p-accordion-panel>
+          </p-accordion>
+        </div>
+      </div>
     </div>
   `
 })
@@ -142,6 +133,7 @@ export class AreaSearchContactFieldComponent {
   @Output() valueChange = new EventEmitter<Partial<AreaSearchFormFieldValue>>();
 
   private readonly verticalService = inject(VerticalService);
+  protected readonly accordionState = inject(AreaSearchAccordionStateService);
 
   readonly pricing = computed(() =>
     readAreaSearchContactPricing(this.verticalService.content()?.app_config)

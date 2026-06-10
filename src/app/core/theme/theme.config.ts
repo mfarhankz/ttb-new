@@ -68,6 +68,74 @@ export interface ThemeTokens {
 export const THEME_STORAGE_KEY = 'ttb-theme-mode';
 export const VARIANT_STORAGE_KEY = 'ttb-theme-variant';
 export const BRAND_STORAGE_KEY = 'ttb-theme-brand';
+export const FONT_FAMILY_STORAGE_KEY = 'ttb-theme-font-family';
+
+export type ThemeFontFamily =
+  | 'default'
+  | 'inter'
+  | 'dm-sans'
+  | 'plus-jakarta-sans'
+  | 'work-sans'
+  | 'open-sans'
+  | 'source-sans-3';
+
+export interface FontFamilyOption {
+  id: ThemeFontFamily;
+  label: string;
+  description: string;
+  stack?: string;
+  googleFontsUrl?: string;
+}
+
+const SYSTEM_FONT_STACK =
+  'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+function googleFontUrl(family: string, weights = '400;500;600;700'): string {
+  return `https://fonts.googleapis.com/css2?family=${family}:wght@${weights}&display=swap`;
+}
+
+function fontOption(
+  id: ThemeFontFamily,
+  label: string,
+  description: string,
+  familyName: string,
+  weights?: string
+): FontFamilyOption {
+  return {
+    id,
+    label,
+    description,
+    stack: `"${familyName}", ${SYSTEM_FONT_STACK}`,
+    googleFontsUrl: googleFontUrl(familyName.replace(/ /g, '+'), weights)
+  };
+}
+
+/** Top dashboard UI fonts + inherit theme/vertical default. */
+export const FONT_FAMILY_OPTIONS: ReadonlyArray<FontFamilyOption> = [
+  {
+    id: 'default',
+    label: 'Default',
+    description: 'Use your theme or vertical font'
+  },
+  fontOption('inter', 'Inter', 'Best all-round dashboard font — crisp at every size', 'Inter'),
+  fontOption('dm-sans', 'DM Sans', 'Geometric and calm — great for dense data layouts', 'DM Sans'),
+  fontOption(
+    'plus-jakarta-sans',
+    'Plus Jakarta Sans',
+    'Modern SaaS look — popular for analytics dashboards',
+    'Plus Jakarta Sans'
+  ),
+  fontOption('work-sans', 'Work Sans', 'Built for screens — strong table and label readability', 'Work Sans'),
+  fontOption('open-sans', 'Open Sans', 'Highly legible — safe choice for long dashboard sessions', 'Open Sans'),
+  fontOption(
+    'source-sans-3',
+    'Source Sans 3',
+    'Professional enterprise feel — excellent for mixed text and numbers',
+    'Source Sans 3'
+  )
+];
+
+export const VALID_FONT_FAMILIES = new Set<ThemeFontFamily>(FONT_FAMILY_OPTIONS.map((option) => option.id));
 
 const sharedLayout: Pick<
   ThemeTokens,
@@ -279,6 +347,27 @@ export function tokensToCssVars(tokens: Partial<ThemeTokens>): Record<string, st
     }
   }
   return vars;
+}
+
+export function getFontFamilyOption(id: ThemeFontFamily): FontFamilyOption {
+  return FONT_FAMILY_OPTIONS.find((option) => option.id === id) ?? FONT_FAMILY_OPTIONS[0];
+}
+
+/** CSS variables for a user-selected font (null when inheriting theme/vertical default). */
+export function fontFamilyToCssVars(id: ThemeFontFamily): Record<string, string> | null {
+  if (id === 'default') {
+    return null;
+  }
+
+  const option = getFontFamilyOption(id);
+  if (!option.stack) {
+    return null;
+  }
+
+  return {
+    '--ttb-font-sans': option.stack,
+    '--ttb-font-display': option.stack
+  };
 }
 
 export function tenantOverrideToCssVars(override: TenantThemeOverride): Record<string, string> {

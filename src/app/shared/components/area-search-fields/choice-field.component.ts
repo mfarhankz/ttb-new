@@ -33,7 +33,7 @@ import { AreaSearchChoiceOption, mapFieldChoices } from './area-search-field.uti
   imports: [FormsModule, Select, AreaSearchFieldLabelComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="flex flex-col gap-1.5">
+    <div class="flex flex-col gap-0.5">
       <app-area-search-field-label [label]="field.label" [htmlFor]="field.field_name" />
       <div
         class="relative"

@@ -39,6 +39,7 @@ import { PropertyRecordRaw } from '@app/core/interfaces/property-record.interfac
 import { AreaSearchFieldGroup } from '@app/core/interfaces/area-search-field.interface';
 import { AreaSearchControlStyles } from '@app/shared/components/area-search-fields/area-search-control.styles';
 import { AreaSearchCriteriaChipsComponent } from '@app/shared/components/area-search-fields/area-search-criteria-chips.component';
+import { AreaSearchAccordionStateService } from '@app/core/services/area-search-accordion-state.service';
 
 @Component({
   selector: 'app-area-search',
@@ -81,6 +82,7 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly recentQueriesService = inject(RecentQueriesService);
   private readonly commonQueriesService = inject(CommonQueriesService);
   private readonly verticalService = inject(VerticalService);
+  private readonly accordionState = inject(AreaSearchAccordionStateService);
 
   private resizeObserver?: ResizeObserver;
 
@@ -279,12 +281,23 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.premiumGroupIds.includes(groupId as (typeof PREMIUM_FIELD_GROUP_IDS)[number]);
   }
 
+  isFirstPremierTab(index: number): boolean {
+    const groups = this.basicFieldGroups();
+    const group = groups[index];
+    if (!group || !this.isPremiumTab(group.group_id)) {
+      return false;
+    }
+
+    return index === 0 || !this.isPremiumTab(groups[index - 1].group_id);
+  }
+
   changeTab(index: number): void {
     if (this.searchBusy()) {
       return;
     }
 
     this.renderedFieldCount.set(0);
+    this.accordionState.closeAll();
     this.formService.setActiveTab(index);
     this.mobileTabOpen.set(false);
     requestAnimationFrame(() => this.beginIncrementalFieldRender());

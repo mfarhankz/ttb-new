@@ -2,53 +2,81 @@
   #modal
   id="theme-modal"
   title="Theme"
-  size="md"
+  size="lg"
   [showFooter]="false"
   (onClose)="onModalClose()"
 >
-  <p class="mb-4 text-body-sm text-muted">
-    Choose how TitleToolbox looks on your device. Your selection is saved automatically.
+  <p class="text-body-sm text-muted">
+    Personalize how TitleToolbox looks. Changes save automatically.
   </p>
 
-  <div class="flex flex-col gap-3">
-    @for (option of options; track option.id) {
-      <button
-        type="button"
-        class="flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left transition-colors hover:border-primary/40 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
-        [class.border-primary]="isSelected(option.id)"
-        [class.bg-primary/5]="isSelected(option.id)"
-        [class.border-border]="!isSelected(option.id)"
-        [attr.aria-pressed]="isSelected(option.id)"
-        (click)="selectVariant(option.id)"
-      >
-        <span
-          class="flex h-14 w-20 shrink-0 overflow-hidden rounded-lg border border-border shadow-xs"
-          aria-hidden="true"
-        >
-          @if (option.id === 'main') {
-            <span class="h-full w-1/3 bg-[rgb(30,41,59)]"></span>
-            <span class="h-full w-2/3 bg-[rgb(249,250,251)]"></span>
-          } @else if (option.id === 'light') {
-            <span class="h-full w-1/3 bg-white"></span>
-            <span class="h-full w-2/3 bg-[rgb(249,250,251)]"></span>
-          } @else {
-            <span class="h-full w-full bg-[rgb(15,23,42)]"></span>
-          }
-        </span>
+  <div class="mt-5 flex flex-col gap-5">
+    <section class="flex flex-col gap-2.5">
+      <h3 class="text-body-sm font-semibold text-foreground">Appearance</h3>
 
-        <span class="min-w-0 flex-1">
-          <span class="flex items-center gap-2">
-            <span class="text-body font-semibold text-foreground">{{ option.label }}</span>
-            @if (isSelected(option.id)) {
-              <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-caption font-semibold text-primary">
-                <i class="pi pi-check text-[0.65rem]!"></i>
-                Active
+      <div class="flex flex-col gap-2">
+        @for (option of options; track option.id) {
+          <button
+            type="button"
+            class="flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors hover:border-primary/40 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+            [class.border-primary]="isSelected(option.id)"
+            [class.bg-primary/5]="isSelected(option.id)"
+            [class.border-border]="!isSelected(option.id)"
+            [attr.aria-pressed]="isSelected(option.id)"
+            (click)="selectVariant(option.id)"
+          >
+            <span
+              class="flex h-11 w-16 shrink-0 overflow-hidden rounded-md border border-border shadow-xs"
+              aria-hidden="true"
+            >
+              @if (option.id === 'main') {
+                <span class="h-full w-1/3 bg-[rgb(30,41,59)]"></span>
+                <span class="h-full w-2/3 bg-[rgb(249,250,251)]"></span>
+              } @else if (option.id === 'light') {
+                <span class="h-full w-1/3 bg-white"></span>
+                <span class="h-full w-2/3 bg-[rgb(249,250,251)]"></span>
+              } @else {
+                <span class="h-full w-full bg-[rgb(15,23,42)]"></span>
+              }
+            </span>
+
+            <span class="min-w-0 flex-1">
+              <span class="flex items-center gap-2">
+                <span class="text-body-sm font-semibold text-foreground">{{ option.label }}</span>
+                @if (isSelected(option.id)) {
+                  <span
+                    class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-caption font-semibold text-primary"
+                  >
+                    <i class="pi pi-check text-[0.65rem]!" aria-hidden="true"></i>
+                    Active
+                  </span>
+                }
               </span>
-            }
-          </span>
-          <span class="mt-0.5 block text-body-sm text-muted">{{ option.description }}</span>
-        </span>
-      </button>
-    }
+              <span class="mt-0.5 block truncate text-caption text-muted">{{ option.description }}</span>
+            </span>
+          </button>
+        }
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-2.5 border-t border-border pt-5">
+      <div>
+        <h3 class="text-body-sm font-semibold text-foreground">Font family</h3>
+        <p class="mt-0.5 text-caption text-muted">{{ selectedFontHint() }}</p>
+      </div>
+
+      <p-select
+        inputId="theme-font-family"
+        size="small"
+        appendTo="body"
+        [overlayOptions]="fontSelectOverlayOptions"
+        class="w-full min-w-0 [&_.p-select-label]:flex [&_.p-select-label]:items-center [&_.p-select-label]:min-h-[calc(2.375rem-2px)] [&_.p-select-label]:px-2.5 [&_.p-select-label]:text-sm! [&_.p-select-label]:leading-5 [&_.p-select-dropdown]:w-8"
+        [options]="fontSelectOptions"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="selectedFontFamily()"
+        (ngModelChange)="onFontFamilyChange($event)"
+      />
+    </section>
   </div>
 </app-modal>
