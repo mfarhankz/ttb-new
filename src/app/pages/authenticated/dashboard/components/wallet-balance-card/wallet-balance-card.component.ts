@@ -3,6 +3,7 @@ import { Component, computed, effect, inject } from '@angular/core';
 import { SessionExpiredService } from '@app/core/services/session-expired.service';
 import { VerticalService } from '@app/core/services/vertical.service';
 import { WalletService } from '@app/core/services/wallet.service';
+import { PayNowModalService } from '@app/core/services/pay-now-modal.service';
 import { ButtonComponent, CardComponent } from '@app/shared/components';
 
 @Component({
@@ -17,6 +18,7 @@ import { ButtonComponent, CardComponent } from '@app/shared/components';
 export class WalletBalanceCardComponent {
   private readonly verticalService = inject(VerticalService);
   private readonly walletService = inject(WalletService);
+  private readonly payNowModalService = inject(PayNowModalService);
   private readonly sessionExpiredService = inject(SessionExpiredService);
 
   readonly walletEnabled = computed(
@@ -38,5 +40,11 @@ export class WalletBalanceCardComponent {
 
   refreshBalance(): void {
     this.walletService.fetchBalance(true);
+  }
+
+  buyCredit(): void {
+    this.payNowModalService
+      .open({ mode: 'creditRecharge' })
+      .subscribe(() => this.walletService.fetchBalance(true));
   }
 }

@@ -1,0 +1,82 @@
+<app-modal
+  #confirmModal
+  title="Confirm Billing"
+  size="md"
+  [showFooter]="false"
+  [backdropClickable]="false"
+  [closeOnBackdropClick]="false"
+>
+  <p class="mb-4 text-body-sm text-muted">
+    Please confirm the billing information mentioned below before we proceed with your request.
+  </p>
+
+  <div class="overflow-hidden rounded-md border border-border">
+    <table class="w-full text-body-sm">
+      <tbody class="divide-y divide-border">
+        <tr>
+          <td class="w-2/5 bg-muted/30 px-3 py-2 font-medium text-muted">Card Number</td>
+          <td class="px-3 py-2 text-foreground">{{ billing.number }}</td>
+        </tr>
+        <tr>
+          <td class="bg-muted/30 px-3 py-2 font-medium text-muted">Name On Card</td>
+          <td class="px-3 py-2 text-foreground">{{ billing.name_on_card }}</td>
+        </tr>
+        <tr>
+          <td class="bg-muted/30 px-3 py-2 font-medium text-muted">Security Code</td>
+          <td class="px-3 py-2 text-foreground">{{ billing.security_code }}</td>
+        </tr>
+        <tr>
+          <td class="bg-muted/30 px-3 py-2 font-medium text-muted">Exp Month</td>
+          <td class="px-3 py-2 text-foreground">{{ billing.exp_month }}</td>
+        </tr>
+        <tr>
+          <td class="bg-muted/30 px-3 py-2 font-medium text-muted">Exp Year</td>
+          <td class="px-3 py-2 text-foreground">{{ billing.exp_year }}</td>
+        </tr>
+        <tr>
+          <td class="bg-muted/30 px-3 py-2 font-medium text-muted">
+            {{ billing.estAmount ? 'Est. Amount' : 'Amount' }}
+          </td>
+          <td class="px-3 py-2 text-foreground">
+            {{ billing.amount | currency: 'USD' : 'symbol' : '1.2-2' }}
+            @if (extraCreditAmount > 0) {
+              <span class="mt-1 block text-caption text-muted">
+                An extra
+                <strong class="text-success">{{ extraCreditAmount | currency: 'USD' : 'symbol' : '1.2-2' }}</strong>
+                worth of credit will be applied.
+              </span>
+            }
+          </td>
+        </tr>
+        <tr>
+          <td class="bg-muted/30 px-3 py-2 font-medium text-muted">Product Type</td>
+          <td class="px-3 py-2 text-foreground">{{ billing.product }}</td>
+        </tr>
+        <tr>
+          <td class="bg-muted/30 px-3 py-2 font-medium text-muted">Zip</td>
+          <td class="px-3 py-2 text-foreground">{{ billing.zip }}</td>
+        </tr>
+        @if (showFarmName) {
+          <tr>
+            <td class="bg-muted/30 px-3 py-2 font-medium text-muted">Farm Name</td>
+            <td class="px-3 py-2">
+              <input
+                pInputText
+                type="text"
+                [class]="inputClass"
+                placeholder="Farm Name"
+                [ngModel]="farmName()"
+                (ngModelChange)="farmName.set($event)"
+              />
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div footer class="flex justify-end gap-2">
+    <app-button variant="danger" (onClick)="onCancel()">Cancel</app-button>
+    <app-button variant="success" (onClick)="onConfirm()">Confirm</app-button>
+  </div>
+</app-modal>

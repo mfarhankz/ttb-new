@@ -6,11 +6,19 @@ import { TargetOfficeService } from '@app/core/services/target-office.service';
 import { LoginModalComponent } from '@app/shared/components/login-modal/login-modal.component';
 import { PropertySearchModalComponent } from '@app/shared/components/property-search-modal/property-search-modal.component';
 import { ThemeModalComponent } from '@app/shared/components/theme-modal/theme-modal.component';
+import { PayNowHostComponent } from '@app/shared/components/pay-now-modal/pay-now-host.component';
 
 @Component({
   selector: 'app-authenticated-layout',
   standalone: true,
-  imports: [RouterOutlet, SidebarComponent, LoginModalComponent, PropertySearchModalComponent, ThemeModalComponent],
+  imports: [
+    RouterOutlet,
+    SidebarComponent,
+    LoginModalComponent,
+    PropertySearchModalComponent,
+    ThemeModalComponent,
+    PayNowHostComponent
+  ],
   templateUrl: './authenticated-layout.component.html',
   styles: []
 })

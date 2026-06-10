@@ -12,7 +12,7 @@ import { ButtonComponent } from '../button/button.component';
 export class ModalComponent {
   @Input() id = 'modal';
   @Input() title = '';
-  @Input() size: 'sm' | 'md' | 'lg' | 'xl' | 'full' = 'md';
+  @Input() size: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full' = 'md';
   @Input() showCloseButton = true;
   @Input() showFooter = true;
   @Input() backdropClickable = true;
@@ -49,6 +49,7 @@ export class ModalComponent {
       md: 'w-full max-w-md',
       lg: 'w-full max-w-lg',
       xl: 'w-full max-w-xl',
+      '2xl': 'w-full max-w-5xl',
       full: 'w-full max-w-7xl'
     };
 

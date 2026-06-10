@@ -372,6 +372,16 @@
   padding: 0;
 }
 
+/* Pay Now modal — match 38px field height (area search). */
+app-pay-now-modal input.p-inputtext,
+app-pay-now-modal .p-inputtext,
+app-confirm-billing-modal input.p-inputtext,
+app-confirm-billing-modal .p-inputtext {
+  box-sizing: border-box;
+  height: 2.375rem !important;
+  min-height: 2.375rem !important;
+}
+
 /* Area search multiselect — match 38px control height; keep overflow visible for overlay panel. */
 .p-multiselect.h-9\.5 {
   box-sizing: border-box;

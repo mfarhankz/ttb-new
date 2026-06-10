@@ -1,0 +1,473 @@
+<app-modal
+  #payNowModal
+  [title]="isCreditRecharge() ? 'Buy Credit' : 'Pay Now'"
+  size="2xl"
+  [showFooter]="false"
+  [backdropClickable]="false"
+  [closeOnBackdropClick]="false"
+  (onClose)="handleModalDismiss()"
+>
+  @if (isCreditRecharge()) {
+    <p subtitle class="mt-1 text-body-sm text-muted">
+      Please fill in Amount and provide billing information to process the payment.
+      <strong class="font-semibold">
+        Please note that all wallet credit purchases are final and cannot be refunded.
+      </strong>
+    </p>
+  }
+
+  @if (!isCreditRecharge()) {
+    <p class="mb-4 text-body-sm text-muted">
+      Please provide billing information to process the payment.
+    </p>
+  }
+
+  @if (options.note) {
+    <app-alert [type]="options.noteType ?? 'info'" class="mb-4 block">{{ options.note }}</app-alert>
+  }
+
+  @if (warningMessage()) {
+    <div class="space-y-3">
+      <app-alert type="warning" class="block">{{ warningMessage() }}</app-alert>
+      <app-button variant="success" size="sm" (onClick)="dismissWarning()">OK</app-button>
+    </div>
+  } @else if (successMessage() && savedFarm()) {
+    <div class="space-y-4">
+      <app-alert type="success" class="block whitespace-pre-line">{{ successMessage() }}</app-alert>
+      @if (!hideDisplayRecords()) {
+        <app-button variant="primary" [fullWidth]="true" (onClick)="displayRecords()">
+          Display Records
+        </app-button>
+      }
+    </div>
+  } @else {
+    <div class="space-y-4">
+      @if (!isCreditRecharge() && priceRequired() > 0) {
+        <div>
+          <h5 class="text-body font-semibold text-foreground">
+            Total Amount:
+            <span class="text-primary">{{ priceRequired() | currency: 'USD' : 'symbol' : '1.2-2' }}</span>
+          </h5>
+          <hr class="mt-4 border-border" />
+        </div>
+      }
+
+      @if (showPaymentMethodChoices()) {
+        <div class="space-y-4">
+          <h6 class="text-body-sm font-semibold text-foreground">Choose a Payment Method:</h6>
+          <div class="grid gap-4 md:grid-cols-2">
+            <button
+              type="button"
+              class="rounded-md border border-border p-4 text-left transition-colors"
+              [class.opacity-50]="isNotPurchaseRecs()"
+              [class.cursor-not-allowed]="isNotPurchaseRecs()"
+              [class.border-primary]="paymentMethod() === 'credit'"
+              [disabled]="isNotPurchaseRecs()"
+              (click)="selectPaymentMethod('credit')"
+            >
+              <div class="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="credit"
+                  [checked]="paymentMethod() === 'credit'"
+                  [disabled]="isNotPurchaseRecs()"
+                  (click)="$event.stopPropagation()"
+                  (change)="selectPaymentMethod('credit')"
+                />
+                <span class="font-medium text-foreground">Credit Balance</span>
+              </div>
+              <div class="mt-3 flex items-center justify-between gap-2">
+                @if (walletLoading()) {
+                  <span class="text-caption text-muted">Fetching info...</span>
+                } @else {
+                  <span class="text-body font-semibold text-foreground">
+                    {{ walletBalance() | currency: 'USD' : 'symbol' : '1.2-2' }}
+                  </span>
+                  @if (insufficientBalance()) {
+                    <div class="flex items-center gap-2">
+                      <span class="text-caption text-danger">Insufficient Credit</span>
+                      <app-button variant="success" size="sm" (onClick)="inlineRechargeWallet(); $event.stopPropagation()">
+                        Buy Credit
+                      </app-button>
+                    </div>
+                  }
+                }
+              </div>
+            </button>
+
+            <button
+              type="button"
+              class="rounded-md border border-border p-4 text-left transition-colors"
+              [class.opacity-50]="isNotRecharge()"
+              [class.cursor-not-allowed]="isNotRecharge()"
+              [class.border-primary]="paymentMethod() === 'card'"
+              [disabled]="isNotRecharge()"
+              (click)="selectPaymentMethod('card')"
+            >
+              <div class="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="card"
+                  [checked]="paymentMethod() === 'card'"
+                  [disabled]="isNotRecharge()"
+                  (click)="$event.stopPropagation()"
+                  (change)="selectPaymentMethod('card')"
+                />
+                <span class="font-medium text-foreground">Credit Card</span>
+              </div>
+              <img
+                src="/card-img.png"
+                alt="Visa, MasterCard, Discover, Amex"
+                class="mt-3 h-7 w-auto max-w-full object-contain"
+              />
+            </button>
+          </div>
+
+          @if (isMinimumPurchase()) {
+            <app-alert type="info" class="block">
+              Prepaid credits allow you to buy records on this website without having to enter your credit card
+              details each time, which speeds up your purchasing process and
+              <strong>{{ minimumPurchaseAmount() | currency: 'USD' : 'symbol' : '1.2-2' }}</strong>
+              Minimum Purchase is not required.
+              <strong class="mt-1 block font-semibold">
+                Please note that all wallet credit purchases are final and cannot be refunded.
+              </strong>
+            </app-alert>
+          }
+        </div>
+      }
+
+      @if (showCreditFarmName()) {
+        <div class="w-full sm:w-1/2">
+          <label class="mb-1 block text-body-sm font-medium text-foreground" for="farm-name">
+            Name the farm (optional)
+          </label>
+          <input
+            pInputText
+            id="farm-name"
+            type="text"
+            [class]="inputClass"
+            placeholder="Farm Name"
+            [ngModel]="farmName()"
+            (ngModelChange)="farmName.set($event)"
+          />
+        </div>
+      }
+
+      @if (isMinimumPurchase() && (isNotRecharge() || insufficientBalance())) {
+        <app-alert type="warning" class="block">
+          Minimum purchase amount by credit card is
+          {{ minimumPurchaseAmount() | currency: 'USD' : 'symbol' : '1.2-2' }}.
+          Please use your credit balance for this purchase.
+          @if (insufficientBalance()) {
+            Your credit balance is insufficient — please
+            <button type="button" class="font-medium text-primary underline" (click)="inlineRechargeWallet()">
+              Buy Credit
+            </button>.
+          }
+        </app-alert>
+      }
+
+      @if (showCardForm()) {
+        <div class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_450px]">
+          <div class="space-y-4">
+            @if (isCreditRecharge()) {
+              <div class="space-y-4">
+                <div class="max-w-sm">
+                  <label class="mb-1 block text-body-sm font-medium text-foreground" for="amount">
+                    Amount: (Minimum amount is ${{ minimumPurchaseAmount() }})
+                  </label>
+                  <input
+                    pInputText
+                    id="amount"
+                    type="number"
+                    class="w-[225px]"
+                    placeholder="E.g. 200"
+                    [attr.min]="minimumPurchaseAmount()"
+                    [ngModel]="form().amount"
+                    (ngModelChange)="updateForm({ amount: $event === '' || $event == null ? null : +$event })"
+                  />
+                  @if (extraCreditAmount() > 0) {
+                    <p class="mt-1 text-caption text-muted">
+                      An extra
+                      <strong class="text-success">
+                        {{ extraCreditAmount() | currency: 'USD' : 'symbol' : '1.2-2' }}
+                      </strong>
+                      worth of credit will be applied.
+                    </p>
+                  }
+                  @if (submitted() && (form().amount == null || (form().amount ?? 0) < minimumPurchaseAmount())) {
+                    <p class="mt-1 text-caption text-danger">Please use a valid recharge amount.</p>
+                  }
+                </div>
+
+                <div>
+                  <h6 class="mb-1 text-body-sm text-muted">Suggestions:</h6>
+                  <div class="flex flex-wrap gap-2">
+                    @for (amount of creditRechargeSuggestions; track amount) {
+                      @if (amount >= minimumPurchaseAmount()) {
+                        <button
+                          type="button"
+                          [class]="amountSuggestionButtonClass(amount)"
+                          (click)="setAmountSuggestion(amount)"
+                        >
+                          ${{ amount }}
+                        </button>
+                      }
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+
+            <div class="space-y-3">
+              <div class="rounded-md border border-border bg-background px-3 py-2">
+                <label class="mb-1 block text-body-sm font-medium text-foreground" for="card-number">
+                  Card Number
+                </label>
+                <input
+                  pInputText
+                  id="card-number"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="19"
+                  autocomplete="cc-number"
+                  [class]="inputClass"
+                  placeholder="Card number"
+                  [ngModel]="form().number"
+                  (keydown)="onCardNumberKeydown($event)"
+                  (input)="onCardNumberInput($event)"
+                />
+                <img
+                  src="/card-img.png"
+                  alt="Visa, MasterCard, Discover, Amex"
+                  class="mt-2 h-7 w-auto max-w-full object-contain"
+                />
+              </div>
+
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label class="mb-1 block text-body-sm font-medium text-foreground" for="first-name">
+                    First Name
+                  </label>
+                  <input
+                    pInputText
+                    id="first-name"
+                    type="text"
+                    [class]="inputClass"
+                    [ngModel]="form().firstName"
+                    (ngModelChange)="updateForm({ firstName: $event })"
+                  />
+                </div>
+                <div>
+                  <label class="mb-1 block text-body-sm font-medium text-foreground" for="last-name">
+                    Last Name
+                  </label>
+                  <input
+                    pInputText
+                    id="last-name"
+                    type="text"
+                    [class]="inputClass"
+                    [ngModel]="form().lastName"
+                    (ngModelChange)="updateForm({ lastName: $event })"
+                  />
+                </div>
+              </div>
+
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label class="mb-1 block text-body-sm font-medium text-foreground" for="card-expiry">
+                    Card Expiry (Example: 06/2022)
+                  </label>
+                  <input
+                    pInputText
+                    id="card-expiry"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="7"
+                    [class]="inputClass"
+                    placeholder="MM/YYYY"
+                    [ngModel]="form().expiry"
+                    (keydown)="blockNonDigitKeydown($event)"
+                    (ngModelChange)="updateCardExpiry($event)"
+                  />
+                </div>
+                <div>
+                  <label class="mb-1 block text-body-sm font-medium text-foreground" for="security-code">
+                    Security Code
+                  </label>
+                  <input
+                    pInputText
+                    id="security-code"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="4"
+                    autocomplete="cc-csc"
+                    [class]="inputClass"
+                    placeholder="Security Code"
+                    [ngModel]="form().securityCode"
+                    (keydown)="blockNonDigitKeydown($event)"
+                    (ngModelChange)="updateSecurityCode($event)"
+                    (focus)="cvcFocused.set(true)"
+                    (blur)="cvcFocused.set(false)"
+                  />
+                </div>
+              </div>
+
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label class="mb-1 block text-body-sm font-medium text-foreground" for="phone-number">
+                    Phone Number
+                  </label>
+                  <input
+                    pInputText
+                    id="phone-number"
+                    type="tel"
+                    [class]="inputClass"
+                    [ngModel]="form().phone"
+                    (ngModelChange)="updateForm({ phone: $event })"
+                  />
+                </div>
+                <div>
+                  <label class="mb-1 block text-body-sm font-medium text-foreground" for="email">
+                    Email Address
+                  </label>
+                  <input
+                    pInputText
+                    id="email"
+                    type="email"
+                    [class]="inputClass"
+                    [ngModel]="form().email"
+                    (ngModelChange)="updateForm({ email: $event })"
+                  />
+                </div>
+              </div>
+
+              <label class="flex items-center gap-2 text-body-sm text-foreground">
+                <p-checkbox
+                  [binary]="true"
+                  [ngModel]="form().billingAddressIsSame"
+                  (ngModelChange)="updateForm({ billingAddressIsSame: $event })"
+                />
+                Billing Address is the same <strong>as account address</strong>
+              </label>
+
+              @if (!form().billingAddressIsSame) {
+                <div>
+                  <h3 class="mb-3 text-body font-semibold text-foreground">Billing Address</h3>
+                  <div class="grid grid-cols-1 gap-3 sm:grid-cols-12">
+                    <div class="sm:col-span-6">
+                      <input
+                        pInputText
+                        type="text"
+                        [class]="inputClass"
+                        placeholder="Address"
+                        [ngModel]="form().address"
+                        (ngModelChange)="updateForm({ address: $event })"
+                      />
+                    </div>
+                    <div class="sm:col-span-6">
+                      <input
+                        pInputText
+                        type="text"
+                        [class]="inputClass"
+                        placeholder="Address 2"
+                        [ngModel]="form().address2"
+                        (ngModelChange)="updateForm({ address2: $event })"
+                      />
+                    </div>
+                    <div class="sm:col-span-6">
+                      <input
+                        pInputText
+                        type="text"
+                        [class]="inputClass"
+                        placeholder="City"
+                        [ngModel]="form().city"
+                        (ngModelChange)="updateForm({ city: $event })"
+                      />
+                    </div>
+                    <div class="sm:col-span-2">
+                      <input
+                        pInputText
+                        type="text"
+                        [class]="inputClass"
+                        placeholder="State"
+                        [ngModel]="form().state"
+                        (ngModelChange)="updateForm({ state: $event })"
+                      />
+                    </div>
+                    <div class="sm:col-span-4">
+                      <input
+                        pInputText
+                        type="text"
+                        [class]="inputClass"
+                        placeholder="Zip"
+                        [ngModel]="form().zip"
+                        (ngModelChange)="updateForm({ zip: $event })"
+                      />
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="order-first xl:order-none xl:sticky xl:top-2 xl:self-start">
+            <app-payment-card-preview
+              [cardNumber]="form().number"
+              [cardholderName]="cardholderDisplayName()"
+              [expiry]="form().expiry"
+              [cvc]="form().securityCode"
+              [cardType]="cardType()"
+              [flipped]="cvcFocused()"
+            />
+          </div>
+        </div>
+      }
+
+      @if (errorMessage()) {
+        <app-alert type="error" class="block">{{ errorMessage() }}</app-alert>
+      }
+
+      @if (errorMessages()?.length) {
+        <app-alert type="error" class="block">
+          @for (message of errorMessages()!; track message) {
+            <div>{{ message }}</div>
+          }
+        </app-alert>
+      }
+
+      @if (options.enableExcelExport) {
+        <label class="flex items-center gap-2 text-body-sm text-foreground">
+          <p-checkbox [binary]="true" [ngModel]="emailCsv()" (ngModelChange)="emailCsv.set($event)" />
+          Include CSV Export with completion Email
+        </label>
+      }
+
+      @if (!hidePayButton()) {
+        <app-button
+          variant="success"
+          [loading]="submitting()"
+          [disabled]="payButtonDisabled()"
+          (onClick)="paySecure()"
+        >
+          <i class="pi pi-lock mr-1.5 text-sm"></i>
+          Pay Secure
+        </app-button>
+      }
+    </div>
+  }
+</app-modal>
+
+@if (billingConfirmation()) {
+  <app-confirm-billing-modal
+    #confirmBillingModal
+    [billing]="billingConfirmation()!"
+    [extraCreditAmount]="extraCreditAmount()"
+    [showFarmName]="isRecsPurchase()"
+    (confirmed)="onConfirmBilling($event)"
+    (cancelled)="onConfirmBillingCancelled()"
+  />
+}

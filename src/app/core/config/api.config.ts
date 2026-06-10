@@ -64,6 +64,7 @@ export const API_CONFIG = {
     removeCommonQuery: '/remove_common_query.json',
     sendData: '/send_data.json',
     recsPurchase: '/recs_purchase.json',
+    creditPurchase: '/credit_purchase.json',
     almFetchConfig: '/alm_fetch_config.json',
     almSaveConfig: '/alm_save_config.json',
     updateResult: '/update_result.json',

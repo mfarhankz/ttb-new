@@ -1,0 +1,31 @@
+<div class="payment-card-scene">
+  <div class="payment-card" [class.is-flipped]="flipped()">
+    <div class="payment-card-face payment-card-front" [ngClass]="themeClass()">
+      <div class="payment-card-shine"></div>
+
+      <div class="flex items-start justify-between gap-3">
+        <div class="payment-card-chip"></div>
+        <div class="payment-card-brand">{{ cardType() || 'CARD' }}</div>
+      </div>
+
+      <div class="payment-card-number">{{ displayNumber() }}</div>
+
+      <div class="payment-card-meta">
+        <div>
+          <span class="payment-card-label">Card Holder</span>
+          <div class="payment-card-value">{{ displayName() }}</div>
+        </div>
+        <div>
+          <span class="payment-card-label">Expires</span>
+          <div class="payment-card-value">{{ displayExpiry() }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="payment-card-face payment-card-back">
+      <div class="payment-card-back-strip"></div>
+      <div class="payment-card-back-cvc">{{ displayCvc() }}</div>
+      <div class="payment-card-back-label">Security Code</div>
+    </div>
+  </div>
+</div>

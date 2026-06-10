@@ -40,6 +40,11 @@ import { AreaSearchFieldGroup } from '@app/core/interfaces/area-search-field.int
 import { AreaSearchControlStyles } from '@app/shared/components/area-search-fields/area-search-control.styles';
 import { AreaSearchCriteriaChipsComponent } from '@app/shared/components/area-search-fields/area-search-criteria-chips.component';
 import { AreaSearchAccordionStateService } from '@app/core/services/area-search-accordion-state.service';
+import { PayNowModalService } from '@app/core/services/pay-now-modal.service';
+import { SavedFarmsService } from '@app/core/services/saved-farms.service';
+import { WalletService } from '@app/core/services/wallet.service';
+import { PayNowResult } from '@app/core/interfaces/payment.interface';
+import { SavedFarmRecord } from '@app/core/interfaces/saved-farm.interface';
 
 @Component({
   selector: 'app-area-search',
@@ -84,6 +89,9 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly commonQueriesService = inject(CommonQueriesService);
   private readonly verticalService = inject(VerticalService);
   private readonly accordionState = inject(AreaSearchAccordionStateService);
+  private readonly payNowModalService = inject(PayNowModalService);
+  private readonly savedFarmsService = inject(SavedFarmsService);
+  private readonly walletService = inject(WalletService);
 
   private resizeObserver?: ResizeObserver;
 
@@ -135,9 +143,11 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly automationSupport = computed(
     () => !!this.verticalService.content()?.app_config?.['automation_support']
   );
-  readonly supportDirectGlobalSearch = computed(
-    () => !!this.verticalService.content()?.app_config?.['support_direct_global_search']
-  );
+  readonly requiresPayment = computed(() => {
+    const price = this.countResult()?.rec_price;
+    return price != null && Number(price) > 0;
+  });
+  readonly showPayNowButton = this.requiresPayment;
 
   readonly availableOafFields = computed(() => {
     const group = this.activeFieldGroup();
@@ -570,9 +580,43 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    this.areaSearchService.purchaseRecs(this.formService.buildPayload()).subscribe({
-      next: () => this.showNotice('Purchase request submitted.'),
-      error: (err: Error) => this.actionError.set(err.message ?? 'Failed to process purchase.')
+    const payload = this.formService.buildPayload();
+    const contactInfo = payload.searchOptions?.include_contact_info;
+
+    this.payNowModalService
+      .open({
+        mode: 'recsPurchase',
+        priceRequired: Number(this.countResult()?.rec_price ?? 0),
+        recordCount: this.countFound(),
+        enableExcelExport: Array.isArray(contactInfo) && contactInfo.length > 0,
+        contactIncluded: Array.isArray(contactInfo) && contactInfo.length > 0,
+        onSuccess: (result) => this.onPurchaseSuccess(result)
+      })
+      .subscribe();
+  }
+
+  private onPurchaseSuccess(result: PayNowResult | null): void {
+    if (!result?.savedFarm) {
+      return;
+    }
+
+    this.walletService.fetchBalance(true);
+    this.savedFarmsService.fetchFarmsList(true);
+    this.navigateToPurchasedFarm(result.savedFarm);
+  }
+
+  private navigateToPurchasedFarm(farm: SavedFarmRecord): void {
+    const farmId = farm.farm_id;
+    if (farmId == null) {
+      return;
+    }
+
+    void this.router.navigate(['/detail/farm', farmId], {
+      queryParams: { returnUrl: '/farming/area-search' },
+      state: {
+        title: farm.name ?? farm.farm_name,
+        geometry: farm.geometry
+      }
     });
   }
 
