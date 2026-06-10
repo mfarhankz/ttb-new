@@ -17,12 +17,12 @@ export type VerticalColorPreset = Pick<
 
 export const VERTICAL_COLOR_PRESETS: Record<string, VerticalColorPreset> = {
   demo: {
-    '--ttb-primary': '37 99 235',
+    '--ttb-primary': '17 161 201',
     '--ttb-primary-foreground': '255 255 255',
     '--ttb-secondary': '75 85 99',
-    '--ttb-accent': '59 130 246',
-    '--ttb-focus-ring': '59 130 246',
-    '--ttb-info': '37 99 235',
+    '--ttb-accent': '17 161 201',
+    '--ttb-focus-ring': '17 161 201',
+    '--ttb-info': '17 161 201',
     '--ttb-font-sans':
       '"Open Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
   },

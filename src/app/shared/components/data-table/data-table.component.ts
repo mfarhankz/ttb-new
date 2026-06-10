@@ -281,12 +281,12 @@ export class DataTableComponent {
 
   headerClasses(column: DataTableColumn, index: number, isLast: boolean): string {
     const classes = [
-      'bg-sidebar-active px-4 py-3 text-caption font-semibold uppercase tracking-wide text-foreground whitespace-nowrap',
+      'bg-background px-4 py-3 text-caption font-semibold uppercase tracking-wide text-muted whitespace-nowrap',
       this.headerAlignClass(column, index)
     ];
 
     if (this.isSorted(column)) {
-      classes.push('bg-primary/10');
+      classes.push('bg-primary/10 text-primary');
     }
 
     if (column.width) {
@@ -659,7 +659,7 @@ export class DataTableComponent {
       case 'success':
         return `${base} bg-success/10 text-success`;
       case 'assignment':
-        return `${base} bg-sidebar-active text-foreground`;
+        return `${base} bg-muted/15 text-foreground`;
       case 'status':
       case 'muted':
         return `${base} bg-muted/20 text-muted`;
@@ -671,7 +671,7 @@ export class DataTableComponent {
   badgeClasses(value: string): string {
     const base = 'inline-flex items-center rounded-full px-2.5 py-1 text-caption font-medium whitespace-nowrap';
     const normalized = value.toLowerCase();
-    let tone = 'bg-sidebar-active text-foreground';
+    let tone = 'bg-muted/15 text-foreground';
 
     if (normalized.includes('cancel') || normalized.includes('fail') || normalized.includes('denied')) {
       tone = 'bg-danger/10 text-danger';

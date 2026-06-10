@@ -168,11 +168,11 @@
 @layer base {
   :root,
   [data-theme='light'] {
-    --ttb-primary: 37 99 235;
+    --ttb-primary: 17 161 201;
     --ttb-primary-foreground: 255 255 255;
     --ttb-secondary: 75 85 99;
     --ttb-secondary-foreground: 255 255 255;
-    --ttb-accent: 59 130 246;
+    --ttb-accent: 17 161 201;
     --ttb-accent-foreground: 255 255 255;
     --ttb-background: 249 250 251;
     --ttb-surface: 255 255 255;
@@ -190,19 +190,19 @@
     --ttb-warning-foreground: 255 255 255;
     --ttb-danger: 220 38 38;
     --ttb-danger-foreground: 255 255 255;
-    --ttb-info: 37 99 235;
+    --ttb-info: 17 161 201;
     --ttb-info-foreground: 255 255 255;
-    --ttb-focus-ring: 59 130 246;
+    --ttb-focus-ring: 17 161 201;
     --sidebar-width: 260px;
     --sidebar-width-collapsed: 72px;
-    --ttb-sidebar: 255 255 255;
-    --ttb-sidebar-foreground: 55 65 81;
-    --ttb-sidebar-muted: 107 114 128;
-    --ttb-sidebar-active: 243 244 246;
-    --ttb-sidebar-hover: 249 250 251;
-    --ttb-sidebar-border: 229 231 235;
-    --ttb-sidebar-tooltip: 31 41 55;
-    --ttb-sidebar-tooltip-foreground: 255 255 255;
+    --ttb-sidebar: 30 41 59;
+    --ttb-sidebar-foreground: 241 245 249;
+    --ttb-sidebar-muted: 148 163 184;
+    --ttb-sidebar-active: 51 65 85;
+    --ttb-sidebar-hover: 51 65 85;
+    --ttb-sidebar-border: 51 65 85;
+    --ttb-sidebar-tooltip: 241 245 249;
+    --ttb-sidebar-tooltip-foreground: 15 23 42;
     --ttb-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --ttb-font-display: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --ttb-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -227,11 +227,11 @@
   }
 
   [data-theme='dark'] {
-    --ttb-primary: 96 165 250;
+    --ttb-primary: 60 192 228;
     --ttb-primary-foreground: 15 23 42;
     --ttb-secondary: 148 163 184;
     --ttb-secondary-foreground: 15 23 42;
-    --ttb-accent: 59 130 246;
+    --ttb-accent: 60 192 228;
     --ttb-accent-foreground: 255 255 255;
     --ttb-background: 15 23 42;
     --ttb-surface: 30 41 59;
@@ -249,9 +249,9 @@
     --ttb-warning-foreground: 15 23 42;
     --ttb-danger: 248 113 113;
     --ttb-danger-foreground: 15 23 42;
-    --ttb-info: 96 165 250;
+    --ttb-info: 60 192 228;
     --ttb-info-foreground: 15 23 42;
-    --ttb-focus-ring: 96 165 250;
+    --ttb-focus-ring: 60 192 228;
     --ttb-sidebar: 15 23 42;
     --ttb-sidebar-foreground: 241 245 249;
     --ttb-sidebar-muted: 148 163 184;

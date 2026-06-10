@@ -5,11 +5,12 @@ import { LayoutService } from '@app/core/services/layout.service';
 import { TargetOfficeService } from '@app/core/services/target-office.service';
 import { LoginModalComponent } from '@app/shared/components/login-modal/login-modal.component';
 import { PropertySearchModalComponent } from '@app/shared/components/property-search-modal/property-search-modal.component';
+import { ThemeModalComponent } from '@app/shared/components/theme-modal/theme-modal.component';
 
 @Component({
   selector: 'app-authenticated-layout',
   standalone: true,
-  imports: [RouterOutlet, SidebarComponent, LoginModalComponent, PropertySearchModalComponent],
+  imports: [RouterOutlet, SidebarComponent, LoginModalComponent, PropertySearchModalComponent, ThemeModalComponent],
   templateUrl: './authenticated-layout.component.html',
   styles: []
 })

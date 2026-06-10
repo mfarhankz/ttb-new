@@ -8,6 +8,7 @@
  */
 
 export type ThemeMode = 'light' | 'dark';
+export type ThemeVariant = 'light' | 'dark' | 'main';
 export type ThemeBrand = 'default' | 'acme';
 
 export interface ThemeTokens {
@@ -65,6 +66,7 @@ export interface ThemeTokens {
 }
 
 export const THEME_STORAGE_KEY = 'ttb-theme-mode';
+export const VARIANT_STORAGE_KEY = 'ttb-theme-variant';
 export const BRAND_STORAGE_KEY = 'ttb-theme-brand';
 
 const sharedLayout: Pick<
@@ -90,13 +92,14 @@ const sharedLayout: Pick<
   '--ttb-radius-xl': '0.75rem'
 };
 
-export const defaultLight: ThemeTokens = {
+/** Classic light theme — white sidebar */
+export const classicLight: ThemeTokens = {
   ...sharedLayout,
-  '--ttb-primary': '37 99 235',
+  '--ttb-primary': '17 161 201',
   '--ttb-primary-foreground': '255 255 255',
   '--ttb-secondary': '75 85 99',
   '--ttb-secondary-foreground': '255 255 255',
-  '--ttb-accent': '59 130 246',
+  '--ttb-accent': '17 161 201',
   '--ttb-accent-foreground': '255 255 255',
   '--ttb-background': '249 250 251',
   '--ttb-surface': '255 255 255',
@@ -114,9 +117,9 @@ export const defaultLight: ThemeTokens = {
   '--ttb-warning-foreground': '255 255 255',
   '--ttb-danger': '220 38 38',
   '--ttb-danger-foreground': '255 255 255',
-  '--ttb-info': '37 99 235',
+  '--ttb-info': '17 161 201',
   '--ttb-info-foreground': '255 255 255',
-  '--ttb-focus-ring': '59 130 246',
+  '--ttb-focus-ring': '17 161 201',
   '--ttb-sidebar': '255 255 255',
   '--ttb-sidebar-foreground': '55 65 81',
   '--ttb-sidebar-muted': '107 114 128',
@@ -127,13 +130,51 @@ export const defaultLight: ThemeTokens = {
   '--ttb-sidebar-tooltip-foreground': '255 255 255'
 };
 
+/** Default branded light theme — navy sidebar */
+export const defaultLight: ThemeTokens = {
+  ...sharedLayout,
+  '--ttb-primary': '17 161 201',
+  '--ttb-primary-foreground': '255 255 255',
+  '--ttb-secondary': '75 85 99',
+  '--ttb-secondary-foreground': '255 255 255',
+  '--ttb-accent': '17 161 201',
+  '--ttb-accent-foreground': '255 255 255',
+  '--ttb-background': '249 250 251',
+  '--ttb-surface': '255 255 255',
+  '--ttb-surface-elevated': '255 255 255',
+  '--ttb-overlay': '0 0 0',
+  '--ttb-foreground': '17 24 39',
+  '--ttb-muted': '75 85 99',
+  '--ttb-subtle': '107 114 128',
+  '--ttb-inverse': '255 255 255',
+  '--ttb-border': '229 231 235',
+  '--ttb-border-strong': '209 213 219',
+  '--ttb-success': '22 163 74',
+  '--ttb-success-foreground': '255 255 255',
+  '--ttb-warning': '202 138 4',
+  '--ttb-warning-foreground': '255 255 255',
+  '--ttb-danger': '220 38 38',
+  '--ttb-danger-foreground': '255 255 255',
+  '--ttb-info': '17 161 201',
+  '--ttb-info-foreground': '255 255 255',
+  '--ttb-focus-ring': '17 161 201',
+  '--ttb-sidebar': '30 41 59',
+  '--ttb-sidebar-foreground': '241 245 249',
+  '--ttb-sidebar-muted': '148 163 184',
+  '--ttb-sidebar-active': '51 65 85',
+  '--ttb-sidebar-hover': '51 65 85',
+  '--ttb-sidebar-border': '51 65 85',
+  '--ttb-sidebar-tooltip': '241 245 249',
+  '--ttb-sidebar-tooltip-foreground': '15 23 42'
+};
+
 export const defaultDark: ThemeTokens = {
   ...sharedLayout,
-  '--ttb-primary': '96 165 250',
+  '--ttb-primary': '60 192 228',
   '--ttb-primary-foreground': '15 23 42',
   '--ttb-secondary': '148 163 184',
   '--ttb-secondary-foreground': '15 23 42',
-  '--ttb-accent': '59 130 246',
+  '--ttb-accent': '60 192 228',
   '--ttb-accent-foreground': '255 255 255',
   '--ttb-background': '15 23 42',
   '--ttb-surface': '30 41 59',
@@ -151,9 +192,9 @@ export const defaultDark: ThemeTokens = {
   '--ttb-warning-foreground': '15 23 42',
   '--ttb-danger': '248 113 113',
   '--ttb-danger-foreground': '15 23 42',
-  '--ttb-info': '96 165 250',
+  '--ttb-info': '60 192 228',
   '--ttb-info-foreground': '15 23 42',
-  '--ttb-focus-ring': '96 165 250',
+  '--ttb-focus-ring': '60 192 228',
   '--ttb-sidebar': '15 23 42',
   '--ttb-sidebar-foreground': '241 245 249',
   '--ttb-sidebar-muted': '148 163 184',
@@ -178,6 +219,34 @@ export const THEME_PRESETS: Record<ThemeMode, ThemeTokens> = {
   light: defaultLight,
   dark: defaultDark
 };
+
+export const VARIANT_PRESETS: Record<ThemeVariant, { mode: ThemeMode; tokens: ThemeTokens }> = {
+  main: { mode: 'light', tokens: defaultLight },
+  light: { mode: 'light', tokens: classicLight },
+  dark: { mode: 'dark', tokens: defaultDark }
+};
+
+export const THEME_VARIANT_OPTIONS: ReadonlyArray<{
+  id: ThemeVariant;
+  label: string;
+  description: string;
+}> = [
+  {
+    id: 'main',
+    label: 'Main',
+    description: 'Default branded look with navy sidebar'
+  },
+  {
+    id: 'light',
+    label: 'Light',
+    description: 'Classic light interface with white sidebar'
+  },
+  {
+    id: 'dark',
+    label: 'Dark',
+    description: 'Dark mode for low-light environments'
+  }
+];
 
 export const BRAND_PRESETS: Record<Exclude<ThemeBrand, 'default'>, Partial<ThemeTokens>> = {
   acme: brandAcme

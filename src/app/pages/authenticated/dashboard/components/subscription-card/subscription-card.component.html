@@ -58,10 +58,9 @@
                 [class.ring-primary/10]="isExpanded(subscription.profile_id)"
               >
                 <div
-                  class="flex items-center gap-2 px-3 py-2.5 transition-colors"
-                  [class.bg-sidebar-active/40]="isExpanded(subscription.profile_id)"
-                  [class.bg-sidebar-active/20]="!isExpanded(subscription.profile_id)"
-                  [class.group-hover:bg-sidebar-active/35]="!isExpanded(subscription.profile_id)"
+                  class="flex items-center gap-2 px-3 py-2.5 bg-surface transition-colors"
+                  [class.bg-background]="isExpanded(subscription.profile_id)"
+                  [class.group-hover:bg-background]="!isExpanded(subscription.profile_id)"
                 >
                   <button
                     type="button"
@@ -137,7 +136,7 @@
                       <div class="overflow-hidden rounded-lg border border-border/60">
                         <table class="w-full text-body-sm">
                           <thead>
-                            <tr class="bg-sidebar-active/30 text-left text-muted">
+                            <tr class="bg-background text-left text-muted">
                               <th class="px-3 py-2 font-medium">Billing History</th>
                               <th class="px-3 py-2 font-medium">Amount</th>
                               <th class="px-3 py-2 font-medium">Status</th>
@@ -148,7 +147,7 @@
                               item of historyForProfile(subscription);
                               track item.profile_id + '-' + item.last_payment_date + '-' + $index
                             ) {
-                              <tr class="hover:bg-sidebar-active/20 transition-colors">
+                              <tr class="hover:bg-background transition-colors">
                                 <td class="px-3 py-2.5 text-foreground">
                                   {{ displayField(item.last_payment_date) }}
                                 </td>
@@ -175,7 +174,7 @@
                       </div>
                     </div>
 
-                    <div class="flex items-center justify-between gap-3 border-t border-border/60 px-4 py-2.5 bg-sidebar-active/15">
+                    <div class="flex items-center justify-between gap-3 border-t border-border/60 px-4 py-2.5 bg-background">
                       <button
                         type="button"
                         class="inline-flex items-center gap-1.5 text-body-sm text-muted hover:text-danger disabled:opacity-50 transition-colors"

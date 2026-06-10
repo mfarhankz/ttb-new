@@ -47,7 +47,7 @@
           <tr class="border-b-2 border-border">
             @if (showLeadingSelectionColumn()) {
               <th
-                class="w-12 bg-sidebar-active px-4 py-3 text-center border-r border-border/60"
+                class="w-12 bg-background px-4 py-3 text-center border-r border-border/60"
                 scope="col"
               >
                 <input
@@ -97,7 +97,7 @@
               </th>
               @if (showTrailingSelectionAfterActions(column)) {
                 <th
-                  class="w-12 bg-sidebar-active px-4 py-3 text-center border-r border-border/60"
+                  class="w-12 bg-background px-4 py-3 text-center border-r border-border/60"
                   scope="col"
                 >
                   <input
@@ -116,8 +116,8 @@
         <tbody>
           @for (row of visibleRows(); track trackRow($index, row); let rowIndex = $index; let even = $even) {
             <tr
-              class="border-b border-border/70 transition-colors last:border-b-0 hover:bg-sidebar-hover"
-              [class.bg-sidebar-active/25]="even || (showSelectionColumn && isRowSelected(row, rowIndex))"
+              class="border-b border-border/70 bg-surface transition-colors last:border-b-0 hover:bg-background"
+              [class.bg-background]="even && !(showSelectionColumn && isRowSelected(row, rowIndex))"
               [class.bg-primary/5]="showSelectionColumn && isRowSelected(row, rowIndex)"
               (mouseenter)="rowEnter.emit(row)"
               (mouseleave)="rowLeave.emit(row)"
@@ -218,7 +218,7 @@
                             [attr.aria-label]="indicator.tooltip"
                           ></span>
                           <span
-                            class="pointer-events-none absolute left-[calc(100%+0.375rem)] top-1/2 z-tooltip hidden w-max max-w-48 -translate-y-1/2 rounded-md bg-sidebar-tooltip px-2.5 py-1.5 text-left text-caption text-sidebar-tooltip-foreground shadow-md group-hover/indicator:block group-focus-within/indicator:block"
+                            class="pointer-events-none absolute left-[calc(100%+0.375rem)] top-1/2 z-tooltip hidden w-max max-w-48 -translate-y-1/2 rounded-md border border-border bg-surface px-2.5 py-1.5 text-left text-caption text-foreground shadow-md group-hover/indicator:block group-focus-within/indicator:block"
                             role="tooltip"
                           >
                             {{ indicator.tooltip }}
@@ -267,7 +267,7 @@
         @for (action of openRowActions(); track action.id) {
           <button
             type="button"
-            class="block w-full border-0 bg-transparent px-(--form-padding-x) py-(--form-padding-y-sm) text-left text-body-sm text-foreground transition-colors hover:bg-sidebar-hover focus:outline-hidden focus-visible:bg-sidebar-hover"
+            class="block w-full border-0 bg-transparent px-(--form-padding-x) py-(--form-padding-y-sm) text-left text-body-sm text-foreground transition-colors hover:bg-background focus:outline-hidden focus-visible:bg-background"
             role="menuitem"
             (click)="onRowActionClick($event, action, openActionsRow()!)"
           >
@@ -279,7 +279,7 @@
 
     @if (paginated) {
       <div
-        class="flex shrink-0 flex-col gap-3 border-t border-border bg-sidebar-active/20 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+        class="flex shrink-0 flex-col gap-3 border-t border-border bg-background px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
       >
         <p class="text-caption text-muted">
           Showing <span class="font-medium text-foreground">{{ pageStart() }}–{{ pageEnd() }}</span>
@@ -306,7 +306,7 @@
           <div class="flex items-center gap-1.5">
             <button
               type="button"
-              class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface text-muted transition-colors hover:border-primary/30 hover:bg-sidebar-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface text-muted transition-colors hover:border-primary/30 hover:bg-background hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
               [disabled]="currentPage() <= 1"
               aria-label="Previous page"
               (click)="goToPage(currentPage() - 1)"
@@ -321,7 +321,7 @@
 
             <button
               type="button"
-              class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface text-muted transition-colors hover:border-primary/30 hover:bg-sidebar-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface text-muted transition-colors hover:border-primary/30 hover:bg-background hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
               [disabled]="currentPage() >= totalPages()"
               aria-label="Next page"
               (click)="goToPage(currentPage() + 1)"

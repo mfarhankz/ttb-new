@@ -1,40 +1,58 @@
-import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import {
   BRAND_PRESETS,
   BRAND_STORAGE_KEY,
-  THEME_PRESETS,
   THEME_STORAGE_KEY,
+  VARIANT_PRESETS,
+  VARIANT_STORAGE_KEY,
   TenantThemeOverride,
   ThemeBrand,
   ThemeMode,
+  ThemeVariant,
   ThemeTokens,
   tenantOverrideToCssVars,
   tokensToCssVars
 } from '../theme/theme.config';
 
+const VALID_VARIANTS = new Set<ThemeVariant>(['light', 'dark', 'main']);
+
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private readonly platformId = inject(PLATFORM_ID);
   private runtimeOverrides: Record<string, string> = {};
+  private readonly _variant = signal<ThemeVariant>('main');
+
+  readonly variant = this._variant.asReadonly();
 
   init(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    const storedMode = localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
-    const mode: ThemeMode = storedMode === 'dark' ? 'dark' : 'light';
+    const storedVariant = localStorage.getItem(VARIANT_STORAGE_KEY) as ThemeVariant | null;
+    let variant: ThemeVariant = 'main';
+
+    if (storedVariant && VALID_VARIANTS.has(storedVariant)) {
+      variant = storedVariant;
+    } else {
+      const storedMode = localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
+      variant = storedMode === 'dark' ? 'dark' : 'main';
+    }
 
     const storedBrand = localStorage.getItem(BRAND_STORAGE_KEY) as ThemeBrand | null;
     const brand: ThemeBrand =
       storedBrand && (storedBrand === 'default' || storedBrand === 'acme') ? storedBrand : 'default';
 
-    this.applyMode(mode, false);
+    this.applyVariant(variant, false);
     this.applyBrand(brand, false);
   }
 
   getMode(): ThemeMode {
     if (!isPlatformBrowser(this.platformId)) return 'light';
     return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  }
+
+  getVariant(): ThemeVariant {
+    return this._variant();
   }
 
   getBrand(): ThemeBrand {
@@ -44,11 +62,16 @@ export class ThemeService {
   }
 
   setMode(mode: ThemeMode): void {
-    this.applyMode(mode, true);
+    const variant: ThemeVariant = mode === 'dark' ? 'dark' : 'main';
+    this.setVariant(variant);
+  }
+
+  setVariant(variant: ThemeVariant): void {
+    this.applyVariant(variant, true);
   }
 
   toggleMode(): void {
-    this.setMode(this.getMode() === 'light' ? 'dark' : 'light');
+    this.setVariant(this.getVariant() === 'dark' ? 'main' : 'dark');
   }
 
   setBrand(brand: ThemeBrand): void {
@@ -74,25 +97,31 @@ export class ThemeService {
   resetToDefault(): void {
     if (!isPlatformBrowser(this.platformId)) return;
     this.runtimeOverrides = {};
-    const mode = this.getMode();
+    const variant = this.getVariant();
     const brand = this.getBrand();
-    this.applyTokens(THEME_PRESETS[mode]);
+    this.applyTokens(VARIANT_PRESETS[variant].tokens);
     if (brand !== 'default') {
       this.applyCssVars(tokensToCssVars(BRAND_PRESETS[brand]));
     }
   }
 
-  private applyMode(mode: ThemeMode, persist: boolean): void {
+  private applyVariant(variant: ThemeVariant, persist: boolean): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    document.documentElement.setAttribute('data-theme', mode);
-    this.applyTokens(THEME_PRESETS[mode]);
+
+    const preset = VARIANT_PRESETS[variant];
+    this._variant.set(variant);
+    document.documentElement.setAttribute('data-theme', preset.mode);
+    this.applyTokens(preset.tokens);
+
     const brand = this.getBrand();
     if (brand !== 'default') {
       this.applyCssVars(tokensToCssVars(BRAND_PRESETS[brand]));
     }
     this.applyCssVars(this.runtimeOverrides);
+
     if (persist) {
-      localStorage.setItem(THEME_STORAGE_KEY, mode);
+      localStorage.setItem(VARIANT_STORAGE_KEY, variant);
+      localStorage.setItem(THEME_STORAGE_KEY, preset.mode);
     }
   }
 

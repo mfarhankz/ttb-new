@@ -4,6 +4,7 @@ import { filter, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/core/services/auth.service';
 import { PropertySearchModalService } from '@app/core/services/property-search-modal.service';
+import { ThemeModalService } from '@app/core/services/theme-modal.service';
 import { LayoutService } from '@app/core/services/layout.service';
 import { VerticalService } from '@app/core/services/vertical.service';
 import {
@@ -12,12 +13,6 @@ import {
   SIDEBAR_COLLAPSED_KEY,
   type NavItem
 } from '@app/core/config/navigation.config';
-import { VERTICAL_CONFIG } from '@app/core/config/vertical.config';
-
-/** Static logos from public/ until vertical white-label URLs are enabled. */
-const SIDEBAR_LOGO_PATH = VERTICAL_CONFIG.defaultLogoPath;
-const SIDEBAR_SHORT_LOGO_PATH = VERTICAL_CONFIG.defaultShortLogoPath;
-
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -31,6 +26,7 @@ const SIDEBAR_SHORT_LOGO_PATH = VERTICAL_CONFIG.defaultShortLogoPath;
 export class SidebarComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private propertySearchModalService = inject(PropertySearchModalService);
+  private themeModalService = inject(ThemeModalService);
   private layoutService = inject(LayoutService);
   private verticalService = inject(VerticalService);
   private router = inject(Router);
@@ -38,8 +34,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private flyoutHideTimer?: ReturnType<typeof setTimeout>;
 
   readonly vertical = this.verticalService;
-  readonly sidebarLogoPath = SIDEBAR_LOGO_PATH;
-  readonly sidebarShortLogoPath = SIDEBAR_SHORT_LOGO_PATH;
+  readonly sidebarLogoPath = computed(() => this.vertical.dashboardLogoUrl());
+  readonly sidebarShortLogoPath = computed(() => this.vertical.dashboardShortLogoUrl());
   collapsedChange = output<boolean>();
 
   readonly mainNav = computed((): NavItem[] =>
@@ -184,6 +180,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     if (item.action === 'property-search') {
       this.propertySearchModalService.open();
+      return;
+    }
+
+    if (item.action === 'theme') {
+      this.themeModalService.open();
     }
   }
 

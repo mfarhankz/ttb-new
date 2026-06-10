@@ -1,13 +1,25 @@
 /**
  * Vertical / white-label resolution (mirrors legacy app.bootstrap.js).
  * Domain → vertical_meta → vertical_conf → optional agency overlay.
+ *
+ * Logo resolution (VerticalService):
+ * - Production: each vertical/agency supplies logos via vertical_conf company_info
+ *   (dashboard_logo_url, profile_logo, public_page_logo_url, logo_url).
+ *   Server URLs take precedence when present — see dashboardLogoUrl / publicPageLogoUrl.
+ * - Fallback: public/*.png below when a vertical has no dashboard/profile logo yet
+ *   (demo vertical today). Theme variant picks light vs dark local assets.
+ * - Do not use generic logo_url for the authenticated sidebar; it is for public pages only.
  */
 
 export const VERTICAL_CONFIG = {
-  /** Default full logo served from public/logo.png */
-  defaultLogoPath: '/logo.png',
-  /** Compact logo for collapsed sidebar (public/short-logo.png) */
-  defaultShortLogoPath: '/short-logo.png',
+  /** Dev/demo fallback — light theme full logo (public/logo.png) */
+  lightLogoPath: '/logo.png',
+  /** Dev/demo fallback — light theme collapsed sidebar (public/short-logo.png) */
+  lightShortLogoPath: '/short-logo.png',
+  /** Dev/demo fallback — main/dark theme full logo (public/logo-dark.png) */
+  darkLogoPath: '/logo-dark.png',
+  /** Dev/demo fallback — main/dark theme collapsed sidebar (public/short-logo-dark.png) */
+  darkShortLogoPath: '/short-logo-dark.png',
   /** Fallback support phone when vertical_conf has no support_info */
   defaultSupportPhone: '855-276-1159',
   /** Meta is always resolved via demo API (legacy behavior) */

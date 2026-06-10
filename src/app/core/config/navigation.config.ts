@@ -2,7 +2,7 @@ export interface NavItem {
   label: string;
   icon: string;
   route?: string;
-  action?: 'logout' | 'property-search';
+  action?: 'logout' | 'property-search' | 'theme';
   badge?: string;
   children?: NavItem[];
 }
@@ -62,6 +62,7 @@ export const ADMIN_NAV: NavItem[] = [
 ];
 
 export const SETTINGS_NAV: NavItem[] = [
+  { label: 'Theme', icon: 'pi pi-palette', action: 'theme' },
   { label: 'Logout', icon: 'pi pi-sign-out', action: 'logout' }
 ];
 

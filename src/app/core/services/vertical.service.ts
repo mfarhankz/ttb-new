@@ -41,22 +41,27 @@ export class VerticalService {
   readonly storageBaseUrl = computed(() => this.buildApiOrigin(this._meta()));
 
   readonly companyName = computed(() => this._companyInfo().company_name ?? 'Title Toolbox');
+  /** Public/login header: vertical public_page_logo_url → logo_url → local theme fallback. */
   readonly publicPageLogoUrl = computed(
     () =>
       this.resolveAssetUrl(
         this._companyInfo().public_page_logo_url || this._companyInfo().logo_url
-      ) ?? VERTICAL_CONFIG.defaultLogoPath
+      ) ?? this.defaultLogoPath()
   );
+  /**
+   * Authenticated sidebar (expanded): vertical dashboard_logo_url → local theme fallback.
+   * Per-vertical logos from vertical_conf/agency overlay replace fallbacks when provided.
+   */
   readonly dashboardLogoUrl = computed(
     () =>
-      this.resolveAssetUrl(
-        this._companyInfo().dashboard_logo_url || this._companyInfo().logo_url
-      ) ?? VERTICAL_CONFIG.defaultLogoPath
+      this.resolveAssetUrl(this._companyInfo().dashboard_logo_url) ?? this.defaultLogoPath()
   );
+  /**
+   * Authenticated sidebar (collapsed): vertical profile_logo → local theme fallback.
+   */
   readonly dashboardShortLogoUrl = computed(
     () =>
-      this.resolveAssetUrl(this._companyInfo().profile_logo) ??
-      VERTICAL_CONFIG.defaultShortLogoPath
+      this.resolveAssetUrl(this._companyInfo().profile_logo) ?? this.defaultShortLogoPath()
   );
   readonly bannerUrl = computed(() => this.resolveAssetUrl(this._companyInfo().banner_url));
   readonly publicLogoStyle = computed(
@@ -320,6 +325,18 @@ export class VerticalService {
     const protocol = meta?.api_http_only ? 'http' : 'https';
     const host = (meta?.vertical_api_url ?? 'demo.api.titletoolbox.com').replace(/^https?:\/\//, '');
     return `${protocol}://${host}`;
+  }
+
+  private defaultLogoPath(): string {
+    return this.themeService.variant() === 'light'
+      ? VERTICAL_CONFIG.lightLogoPath
+      : VERTICAL_CONFIG.darkLogoPath;
+  }
+
+  private defaultShortLogoPath(): string {
+    return this.themeService.variant() === 'light'
+      ? VERTICAL_CONFIG.lightShortLogoPath
+      : VERTICAL_CONFIG.darkShortLogoPath;
   }
 
   private applyVerticalBranding(verticalName: string): void {

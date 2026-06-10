@@ -1,5 +1,5 @@
 <nav
-  class="fixed top-0 left-0 bottom-0 z-sidebar flex flex-col mr-0 bg-sidebar border border-sidebar-border shadow-xs transition-[width] duration-200 overflow-visible"
+  class="fixed top-0 left-0 bottom-0 z-sidebar flex flex-col mr-0 bg-sidebar border-r border-sidebar-border shadow-md transition-[width] duration-200 overflow-visible"
   [class.w-sidebar]="!isCollapsed"
   [class.w-sidebar-collapsed]="isCollapsed"
 >
@@ -9,9 +9,8 @@
     [class.justify-center]="isCollapsed"
     [class.px-3]="isCollapsed"
   >
-    <!-- Future: vertical.dashboardShortLogoUrl() / vertical.dashboardLogoUrl() -->
     <img
-      [src]="isCollapsed ? sidebarShortLogoPath : sidebarLogoPath"
+      [src]="isCollapsed ? sidebarShortLogoPath() : sidebarLogoPath()"
       [alt]="vertical.companyName()"
       class="object-contain"
       [class.w-full]="!isCollapsed"
@@ -76,7 +75,7 @@
             <div class="ml-4 pl-3 border-l border-sidebar-border mt-1 mb-2">
               @for (child of item.children; track child.label) {
                 <a
-                  class="flex items-center w-full px-3 py-2 mb-0.5 text-sm rounded-lg text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium"
+                  class="flex items-center w-full px-3 py-2 mb-0.5 text-sm rounded-lg text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium [&.active]:text-sidebar-foreground"
                   [routerLink]="child.route"
                   routerLinkActive="active"
                 >
@@ -136,7 +135,7 @@
         } @else {
           <div class="relative group">
             <a
-              class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-sm font-semibold text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-bold"
+              class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-sm font-semibold text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-bold [&.active]:text-sidebar-foreground"
               [class.justify-center]="isCollapsed"
               [class.px-2]="isCollapsed"
               [routerLink]="item.route"
@@ -169,7 +168,7 @@
       <div class="relative mb-1 group">
         @if (item.route) {
           <a
-            class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-sm font-semibold text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-bold"
+            class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-sm font-semibold text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-bold [&.active]:text-sidebar-foreground"
             [class.justify-center]="isCollapsed"
             [class.px-2]="isCollapsed"
             [routerLink]="item.route"
@@ -178,7 +177,7 @@
             <i [class]="item.icon" class="text-lg shrink-0"></i>
             <span class="truncate" [class.hidden]="isCollapsed">{{ item.label }}</span>
           </a>
-        } @else if (item.action === 'logout') {
+        } @else if (item.action) {
           <button
             type="button"
             class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-sm font-semibold text-sidebar-foreground border-0 bg-transparent cursor-pointer text-left transition-colors hover:bg-sidebar-hover"
