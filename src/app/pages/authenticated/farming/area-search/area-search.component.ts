@@ -1,4 +1,4 @@
-import { DecimalPipe, JsonPipe } from '@angular/common';
+import { CurrencyPipe, DecimalPipe, JsonPipe } from '@angular/common';
 import {
   AfterViewInit,
   Component,
@@ -45,6 +45,7 @@ import { AreaSearchAccordionStateService } from '@app/core/services/area-search-
   selector: 'app-area-search',
   standalone: true,
   imports: [
+    CurrencyPipe,
     DecimalPipe,
     JsonPipe,
     FormsModule,

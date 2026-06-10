@@ -41,10 +41,6 @@
         </button>
       </div>
 
-      @if (actionError()) {
-        <app-alert type="error" class="mx-6 mt-4 block">{{ actionError() }}</app-alert>
-      }
-
       <div class="area-search-layout flex min-h-0 flex-1 [--main-content-height:auto]">
         <aside class="hidden min-h-(--main-content-height,auto) w-64 shrink-0 flex-col border-r border-border bg-surface-elevated/40 md:flex">
           <nav class="flex flex-1 flex-col p-2.5">
@@ -265,6 +261,14 @@
       </div>
 
       <div footer class="flex flex-col gap-3">
+        @if (actionError()) {
+          <app-alert type="error" class="block">{{ actionError() }}</app-alert>
+        }
+
+        @if (actionNotice()) {
+          <app-alert type="success" class="block">{{ actionNotice() }}</app-alert>
+        }
+
         @if (selectedCriteria().length) {
           <app-area-search-criteria-chips
             [chips]="selectedCriteria()"
@@ -277,45 +281,54 @@
           <div class="rounded-md border border-success/30 bg-success/10 px-4 py-3">
             <p class="text-body-sm text-foreground">
               <span class="font-semibold text-success">{{ countFound() | number }}</span>
-              properties found against given search criteria.
-              @if (countResult()?.rec_price != null) {
-                <span class="text-muted"> — estimated price: {{ countResult()?.rec_price }}</span>
-              }
+              properties match your selected search criteria.
             </p>
 
-            <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-              @if (automationSupport()) {
-                <button
-                  type="button"
-                  class="cursor-pointer border-0 bg-transparent p-0 text-body-sm font-medium text-success underline hover:text-success/80"
-                  (click)="openAlmModal()"
-                >
-                  Dynamic Stats
-                </button>
-              }
+            @if (countResult()?.rec_price != null) {
+              <p class="mt-1 text-body-sm text-foreground">
+                Total Price for Records = {{ countResult()?.rec_price | currency: 'USD' : 'symbol' : '1.2-2' }}
+              </p>
+            }
 
-              @if (countResult()?.rec_group_zip) {
-                <button
-                  type="button"
-                  class="cursor-pointer border-0 bg-transparent p-0 text-body-sm font-medium text-success underline hover:text-success/80"
-                  (click)="openGeographyModal()"
-                >
-                  Geography Details
-                </button>
-              }
+            @if (supportDirectGlobalSearch()) {
+              <p class="mt-1 text-body-sm text-foreground">Click 'Pay Now' to continue</p>
+            }
 
-              <div class="flex flex-wrap items-center gap-2">
-                <app-button variant="primary" size="sm" (onClick)="openSaveModal()">Save Search</app-button>
-                <app-button variant="primary" size="sm" (onClick)="openShareModal()">Share Search</app-button>
-
-                @if (supportDirectGlobalSearch()) {
-                  <app-button variant="primary" size="sm" (onClick)="payNow()">Pay Now</app-button>
+            @if (automationSupport() || countResult()?.rec_group_zip) {
+              <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+                @if (automationSupport()) {
+                  <button
+                    type="button"
+                    class="cursor-pointer border-0 bg-transparent p-0 text-body-sm font-medium text-success underline hover:text-success/80"
+                    (click)="openAlmModal()"
+                  >
+                    Dynamic Stats
+                  </button>
                 }
 
-                <app-button variant="success" size="sm" [loading]="recordsSending()" (onClick)="viewRecords()">
-                  Download / View Records
-                </app-button>
+                @if (countResult()?.rec_group_zip) {
+                  <button
+                    type="button"
+                    class="cursor-pointer border-0 bg-transparent p-0 text-body-sm font-medium text-success underline hover:text-success/80"
+                    (click)="openGeographyModal()"
+                  >
+                    Geography Details
+                  </button>
+                }
               </div>
+            }
+
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+              @if (supportDirectGlobalSearch()) {
+                <app-button variant="success" size="sm" (onClick)="payNow()">Pay Now</app-button>
+              }
+
+              <app-button variant="primary" size="sm" (onClick)="openSaveModal()">Save Search</app-button>
+              <app-button variant="primary" size="sm" (onClick)="openShareModal()">Share Search</app-button>
+
+              <app-button variant="success" size="sm" [loading]="recordsSending()" (onClick)="viewRecords()">
+                Download / View Records
+              </app-button>
             </div>
           </div>
         }

@@ -10,7 +10,9 @@ import { mapFieldChoices } from '@app/shared/components/area-search-fields/area-
 import {
   AREA_SEARCH_CONTACT_FIELD_NAME,
   AREA_SEARCH_CRITERIA_ALWAYS_VISIBLE_FIELDS,
-  AREA_SEARCH_CRITERIA_GEOGRAPHIC_ORDER
+  AREA_SEARCH_CRITERIA_GEOGRAPHIC_ORDER,
+  AREA_SEARCH_DATE_MATCH_OPTIONS,
+  AREA_SEARCH_RANGE_MATCH_OPTIONS
 } from '../config/area-search-fields.config';
 import { expandContactInfoValues } from './area-search-contact-note.util';
 import { createEmptyFieldValue, flatCustomFilters, parseFormData } from './area-search-form.util';
@@ -82,6 +84,14 @@ function formatPayloadPrimitive(
   return resolveChoiceLabel(field, String(payloadValue), resolveDynamicLabel, dependencyKey);
 }
 
+function resolveRangeMatchLabel(match: string): string {
+  const option =
+    AREA_SEARCH_DATE_MATCH_OPTIONS.find((entry) => entry.value === match) ??
+    AREA_SEARCH_RANGE_MATCH_OPTIONS.find((entry) => entry.value === match);
+
+  return option?.label ?? match;
+}
+
 function formatPayloadStructured(
   field: AreaSearchFieldMeta,
   payloadValue: unknown,
@@ -114,8 +124,11 @@ function formatPayloadStructured(
     return null;
   }
 
-  const match = structured.match ? `${structured.match} ` : '';
-  return `${match}${String(rawValue)}`.trim();
+  if (structured.match) {
+    return `${resolveRangeMatchLabel(structured.match)}: ${String(rawValue)}`;
+  }
+
+  return String(rawValue);
 }
 
 function formatPayloadValue(

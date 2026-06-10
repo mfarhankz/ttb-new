@@ -23,7 +23,7 @@ import { AreaSearchFieldLabelComponent } from './area-search-field-label.compone
     <div class="flex flex-col gap-0.5">
       <app-area-search-field-label [label]="field.label" />
 
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-2 items-center gap-2">
         <p-select
           size="small"
           [inputId]="field.field_name + '_match'"
@@ -40,41 +40,41 @@ import { AreaSearchFieldLabelComponent } from './area-search-field-label.compone
           <input
             pInputText
             [id]="field.field_name + '_from'"
-            [type]="inputType"
+            [type]="valueInputType"
             [ngModel]="displayFrom()"
             (ngModelChange)="onFromChange($event)"
-            [attr.min]="validationMin"
-            [attr.max]="validationMax"
-            [attr.placeholder]="inputType === 'date' ? 'dd/mm/yyyy' : 'From'"
+            [attr.min]="valueInputMin"
+            [attr.max]="valueInputMax"
+            [attr.placeholder]="rangeValuePlaceholder('from')"
             [class]="controlStyles.input"
           />
         } @else {
           <input
             pInputText
             [id]="field.field_name"
-            [type]="inputType"
+            [type]="valueInputType"
             [ngModel]="displayValue()"
             (ngModelChange)="onValueChange($event)"
-            [attr.min]="validationMin"
-            [attr.max]="validationMax"
-            [attr.placeholder]="inputType === 'date' ? 'dd/mm/yyyy' : null"
+            [attr.min]="valueInputMin"
+            [attr.max]="valueInputMax"
+            [attr.placeholder]="rangeValuePlaceholder('value')"
             [class]="controlStyles.input"
           />
         }
       </div>
 
       @if (isBetween()) {
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-2 items-center gap-2">
           <div class="min-w-0" aria-hidden="true"></div>
           <input
             pInputText
             [id]="field.field_name + '_to'"
-            [type]="inputType"
+            [type]="valueInputType"
             [ngModel]="displayTo()"
             (ngModelChange)="onToChange($event)"
-            [attr.min]="validationMin"
-            [attr.max]="validationMax"
-            [attr.placeholder]="inputType === 'date' ? 'dd/mm/yyyy' : 'To'"
+            [attr.min]="valueInputMin"
+            [attr.max]="valueInputMax"
+            [attr.placeholder]="rangeValuePlaceholder('to')"
             [class]="controlStyles.input"
           />
         </div>
@@ -95,14 +95,30 @@ export class AreaSearchRangeFieldComponent implements OnInit {
   matchOptions: { value: string; label: string }[] = [...AREA_SEARCH_RANGE_MATCH_OPTIONS];
 
   ngOnInit(): void {
-    this.matchOptions =
-      this.field.value_type === 'date'
-        ? [...AREA_SEARCH_DATE_MATCH_OPTIONS]
-        : [...AREA_SEARCH_RANGE_MATCH_OPTIONS];
+    this.matchOptions = this.isDateRangeField
+      ? [...AREA_SEARCH_DATE_MATCH_OPTIONS]
+      : [...AREA_SEARCH_RANGE_MATCH_OPTIONS];
+  }
+
+  get isDateRangeField(): boolean {
+    return (this.field.value_type ?? '').toLowerCase() === 'date';
   }
 
   get inputType(): 'number' | 'date' | 'text' {
     return resolveRangeInputType(this.field);
+  }
+
+  get isLastXMonths(): boolean {
+    return this.value?.match === 'Last_x_Months';
+  }
+
+  /** Last X Months uses a plain number field — no date picker. */
+  get valueInputType(): 'number' | 'date' | 'text' {
+    if (this.isLastXMonths) {
+      return 'number';
+    }
+
+    return this.inputType;
   }
 
   get validationMin(): number | string | null {
@@ -115,8 +131,32 @@ export class AreaSearchRangeFieldComponent implements OnInit {
     return max == null || max === '' ? null : (max as number | string);
   }
 
+  get valueInputMin(): number | string | null {
+    return this.isLastXMonths ? (this.validationMin ?? 1) : this.validationMin;
+  }
+
+  get valueInputMax(): number | string | null {
+    return this.validationMax;
+  }
+
   isBetween(): boolean {
     return this.value?.match === 'Between' || this.value?.match === 'From-To';
+  }
+
+  rangeValuePlaceholder(slot: 'value' | 'from' | 'to'): string | null {
+    if (this.isLastXMonths) {
+      return null;
+    }
+
+    if (this.inputType === 'date') {
+      return 'dd/mm/yyyy';
+    }
+
+    if (this.isBetween()) {
+      return slot === 'from' ? 'From' : 'To';
+    }
+
+    return null;
   }
 
   displayValue(): string {
@@ -125,7 +165,7 @@ export class AreaSearchRangeFieldComponent implements OnInit {
       return '';
     }
 
-    return this.inputType === 'date' ? formatExactMatchDateValue(raw) : String(raw);
+    return this.usesDateFormatting() ? formatExactMatchDateValue(raw) : String(raw);
   }
 
   displayFrom(): string {
@@ -134,7 +174,7 @@ export class AreaSearchRangeFieldComponent implements OnInit {
       return '';
     }
 
-    return this.inputType === 'date' ? formatExactMatchDateValue(raw) : String(raw);
+    return this.usesDateFormatting() ? formatExactMatchDateValue(raw) : String(raw);
   }
 
   displayTo(): string {
@@ -143,7 +183,11 @@ export class AreaSearchRangeFieldComponent implements OnInit {
       return '';
     }
 
-    return this.inputType === 'date' ? formatExactMatchDateValue(raw) : String(raw);
+    return this.usesDateFormatting() ? formatExactMatchDateValue(raw) : String(raw);
+  }
+
+  private usesDateFormatting(): boolean {
+    return this.inputType === 'date' && !this.isLastXMonths;
   }
 
   onMatchChange(match: string): void {
