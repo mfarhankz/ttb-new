@@ -47,6 +47,7 @@ export interface MapObjectRefs {
 
 export interface CreateShapeFeatureOptions {
   onDrawComplete?: (geometry: MapDrawnGeometry, label: string) => void;
+  onGeometryChange?: (geometry: MapDrawnGeometry, label: string) => void;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -214,11 +215,85 @@ export class OlMapService {
       refs.showRadiusBtn = shape === 'circle';
 
       options.onDrawComplete?.(geometry, label);
+      this.activateShapeEditing(refs, shape, options);
       this.fitMapToShapes(refs);
     });
 
     refs.map.addInteraction(draw);
     (refs as any).drawInteraction = draw;
+
+    if (shape === 'polygon') {
+      const snap = new ol.interaction.Snap({ source });
+      refs.map.addInteraction(snap);
+      (refs as any).snapInteraction = snap;
+    }
+  }
+
+  /** Enable drag-to-move and edit handles after a shape is drawn (legacy parity). */
+  activateShapeEditing(
+    refs: MapObjectRefs,
+    shape: 'circle' | 'polygon',
+    options: CreateShapeFeatureOptions = {}
+  ): void {
+    if (!refs.map || !refs.shapesLayer) {
+      return;
+    }
+
+    this.removeShapeEditInteractions(refs);
+
+    const source = refs.shapesLayer.getSource();
+    const featureId = shape === 'circle' ? 'circle' : 'polygon';
+
+    const syncGeometryFromMap = (): void => {
+      const feature = source
+        .getFeatures()
+        .find((f: any) => f.getId() === featureId);
+      if (!feature) {
+        return;
+      }
+
+      const geometry = this.serializeDrawnFeature(feature, shape);
+      if (!geometry) {
+        return;
+      }
+
+      const label =
+        shape === 'circle'
+          ? `Selected Radius : ${geometry.value.radius} miles`
+          : 'Selected Boundary';
+
+      refs.geometry = geometry;
+      refs.shapeAlertMessage = label;
+      refs.topPolygonLength = shape === 'circle' ? label : '';
+      options.onGeometryChange?.(geometry, label);
+    };
+
+    const translate = new ol.interaction.Translate({
+      layers: [refs.shapesLayer]
+    });
+    translate.on('translateend', syncGeometryFromMap);
+    refs.map.addInteraction(translate);
+    (refs as any).translateInteraction = translate;
+    translate.setActive(true);
+
+    const modify = new ol.interaction.Modify({
+      source,
+      deleteCondition: ol.events.condition.never,
+      insertVertexCondition: ol.events.condition.never
+    });
+    modify.on('modifyend', syncGeometryFromMap);
+    refs.map.addInteraction(modify);
+    (refs as any).modifyInteraction = modify;
+  }
+
+  removeShapeEditInteractions(refs: MapObjectRefs): void {
+    for (const key of ['translateInteraction', 'modifyInteraction', 'snapInteraction']) {
+      const interaction = (refs as any)[key];
+      if (interaction && refs.map) {
+        refs.map.removeInteraction(interaction);
+        (refs as any)[key] = null;
+      }
+    }
   }
 
   removeDrawInteraction(refs: MapObjectRefs): void {
@@ -227,6 +302,7 @@ export class OlMapService {
       refs.map.removeInteraction(prevDraw);
       (refs as any).drawInteraction = null;
     }
+    this.removeShapeEditInteractions(refs);
   }
 
   centerMapOnCoordinates(refs: MapObjectRefs, lon: number, lat: number, zoom = 14): void {
@@ -418,7 +494,11 @@ export class OlMapService {
 
   /** Clear user-drawn / preview shapes without resetting map center. */
   clearShapesLayer(refs: MapObjectRefs): void {
+    this.removeShapeEditInteractions(refs);
     refs.shapesLayer?.getSource()?.clear();
+    refs.geometry = undefined;
+    refs.shapeAlertMessage = false;
+    refs.topPolygonLength = '';
   }
 
   /** Draw legacy farm/search geometry objects on the shapes layer. */

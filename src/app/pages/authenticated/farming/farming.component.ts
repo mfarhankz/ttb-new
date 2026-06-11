@@ -223,6 +223,7 @@ export class FarmingComponent implements OnInit, OnDestroy {
     this.mapObject.shapeAlertMessage = false;
     this.mapObject.topPolygonLength = '';
     this.mapObject.showSearchBox = true;
+    this.olMapService.removeShapeEditInteractions(this.mapObject);
     this.olMapService.clearShapesLayer(this.mapObject);
     this.addressResetToken.update((token) => token + 1);
     this.activateMapMode(mode);
@@ -316,12 +317,17 @@ export class FarmingComponent implements OnInit, OnDestroy {
     this.mapObject.showDragBtn = false;
 
     const shape = mode === 'radius' ? 'circle' : 'polygon';
-    this.olMapService.createShapeFeature(this.mapObject, shape, {
-      onDrawComplete: (_geometry, label) => {
+    const shapeCallbacks = {
+      onDrawComplete: (_geometry: unknown, label: string) => {
         this.showSearchPanel.set(false);
         this.showShapeActions.set(true);
         this.shapeSummary.set(label);
+      },
+      onGeometryChange: (_geometry: unknown, label: string) => {
+        this.shapeSummary.set(label);
       }
-    });
+    };
+
+    this.olMapService.createShapeFeature(this.mapObject, shape, shapeCallbacks);
   }
 }
