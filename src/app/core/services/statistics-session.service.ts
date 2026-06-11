@@ -44,6 +44,10 @@ export class StatisticsSessionService {
     return this.sessions.get(sessionId);
   }
 
+  clearSession(sessionId: string): void {
+    this.sessions.delete(sessionId);
+  }
+
   updateSession(sessionId: string, updates: Partial<Pick<StatisticsSession, 'rows'>>): void {
     const session = this.sessions.get(sessionId);
     if (!session) {

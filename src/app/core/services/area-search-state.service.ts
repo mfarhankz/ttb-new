@@ -61,4 +61,12 @@ export class AreaSearchStateService {
     this._queryId.set(queryId);
     this._queryName.set(queryName);
   }
+
+  resetHandoffState(): void {
+    this._pendingGeometry.set(null);
+    this._editCriteria.set(null);
+    this._runGetCountOnEntry.set(false);
+    this._queryId.set(null);
+    this._queryName.set(null);
+  }
 }

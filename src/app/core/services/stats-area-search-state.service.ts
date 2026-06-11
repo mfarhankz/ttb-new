@@ -66,4 +66,12 @@ export class StatsAreaSearchStateService {
     this._editGroupType.set(null);
     return groupType;
   }
+
+  reset(): void {
+    this._pendingGeometry.set(null);
+    this._runDirectSubmitOnEntry.set(false);
+    this._returnUrl.set(null);
+    this._editPayload.set(null);
+    this._editGroupType.set(null);
+  }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, finalize } from 'rxjs';
@@ -14,6 +14,8 @@ import { AreaSearchStateService } from '@app/core/services/area-search-state.ser
 import { StatsAreaSearchStateService } from '@app/core/services/stats-area-search-state.service';
 import { PropertySearchService } from '@app/core/services/property-search.service';
 import { VerticalService } from '@app/core/services/vertical.service';
+import { ClearSearchService } from '@app/core/services/clear-search.service';
+import { ClearSearchStateService } from '@app/core/services/clear-search-state.service';
 import { SmartyAddressDetails } from '@app/core/interfaces/smarty.interface';
 import { CountyFipsOption, ParcelSearchPayload } from '@app/core/interfaces/property-search.interface';
 
@@ -36,6 +38,8 @@ export class FarmingComponent implements OnInit, OnDestroy {
   private readonly statsAreaSearchStateService = inject(StatsAreaSearchStateService);
   private readonly propertySearchService = inject(PropertySearchService);
   private readonly verticalService = inject(VerticalService);
+  private readonly clearSearchService = inject(ClearSearchService);
+  private readonly clearSearchState = inject(ClearSearchStateService);
   private sidebarResizeSub?: Subscription;
   private mapReadyAttempts = 0;
   private parcelCountyDebounce?: ReturnType<typeof setTimeout>;
@@ -62,7 +66,17 @@ export class FarmingComponent implements OnInit, OnDestroy {
 
   readonly smartyVerificationEnabled = this.verticalService.smartyVerificationEnabled;
 
+  constructor() {
+    effect(() => {
+      this.clearSearchState.setMapShapeActive(
+        this.showShapeActions(),
+        this.showShapeActions() ? this.searchContext() : null
+      );
+    });
+  }
+
   ngOnInit(): void {
+    this.clearSearchService.registerMapHandler(() => this.onCancelSearch());
     this.sidebarResizeSub = this.layoutService.onSidebarResize.subscribe(() => {
       setTimeout(() => this.mapObject.map?.updateSize?.(), 220);
     });
@@ -80,6 +94,8 @@ export class FarmingComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearSearchService.unregisterMapHandler();
+    this.clearSearchState.setMapShapeActive(false);
     this.sidebarResizeSub?.unsubscribe();
     if (this.parcelCountyDebounce) {
       clearTimeout(this.parcelCountyDebounce);

@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  OnInit,
+  computed,
+  effect,
+  inject,
+  signal
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { InputText } from 'primeng/inputtext';
@@ -27,6 +36,7 @@ import {
 } from '@app/core/utils/stats-area-search-form.util';
 import { AlertComponent, ButtonComponent, CardComponent } from '@app/shared/components';
 import { AreaSearchControlStyles } from '@app/shared/components/area-search-fields/area-search-control.styles';
+import { ClearSearchStateService } from '@app/core/services/clear-search-state.service';
 
 @Component({
   selector: 'app-stats-area-search',
@@ -43,7 +53,7 @@ import { AreaSearchControlStyles } from '@app/shared/components/area-search-fiel
   templateUrl: './stats-area-search.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StatsAreaSearchComponent implements OnInit {
+export class StatsAreaSearchComponent implements OnInit, OnDestroy {
   protected readonly controlStyles = AreaSearchControlStyles;
   private static readonly EMPTY_SELECTION: string[] = [];
 
@@ -54,6 +64,7 @@ export class StatsAreaSearchComponent implements OnInit {
   private readonly statisticsSessionService = inject(StatisticsSessionService);
   private readonly areaChoicesService = inject(AreaChoicesService);
   private readonly authService = inject(AuthService);
+  private readonly clearSearchState = inject(ClearSearchStateService);
 
   readonly rangeFields = STATS_RANGE_FIELDS;
   readonly propertyTypeOptions = STATS_PROPERTY_TYPE_OPTIONS.map((option) => ({
@@ -115,6 +126,28 @@ export class StatsAreaSearchComponent implements OnInit {
 
   private directSubmitScheduled = false;
 
+  constructor() {
+    effect(() => {
+      if (this.initializing()) {
+        this.clearSearchState.setStatsAreaSearchActive(false);
+        return;
+      }
+
+      const form = this.formData();
+      const hasRangeCriteria = STATS_RANGE_FIELDS.some((field) => {
+        const range = form[field.name];
+        return range?.from != null || range?.to != null;
+      });
+      const active =
+        this.isGeometryAvailable() ||
+        !!form.mm_fips_muni_code ||
+        !!(form.sa_site_city_value?.length || form.sa_site_zip_value?.length) ||
+        hasRangeCriteria;
+
+      this.clearSearchState.setStatsAreaSearchActive(active);
+    });
+  }
+
   ngOnInit(): void {
     const queryReturnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
     const stateReturnUrl = this.stateService.consumeReturnUrl();
@@ -126,6 +159,10 @@ export class StatsAreaSearchComponent implements OnInit {
     }
 
     void this.initializeForm();
+  }
+
+  ngOnDestroy(): void {
+    this.clearSearchState.setStatsAreaSearchActive(false);
   }
 
   rangeValue(fieldName: (typeof STATS_RANGE_FIELDS)[number]['name']): StatsRangeFieldValue {

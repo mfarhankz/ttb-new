@@ -178,6 +178,28 @@
           </div>
         }
       </div>
+
+      @if (shouldShowClearSearchAfter(item)) {
+        <div class="relative mb-1 group">
+          <button
+            type="button"
+            class="flex items-center gap-3 w-full h-10 px-3 rounded-xl text-sm font-semibold text-sidebar-foreground border-0 bg-transparent cursor-pointer text-left transition-colors hover:bg-sidebar-hover"
+            [class.justify-center]="isCollapsed"
+            [class.px-2]="isCollapsed"
+            (click)="onClearSearch()"
+          >
+            <i class="pi pi-times-circle text-lg shrink-0"></i>
+            <span class="truncate flex-1" [class.hidden]="isCollapsed">Clear Search</span>
+          </button>
+          @if (isCollapsed) {
+            <span
+              class="hidden group-hover:block absolute left-[calc(100%+0.5rem)] top-1/2 -translate-y-1/2 bg-surface text-foreground border border-border px-3 py-1.5 rounded-lg text-caption whitespace-nowrap z-tooltip pointer-events-none shadow-md"
+            >
+              Clear Search
+            </span>
+          }
+        </div>
+      }
     }
 
     <div class="text-overline uppercase text-sidebar-muted px-2 pt-4 pb-2" [class.hidden]="isCollapsed">

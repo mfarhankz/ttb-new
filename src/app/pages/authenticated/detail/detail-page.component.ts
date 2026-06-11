@@ -62,6 +62,9 @@ import { MapTableSyncService } from '@app/core/services/map-table-sync.service';
 import { OlMapService, type MapObjectRefs } from '@app/core/services/ol-map.service';
 import { StatsAreaSearchStateService } from '@app/core/services/stats-area-search-state.service';
 import { StatisticsSessionService } from '@app/core/services/statistics-session.service';
+import { ClearSearchService } from '@app/core/services/clear-search.service';
+import { ClearSearchStateService } from '@app/core/services/clear-search-state.service';
+import type { DetailSource } from '@app/core/services/clear-search-state.service';
 import { downloadCsv } from '@app/core/utils/csv-download.util';
 
 const DETAIL_ACTIONS_COLUMN: DataTableColumn = {
@@ -139,6 +142,8 @@ export class DetailPageComponent implements OnInit, OnDestroy {
   private readonly layoutService = inject(LayoutService);
   private readonly statisticsSessionService = inject(StatisticsSessionService);
   private readonly statsAreaSearchStateService = inject(StatsAreaSearchStateService);
+  private readonly clearSearchService = inject(ClearSearchService);
+  private readonly clearSearchState = inject(ClearSearchStateService);
 
   readonly rows = this.detailPageService.rows;
   readonly loading = this.detailPageService.loading;
@@ -266,6 +271,22 @@ export class DetailPageComponent implements OnInit, OnDestroy {
         this.renderMapWhenReady(geometry, rows);
       });
     });
+
+    effect(() => {
+      const source = this.detailPageService.source();
+      const rows = this.detailPageService.rows();
+      const sessionId = this.detailPageService.sourceId();
+      const detailSource: DetailSource | null =
+        source === 'query' ? 'query' : source === 'statistics' ? 'statistics' : null;
+      const active = !!detailSource && rows.length > 0;
+
+      this.clearSearchState.setDetailResultsActive(
+        active,
+        detailSource,
+        sessionId || null,
+        rows.length > 0
+      );
+    });
   }
 
   ngOnInit(): void {
@@ -284,6 +305,7 @@ export class DetailPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearSearchState.setDetailResultsActive(false);
     this.detailPageService.destroy();
     if (this.autoCollapsedNavForSplit) {
       this.layoutService.requestSidebarCollapse(false);
@@ -726,13 +748,9 @@ export class DetailPageComponent implements OnInit, OnDestroy {
     this.queryActionLoading.set(true);
     this.actionError.set(null);
 
-    this.areaSearchService.clearGlobalSearch().subscribe({
+    this.clearSearchService.clearQueryDetail(sessionId || null).subscribe({
       next: () => {
         this.queryActionLoading.set(false);
-        if (sessionId) {
-          this.areaSearchSessionService.clearSession(sessionId);
-        }
-        void this.router.navigate(['/farming/area-search']);
       },
       error: (err: Error) => {
         this.queryActionLoading.set(false);

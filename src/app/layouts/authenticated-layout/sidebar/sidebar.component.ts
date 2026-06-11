@@ -7,6 +7,8 @@ import { PropertySearchModalService } from '@app/core/services/property-search-m
 import { ThemeModalService } from '@app/core/services/theme-modal.service';
 import { LayoutService } from '@app/core/services/layout.service';
 import { VerticalService } from '@app/core/services/vertical.service';
+import { ClearSearchService } from '@app/core/services/clear-search.service';
+import { ClearSearchStateService } from '@app/core/services/clear-search-state.service';
 import {
   MAIN_NAV,
   SETTINGS_NAV,
@@ -30,6 +32,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private layoutService = inject(LayoutService);
   private verticalService = inject(VerticalService);
   private router = inject(Router);
+  readonly clearSearchState = inject(ClearSearchStateService);
+  private clearSearchService = inject(ClearSearchService);
   private routerSub?: Subscription;
   private flyoutHideTimer?: ReturnType<typeof setTimeout>;
 
@@ -62,6 +66,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
     })
   );
   settingsNav = SETTINGS_NAV;
+
+  readonly statisticsHidden = computed(
+    () => this.verticalService.content()?.custom_content?.user_home?.statistics_hide === true
+  );
 
   tbUser = this.authService.tbUser;
   name = computed(() => this.authService.getUserName() || 'User');
@@ -203,6 +211,22 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (child.action) {
       this.onNavAction(child);
     }
+  }
+
+  shouldShowClearSearchAfter(item: NavItem): boolean {
+    if (!this.clearSearchState.showClearSearch()) {
+      return false;
+    }
+
+    if (item.label === 'Statistics') {
+      return true;
+    }
+
+    return item.label === 'Farming' && this.statisticsHidden();
+  }
+
+  onClearSearch(): void {
+    this.clearSearchService.clearSearch();
   }
 
   private setCollapsed(collapsed: boolean, persist = true): void {
