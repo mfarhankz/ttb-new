@@ -69,7 +69,8 @@ export const API_CONFIG = {
     almSaveConfig: '/alm_save_config.json',
     updateResult: '/update_result.json',
     clearGlobalSearch: '/clear_global_search.json',
-    contactLookup: '/contact_lookup.json'
+    contactLookup: '/contact_lookup.json',
+    tractStats: '/tract_stats.json'
   }
 } as const;
 

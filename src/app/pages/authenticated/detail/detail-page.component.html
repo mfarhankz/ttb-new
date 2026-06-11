@@ -80,6 +80,26 @@
         </button>
       }
 
+      @if (isStatisticsDetail()) {
+        <button
+          type="button"
+          [class]="toolbarBtnPrimaryClass"
+          [disabled]="toolbarDisabled() || !rows().length"
+          (click)="exportStatisticsCsv()"
+        >
+          Export
+        </button>
+
+        <button
+          type="button"
+          [class]="toolbarBtnPrimaryClass"
+          [disabled]="toolbarDisabled()"
+          (click)="editStatisticsSearch()"
+        >
+          Edit Search
+        </button>
+      }
+
       <button
         type="button"
         [class]="toolbarBtnClass"
@@ -195,7 +215,7 @@
               inputId="detail-page-search-field"
               size="small"
               class="w-full shrink-0 sm:min-w-64 sm:w-auto"
-              [options]="searchFieldOptions"
+              [options]="searchFieldOptions()"
               optionLabel="label"
               optionValue="value"
               placeholder="Filter by"
@@ -244,6 +264,29 @@
               Include Selected
             </app-button>
           </div>
+        } @else if (isStatisticsDetail()) {
+          <div class="flex shrink-0 flex-wrap items-center justify-end gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2">
+            <span class="mr-auto text-body-sm text-foreground">
+              @if (hasSelection()) {
+                <span class="font-medium">{{ selectedCount() }}</span>
+                {{ selectedCount() === 1 ? 'tract' : 'tracts' }} selected
+              } @else {
+                Select tracts to exclude from results
+              }
+            </span>
+            <app-button variant="outline" size="sm" (onClick)="exitSelectionMode()">
+              Cancel
+            </app-button>
+            <app-button
+              variant="danger"
+              size="sm"
+              icon="pi pi-trash"
+              [disabled]="!hasSelection() || deleting()"
+              (onClick)="openDeleteConfirm()"
+            >
+              Exclude selected
+            </app-button>
+          </div>
         } @else {
           <div class="flex shrink-0 flex-wrap items-center justify-end gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2">
             <span class="mr-auto text-body-sm text-foreground">
@@ -279,7 +322,7 @@
         [selectionColumnAfterActions]="true"
         [actionsHeaderLabel]="selectionMode() || !supportsBulkSelection() ? null : 'Select'"
         [actionsHeaderDisabled]="loading() || !rows().length"
-        [showSecondaryRowAction]="true"
+        [showSecondaryRowAction]="!isStatisticsDetail()"
         secondaryRowActionIcon="pi pi-file-o"
         secondaryRowActionLabel="Property notes"
         [selectedRowIds]="selectedPropertyIds()"
@@ -308,7 +351,13 @@
   (onClose)="closeDeleteConfirm()"
 >
   <p class="text-body-sm text-foreground">
-    @if (selectedCount() === 1) {
+    @if (isStatisticsDetail()) {
+      @if (selectedCount() === 1) {
+        Are you sure you want to exclude this tract from the results?
+      } @else {
+        Are you sure you want to exclude these tracts from the results?
+      }
+    } @else if (selectedCount() === 1) {
       Are you sure you want to exclude this property from the farm?
     } @else {
       Are you sure you want to exclude these properties from the farm?

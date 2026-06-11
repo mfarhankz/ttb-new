@@ -1,0 +1,222 @@
+<div class="flex min-h-screen flex-col bg-background p-4 md:p-6 lg:p-8">
+  <app-card
+    [title]="pageTitle()"
+    subtitle="Search for tracts using Advanced Search."
+    [padding]="'lg'"
+    [footer]="!initializing()"
+    class="mx-auto w-full max-w-360"
+  >
+    @if (statusMessage()) {
+      <app-alert class="mb-4 block" [type]="statusType() === 'error' ? 'error' : 'success'">
+        {{ statusMessage() }}
+      </app-alert>
+    }
+
+    @if (initializing()) {
+      <p class="text-body-sm text-muted">Loading search filters…</p>
+    } @else {
+      <div class="grid gap-6 md:grid-cols-2">
+        <div class="space-y-4">
+          <div class="flex flex-col gap-0.5">
+            <label [class]="controlStyles.fieldLabel" for="stats-state">State</label>
+            <p-select
+              size="small"
+              inputId="stats-state"
+              name="stats-state"
+              [options]="stateOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select state"
+              [disabled]="initializing() || submitting()"
+              [ngModel]="formData().mm_fips_state_code"
+              [ngModelOptions]="{ standalone: true }"
+              [panelStyleClass]="controlStyles.selectPanel"
+              [class]="controlStyles.select"
+              (ngModelChange)="onStateChange($event)"
+            />
+          </div>
+
+          <div class="flex flex-col gap-0.5">
+            <label [class]="controlStyles.fieldLabel" for="stats-county">County</label>
+            <p-select
+              size="small"
+              inputId="stats-county"
+              name="stats-county"
+              [options]="countyOptions()"
+              optionLabel="value"
+              optionValue="key"
+              placeholder="Select county"
+              [disabled]="
+                isGeometryAvailable() ||
+                initializing() ||
+                submitting() ||
+                !formData().mm_fips_state_code ||
+                loadingCounties()
+              "
+              [ngModel]="formData().mm_fips_muni_code"
+              [ngModelOptions]="{ standalone: true }"
+              [panelStyleClass]="controlStyles.selectPanel"
+              [class]="controlStyles.select"
+              (ngModelChange)="onCountyChange($event)"
+              [title]="isGeometryAvailable() ? geometryDisabledTooltip : ''"
+            />
+          </div>
+
+          <div class="flex flex-col gap-0.5">
+            <span [class]="controlStyles.fieldLabel">City / Zip Code</span>
+            <div class="mb-1 flex gap-4 text-body-sm text-foreground">
+              <label class="inline-flex cursor-pointer items-center gap-2">
+                <input
+                  type="radio"
+                  name="stats-group-type"
+                  value="sa_site_city"
+                  [disabled]="isGeometryAvailable() || initializing() || submitting()"
+                  [ngModel]="groupType()"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="onGroupTypeChange('sa_site_city')"
+                />
+                City
+              </label>
+              <label class="inline-flex cursor-pointer items-center gap-2">
+                <input
+                  type="radio"
+                  name="stats-group-type"
+                  value="sa_site_zip"
+                  [disabled]="isGeometryAvailable() || initializing() || submitting()"
+                  [ngModel]="groupType()"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="onGroupTypeChange('sa_site_zip')"
+                />
+                Zip Code
+              </label>
+            </div>
+            <p-multiSelect
+              size="small"
+              name="stats-group-values"
+              [options]="groupChoices()"
+              optionLabel="value"
+              optionValue="key"
+              placeholder="Select"
+              [showToggleAll]="false"
+              [showHeader]="false"
+              [filter]="false"
+              [disabled]="
+                isGeometryAvailable() ||
+                initializing() ||
+                submitting() ||
+                !formData().mm_fips_state_code ||
+                !formData().mm_fips_muni_code ||
+                loadingGroupChoices()
+              "
+              [ngModel]="selectedGroupValues()"
+              [ngModelOptions]="{ standalone: true }"
+              [panelStyleClass]="controlStyles.multiSelectPanel"
+              [class]="controlStyles.multiSelect"
+              (ngModelChange)="onGroupValuesChange($event)"
+              [title]="isGeometryAvailable() ? geometryDisabledTooltip : ''"
+            />
+          </div>
+
+          <div class="flex flex-col gap-0.5">
+            <label [class]="controlStyles.fieldLabel" for="stats-property-type">Property Type</label>
+            <p-multiSelect
+              inputId="stats-property-type"
+              name="stats-property-type"
+              [options]="propertyTypeOptions"
+              optionLabel="value"
+              optionValue="key"
+              placeholder="Select property types"
+              scrollHeight="250px"
+              display="chip"
+              [showToggleAll]="false"
+              [showHeader]="false"
+              [filter]="false"
+              [highlightOnSelect]="true"
+              [maxSelectedLabels]="100"
+              [chipIcon]="controlStyles.chipRemoveIcon"
+              [disabled]="initializing() || submitting()"
+              [ngModel]="selectedPropertyTypes()"
+              [ngModelOptions]="{ standalone: true }"
+              [panelStyleClass]="controlStyles.treeMultiSelectPanel"
+              [class]="controlStyles.treeMultiSelect"
+              (ngModelChange)="onPropertyTypesChange($event)"
+            />
+          </div>
+
+          <div class="flex flex-col gap-0.5">
+            <label [class]="controlStyles.fieldLabel" for="stats-tract-type">Area Type</label>
+            <p-select
+              size="small"
+              inputId="stats-tract-type"
+              name="stats-tract-type"
+              [options]="tractTypeOptions()"
+              optionLabel="title"
+              optionValue="value"
+              placeholder="Select area type"
+              [disabled]="initializing() || submitting()"
+              [ngModel]="formData().tract_type"
+              [ngModelOptions]="{ standalone: true }"
+              [panelStyleClass]="controlStyles.selectPanel"
+              [class]="controlStyles.select"
+              (ngModelChange)="updateFormField('tract_type', $event)"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          @for (field of rangeFields; track field.name) {
+            <div class="grid grid-cols-2 gap-3">
+              <div class="flex flex-col gap-0.5">
+                <label [class]="controlStyles.fieldLabel" [attr.for]="field.name + '-from'">
+                  {{ field.label }} (min)
+                </label>
+                <input
+                  pInputText
+                  type="number"
+                  [id]="field.name + '-from'"
+                  [name]="field.name + '-from'"
+                  [disabled]="initializing() || submitting()"
+                  [ngModel]="rangeValue(field.name).from"
+                  [ngModelOptions]="{ standalone: true }"
+                  [class]="controlStyles.input"
+                  (ngModelChange)="updateRangeField(field.name, 'from', $event)"
+                />
+              </div>
+              <div class="flex flex-col gap-0.5">
+                <label [class]="controlStyles.fieldLabel" [attr.for]="field.name + '-to'">
+                  {{ field.label }} (max)
+                </label>
+                <input
+                  pInputText
+                  type="number"
+                  [id]="field.name + '-to'"
+                  [name]="field.name + '-to'"
+                  [disabled]="initializing() || submitting()"
+                  [ngModel]="rangeValue(field.name).to"
+                  [ngModelOptions]="{ standalone: true }"
+                  [class]="controlStyles.input"
+                  (ngModelChange)="updateRangeField(field.name, 'to', $event)"
+                />
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <div footer class="flex flex-wrap items-center justify-between gap-3">
+      <app-button type="button" variant="danger" size="sm" [disabled]="submitting()" (onClick)="resetForm()">
+        Clear Fields
+      </app-button>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <app-button type="button" variant="danger" size="sm" [disabled]="submitting()" (onClick)="onCancel()">
+          Cancel
+        </app-button>
+        <app-button type="button" variant="success" size="sm" [loading]="submitting()" (onClick)="submitForm()">
+          Search
+        </app-button>
+      </div>
+    </div>
+  </app-card>
+</div>

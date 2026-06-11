@@ -46,6 +46,9 @@ import {
   DETAIL_PAGE_EMPTY_COPY,
   DETAIL_PAGE_SIZE_OPTIONS,
   DETAIL_SEARCH_FIELD_OPTIONS,
+  STATISTICS_DETAIL_COLUMNS,
+  STATISTICS_DETAIL_EMPTY_COPY,
+  STATISTICS_SEARCH_FIELD_OPTIONS,
   isSellRefiScoresPending,
   shouldHideSellRefiScoresMenuAction
 } from '@app/core/config/detail-page.config';
@@ -57,6 +60,9 @@ import { DetailPageService } from '@app/core/services/detail-page.service';
 import { LayoutService } from '@app/core/services/layout.service';
 import { MapTableSyncService } from '@app/core/services/map-table-sync.service';
 import { OlMapService, type MapObjectRefs } from '@app/core/services/ol-map.service';
+import { StatsAreaSearchStateService } from '@app/core/services/stats-area-search-state.service';
+import { StatisticsSessionService } from '@app/core/services/statistics-session.service';
+import { downloadCsv } from '@app/core/utils/csv-download.util';
 
 const DETAIL_ACTIONS_COLUMN: DataTableColumn = {
   key: 'actions',
@@ -131,6 +137,8 @@ export class DetailPageComponent implements OnInit, OnDestroy {
   private readonly mapTableSync = inject(MapTableSyncService);
   private readonly olMapService = inject(OlMapService);
   private readonly layoutService = inject(LayoutService);
+  private readonly statisticsSessionService = inject(StatisticsSessionService);
+  private readonly statsAreaSearchStateService = inject(StatsAreaSearchStateService);
 
   readonly rows = this.detailPageService.rows;
   readonly loading = this.detailPageService.loading;
@@ -145,10 +153,13 @@ export class DetailPageComponent implements OnInit, OnDestroy {
   readonly supportsBulkSelection = computed(() => !!this.bulkSelectionMode());
   readonly searchText = this.detailPageService.searchText;
   readonly searchField = this.detailPageService.searchField;
-  readonly searchFieldOptions = DETAIL_SEARCH_FIELD_OPTIONS;
+  readonly searchFieldOptions = computed(() =>
+    this.isStatisticsDetail() ? STATISTICS_SEARCH_FIELD_OPTIONS : DETAIL_SEARCH_FIELD_OPTIONS
+  );
 
   readonly isFarmDetail = computed(() => this.detailPageService.source() === 'farm');
   readonly isQueryDetail = computed(() => this.detailPageService.source() === 'query');
+  readonly isStatisticsDetail = computed(() => this.detailPageService.source() === 'statistics');
   readonly toolbarDisabled = computed(() => this.loading() || this.selectionMode());
   readonly exportMenuItems = computed(() =>
     buildDetailExportMenuItems((actionId) => this.onExportAction(actionId))
@@ -185,12 +196,13 @@ export class DetailPageComponent implements OnInit, OnDestroy {
     return this.detailPageService.hasActiveClientFilters();
   });
 
-  readonly emptyTitle = computed(() => DETAIL_PAGE_EMPTY_COPY.title);
-  readonly emptyDescription = computed(() =>
-    this.hasActiveFilters()
-      ? DETAIL_PAGE_EMPTY_COPY.filteredDescription
-      : DETAIL_PAGE_EMPTY_COPY.description
+  readonly emptyTitle = computed(() =>
+    this.isStatisticsDetail() ? STATISTICS_DETAIL_EMPTY_COPY.title : DETAIL_PAGE_EMPTY_COPY.title
   );
+  readonly emptyDescription = computed(() => {
+    const copy = this.isStatisticsDetail() ? STATISTICS_DETAIL_EMPTY_COPY : DETAIL_PAGE_EMPTY_COPY;
+    return this.hasActiveFilters() ? copy.filteredDescription : copy.description;
+  });
 
   readonly pipelineConfig = {
     defaultViewMode: 'both' as const,
@@ -214,9 +226,13 @@ export class DetailPageComponent implements OnInit, OnDestroy {
 
   readonly selectedCount = computed(() => this.selectedPropertyIds().size);
   readonly hasSelection = computed(() => this.selectedCount() > 0);
-  readonly deleteConfirmTitle = computed(() =>
-    this.selectedCount() === 1 ? 'Exclude property?' : `Exclude ${this.selectedCount()} properties?`
-  );
+  readonly deleteConfirmTitle = computed(() => {
+    if (this.isStatisticsDetail()) {
+      return this.selectedCount() === 1 ? 'Exclude tract?' : `Exclude ${this.selectedCount()} tracts?`;
+    }
+
+    return this.selectedCount() === 1 ? 'Exclude property?' : `Exclude ${this.selectedCount()} properties?`;
+  });
 
   mapObject: MapObjectRefs = {
     hovers: { hoverOnFarm: false }
@@ -402,10 +418,15 @@ export class DetailPageComponent implements OnInit, OnDestroy {
         this.deleting.set(false);
         this.closeDeleteConfirm();
         this.exitSelectionMode();
+        this.showActionNotice(
+          this.isStatisticsDetail()
+            ? 'Selected tracts excluded from results.'
+            : 'Selected properties excluded from results.'
+        );
       },
       error: (err: Error) => {
         this.deleting.set(false);
-        this.deleteError.set(err.message ?? 'Failed to exclude selected properties.');
+        this.deleteError.set(err.message ?? 'Failed to exclude selected records.');
       }
     });
   }
@@ -475,6 +496,48 @@ export class DetailPageComponent implements OnInit, OnDestroy {
 
   onExportAction(_actionId: DetailExportActionId): void {
     this.showActionNotice('This export option will be available in a future update.');
+  }
+
+  exportStatisticsCsv(): void {
+    const rows = this.detailPageService.allRows();
+    if (!rows.length) {
+      this.showActionNotice('No records to export.');
+      return;
+    }
+
+    const headers = STATISTICS_DETAIL_COLUMNS.map((column) => column.label);
+    const dataRows = rows.map((row) =>
+      STATISTICS_DETAIL_COLUMNS.map((column) => String(row[column.key] ?? ''))
+    );
+    const date = new Date().toISOString().slice(0, 10);
+
+    downloadCsv(`statistics-${date}.csv`, headers, dataRows);
+  }
+
+  editStatisticsSearch(): void {
+    const sessionId = this.detailPageService.sourceId();
+    if (!sessionId) {
+      return;
+    }
+
+    const session = this.statisticsSessionService.getSession(sessionId);
+    if (!session) {
+      this.actionError.set('Statistics session expired. Please run Statistics Area Search again.');
+      return;
+    }
+
+    const returnUrl =
+      this.route.snapshot.queryParamMap.get('returnUrl') ?? session.returnUrl ?? '/statistics/radius-search';
+    const groupType = session.info.groupType === 'sa_site_zip' ? 'sa_site_zip' : 'sa_site_city';
+
+    this.statsAreaSearchStateService.setEditCriteria(session.payload, groupType, {
+      geometry: session.geometry ?? session.info.geometry,
+      returnUrl
+    });
+
+    void this.router.navigate(['/statistics/area-search'], {
+      queryParams: { edit: 'true', returnUrl }
+    });
   }
 
   onQueryOverflowAction(actionId: QueryOverflowActionId): void {

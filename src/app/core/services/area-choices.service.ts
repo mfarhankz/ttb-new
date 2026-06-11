@@ -30,6 +30,20 @@ export class AreaChoicesService {
     );
   }
 
+  fetchCitiesByFips(stateFips: string, countyFips: string): Observable<CountyChoice[]> {
+    const endpoint = `/get_cities/${stateFips}${countyFips}.json`;
+    return this.apiService
+      .getParsedJson<unknown>(endpoint)
+      .pipe(map((response) => this.parseCountyChoices(response)));
+  }
+
+  fetchZipCodesByFips(stateFips: string, countyFips: string): Observable<CountyChoice[]> {
+    const endpoint = `/get_zipcodes/${stateFips}${countyFips}.json`;
+    return this.apiService
+      .getParsedJson<unknown>(endpoint)
+      .pipe(map((response) => this.parseCountyChoices(response)));
+  }
+
   /** Legacy GET webservices/get_counties/{stateFips}.json */
   fetchCountiesByFips(stateFips: string): Observable<CountyChoice[]> {
     const endpoint = `${API_CONFIG.endpoints.getCounties}/${stateFips}.json`;

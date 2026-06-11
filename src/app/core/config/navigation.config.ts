@@ -22,7 +22,15 @@ export const MAIN_NAV: NavItem[] = [
       { label: 'Saved Net Sheets', icon: 'pi pi-file-edit', route: '/farming/saved-net-sheets' }
     ]
   },
-  { label: 'Statistics', icon: 'pi pi-chart-bar', route: '/statistics' },
+  {
+    label: 'Statistics',
+    icon: 'pi pi-chart-bar',
+    children: [
+      { label: 'Radius search', icon: 'pi pi-circle', route: '/statistics/radius-search' },
+      { label: 'Boundary search', icon: 'pi pi-stop', route: '/statistics/boundary-search' },
+      { label: 'Area Search', icon: 'pi pi-sliders-h', route: '/statistics/area-search' }
+    ]
+  },
   { label: 'Buyer Cost Estimate', icon: 'pi pi-calculator', route: '/buyer-cost-estimate' },
   { label: 'Daily Lead Alerts', icon: 'pi pi-bell', route: '/daily-lead-alerts', badge: 'NEW' },
   { label: 'High Volume Search', icon: 'pi pi-compass' },

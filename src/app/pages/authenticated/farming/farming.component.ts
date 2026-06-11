@@ -11,12 +11,14 @@ import { OlMapService, type MapObjectRefs } from '@app/core/services/ol-map.serv
 import { MAP_DEFAULTS } from '@app/core/config/map.config';
 import { LayoutService } from '@app/core/services/layout.service';
 import { AreaSearchStateService } from '@app/core/services/area-search-state.service';
+import { StatsAreaSearchStateService } from '@app/core/services/stats-area-search-state.service';
 import { PropertySearchService } from '@app/core/services/property-search.service';
 import { VerticalService } from '@app/core/services/vertical.service';
 import { SmartyAddressDetails } from '@app/core/interfaces/smarty.interface';
 import { CountyFipsOption, ParcelSearchPayload } from '@app/core/interfaces/property-search.interface';
 
 export type FarmingMapMode = 'radius' | 'boundary';
+export type FarmingSearchContext = 'farming' | 'statistics';
 
 @Component({
   selector: 'app-farming',
@@ -31,6 +33,7 @@ export class FarmingComponent implements OnInit, OnDestroy {
   private readonly olMapService = inject(OlMapService);
   private readonly layoutService = inject(LayoutService);
   private readonly areaSearchStateService = inject(AreaSearchStateService);
+  private readonly statsAreaSearchStateService = inject(StatsAreaSearchStateService);
   private readonly propertySearchService = inject(PropertySearchService);
   private readonly verticalService = inject(VerticalService);
   private sidebarResizeSub?: Subscription;
@@ -46,6 +49,7 @@ export class FarmingComponent implements OnInit, OnDestroy {
   };
 
   readonly mapMode = signal<FarmingMapMode | null>(null);
+  readonly searchContext = signal<FarmingSearchContext>('farming');
   readonly showSearchPanel = signal(false);
   readonly showShapeActions = signal(false);
   readonly shapeSummary = signal('');
@@ -65,6 +69,9 @@ export class FarmingComponent implements OnInit, OnDestroy {
 
     this.route.data.subscribe((data) => {
       const mode = data['mapMode'] as FarmingMapMode | undefined;
+      const context = (data['searchContext'] as FarmingSearchContext | undefined) ?? 'farming';
+      this.searchContext.set(context);
+
       if (mode) {
         this.mapMode.set(mode);
         this.scheduleMapMode(mode);
@@ -205,10 +212,6 @@ export class FarmingComponent implements OnInit, OnDestroy {
     this.activateMapMode(mode);
   }
 
-  onClearSearch(): void {
-    this.onCancelSearch();
-  }
-
   onCancelSearch(): void {
     if (!this.mapObject.resetMapHandler) {
       return;
@@ -227,12 +230,35 @@ export class FarmingComponent implements OnInit, OnDestroy {
     this.searchError.set(null);
     this.addressResetToken.update((token) => token + 1);
     this.olMapService.removeDrawInteraction(this.mapObject);
-    void this.router.navigate(['/dashboard']);
+    const cancelRoute =
+      this.searchContext() === 'statistics' ? '/statistics/radius-search' : '/dashboard';
+    void this.router.navigate([cancelRoute]);
   }
 
   private openAreaSearch(runGetCount: boolean): void {
     const geometry = this.mapObject.geometry;
     if (!geometry?.match || !geometry.value) {
+      return;
+    }
+
+    if (this.searchContext() === 'statistics') {
+      const returnUrl =
+        this.mapMode() === 'boundary'
+          ? '/statistics/boundary-search'
+          : '/statistics/radius-search';
+
+      this.statsAreaSearchStateService.setPendingGeometry(
+        {
+          match: geometry.match,
+          value: geometry.value
+        },
+        runGetCount,
+        returnUrl
+      );
+
+      void this.router.navigate(['/statistics/area-search'], {
+        queryParams: { returnUrl }
+      });
       return;
     }
 

@@ -92,8 +92,28 @@ export const routes: Routes = [
       },
       {
         path: 'statistics',
-        loadComponent: () => import('./pages/authenticated/placeholder/placeholder.component').then(m => m.PlaceholderComponent),
-        title: 'Statistics'
+        redirectTo: 'statistics/radius-search',
+        pathMatch: 'full'
+      },
+      {
+        path: 'statistics/radius-search',
+        loadComponent: () => import('./pages/authenticated/farming/farming.component').then(m => m.FarmingComponent),
+        title: 'Statistics Radius search',
+        data: { mapMode: 'radius', searchContext: 'statistics' }
+      },
+      {
+        path: 'statistics/boundary-search',
+        loadComponent: () => import('./pages/authenticated/farming/farming.component').then(m => m.FarmingComponent),
+        title: 'Statistics Boundary search',
+        data: { mapMode: 'boundary', searchContext: 'statistics' }
+      },
+      {
+        path: 'statistics/area-search',
+        loadComponent: () =>
+          import('./pages/authenticated/statistics/stats-area-search/stats-area-search.component').then(
+            m => m.StatsAreaSearchComponent
+          ),
+        title: 'Statistics Area Search'
       },
       {
         path: 'buyer-cost-estimate',

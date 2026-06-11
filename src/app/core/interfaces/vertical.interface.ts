@@ -45,6 +45,7 @@ export interface VerticalCustomContent {
   };
   user_home?: {
     need_help_hide?: boolean;
+    statistics_hide?: boolean;
   };
   [key: string]: unknown;
 }

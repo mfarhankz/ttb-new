@@ -74,13 +74,23 @@
           @if (isMenuExpanded(item.label) && !isCollapsed) {
             <div class="ml-4 pl-3 border-l border-sidebar-border mt-1 mb-2">
               @for (child of item.children; track child.label) {
-                <a
-                  class="flex items-center w-full px-3 py-2 mb-0.5 text-sm rounded-lg text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium [&.active]:text-sidebar-foreground"
-                  [routerLink]="child.route"
-                  routerLinkActive="active"
-                >
-                  <span class="truncate">{{ child.label }}</span>
-                </a>
+                @if (child.action) {
+                  <button
+                    type="button"
+                    class="flex items-center w-full px-3 py-2 mb-0.5 text-sm rounded-lg text-sidebar-foreground border-0 bg-transparent cursor-pointer text-left transition-colors hover:bg-sidebar-hover"
+                    (click)="onChildNavAction(child)"
+                  >
+                    <span class="truncate">{{ child.label }}</span>
+                  </button>
+                } @else {
+                  <a
+                    class="flex items-center w-full px-3 py-2 mb-0.5 text-sm rounded-lg text-sidebar-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium [&.active]:text-sidebar-foreground"
+                    [routerLink]="child.route"
+                    routerLinkActive="active"
+                  >
+                    <span class="truncate">{{ child.label }}</span>
+                  </a>
+                }
               }
             </div>
           }
@@ -97,14 +107,24 @@
                   {{ item.label }}
                 </div>
                 @for (child of item.children; track child.label) {
-                  <a
-                    class="block px-3 py-2 mx-1 rounded-lg text-body-sm text-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium"
-                    [routerLink]="child.route"
-                    routerLinkActive="active"
-                    (click)="clearFlyout()"
-                  >
-                    {{ child.label }}
-                  </a>
+                  @if (child.action) {
+                    <button
+                      type="button"
+                      class="block w-[calc(100%-0.5rem)] mx-1 px-3 py-2 rounded-lg text-body-sm text-foreground border-0 bg-transparent cursor-pointer text-left transition-colors hover:bg-sidebar-hover"
+                      (click)="onChildNavAction(child); clearFlyout()"
+                    >
+                      {{ child.label }}
+                    </button>
+                  } @else {
+                    <a
+                      class="block px-3 py-2 mx-1 rounded-lg text-body-sm text-foreground no-underline transition-colors hover:bg-sidebar-hover [&.active]:bg-sidebar-active [&.active]:font-medium"
+                      [routerLink]="child.route"
+                      routerLinkActive="active"
+                      (click)="clearFlyout()"
+                    >
+                      {{ child.label }}
+                    </a>
+                  }
                 }
               </div>
             </div>

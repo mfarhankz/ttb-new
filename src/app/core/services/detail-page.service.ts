@@ -13,8 +13,10 @@ import {
 import { SearchDetailContext } from '../detail-contexts/search-detail.context';
 import {
   DETAIL_PAGE_DEFAULT_FILTER,
+  STATISTICS_DETAIL_COLUMNS,
   resolveVisibleDetailColumns
 } from '../config/detail-page.config';
+import { StatisticsDetailContext, isStatisticsSessionExpiredError } from '../detail-contexts/statistics-detail.context';
 import { SavedFarmGeometry } from '../interfaces/saved-farm.interface';
 import { AreaSearchCriteriaChip } from '../utils/area-search-criteria.util';
 
@@ -25,6 +27,7 @@ export class DetailPageService {
   private readonly farmDetailContext = inject(FarmDetailContext);
   private readonly searchDetailContext = inject(SearchDetailContext);
   private readonly queryDetailContext = inject(QueryDetailContext);
+  private readonly statisticsDetailContext = inject(StatisticsDetailContext);
   private readonly router = inject(Router);
 
   private readonly _source = signal<string | null>(null);
@@ -66,7 +69,13 @@ export class DetailPageService {
   readonly searchField = this._searchField.asReadonly();
   readonly criteriaChips = this._criteriaChips.asReadonly();
 
-  readonly columns = computed(() => resolveVisibleDetailColumns(this._allRows(), this._leadsTypes()));
+  readonly columns = computed(() => {
+    if (this._source() === 'statistics') {
+      return STATISTICS_DETAIL_COLUMNS;
+    }
+
+    return resolveVisibleDetailColumns(this._allRows(), this._leadsTypes());
+  });
 
   private searchDebounce?: ReturnType<typeof setTimeout>;
 
@@ -256,6 +265,10 @@ export class DetailPageService {
       return this.queryDetailContext;
     }
 
+    if (source === 'statistics') {
+      return this.statisticsDetailContext;
+    }
+
     throw new Error(`Unsupported detail source: ${source}`);
   }
 
@@ -263,6 +276,12 @@ export class DetailPageService {
     if (source === 'query' && isQuerySessionExpiredError(err)) {
       this._loading.set(false);
       void this.router.navigate(['/farming/area-search']);
+      return;
+    }
+
+    if (source === 'statistics' && isStatisticsSessionExpiredError(err)) {
+      this._loading.set(false);
+      void this.router.navigate(['/statistics/radius-search']);
       return;
     }
 

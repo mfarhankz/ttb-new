@@ -28,6 +28,34 @@ export interface DetailSearchFieldOption {
   label: string;
 }
 
+export const STATISTICS_DETAIL_COLUMNS: DataTableColumn[] = [
+  {
+    key: 'serialNumber',
+    label: '#',
+    sortType: 'number',
+    variant: 'mapPin',
+    align: 'center',
+    width: 'w-12',
+    nowrap: true
+  },
+  { key: 'tract_value', label: 'Group', sortType: 'text', truncate: true, width: 'min-w-40' },
+  { key: 'sa_site_city', label: 'City', sortType: 'text', truncate: true, width: 'min-w-32' },
+  { key: 'sa_site_zip', label: 'Zip', sortType: 'text', width: 'w-24', nowrap: true },
+  { key: 'customTurnoverRate', label: 'Turn Over', sortType: 'text', width: 'w-28', nowrap: true },
+  { key: 'total_units', label: '# of Homes', sortType: 'number', variant: 'numeric', align: 'right', width: 'w-28', nowrap: true },
+  { key: 'total_sales', label: 'Total Sales', sortType: 'number', variant: 'numeric', align: 'right', width: 'w-28', nowrap: true },
+  { key: 'customAvgPrice', label: 'Average Price', sortType: 'text', width: 'min-w-32', nowrap: true },
+  { key: 'avg_yr_owned', label: 'Avg Yr Owned', sortType: 'text', width: 'w-28', nowrap: true },
+  { key: 'customNOORatio', label: 'NOO Ratio', sortType: 'text', width: 'w-28', nowrap: true }
+];
+
+export const STATISTICS_SEARCH_FIELD_OPTIONS: DetailSearchFieldOption[] = [
+  { value: '$', label: 'All fields' },
+  { value: 'tract_value', label: 'Group' },
+  { value: 'sa_site_city', label: 'City' },
+  { value: 'sa_site_zip', label: 'Zip' }
+];
+
 export const DETAIL_SEARCH_FIELD_OPTIONS: DetailSearchFieldOption[] = [
   { value: '$', label: 'All fields' },
   { value: 'customAddress', label: 'Address' },
@@ -225,4 +253,10 @@ export const DETAIL_PAGE_EMPTY_COPY = {
   title: 'No properties found',
   description: 'No property records match the current filter for this selection.',
   filteredDescription: 'No properties match your current filters. Try a different search or clear filters.'
+};
+
+export const STATISTICS_DETAIL_EMPTY_COPY = {
+  title: 'No tracts found',
+  description: 'No tract records match the current statistics search.',
+  filteredDescription: 'No tracts match your current filters. Try a different search or clear filters.'
 };

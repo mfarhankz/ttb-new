@@ -7,7 +7,6 @@ import { LoginModalComponent } from '@app/shared/components/login-modal/login-mo
 import { PropertySearchModalComponent } from '@app/shared/components/property-search-modal/property-search-modal.component';
 import { ThemeModalComponent } from '@app/shared/components/theme-modal/theme-modal.component';
 import { PayNowHostComponent } from '@app/shared/components/pay-now-modal/pay-now-host.component';
-
 @Component({
   selector: 'app-authenticated-layout',
   standalone: true,

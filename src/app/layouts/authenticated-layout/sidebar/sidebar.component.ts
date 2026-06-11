@@ -39,9 +39,18 @@ export class SidebarComponent implements OnInit, OnDestroy {
   collapsedChange = output<boolean>();
 
   readonly mainNav = computed((): NavItem[] =>
-    MAIN_NAV.map((item) => {
+    MAIN_NAV.flatMap((item) => {
+      if (item.label === 'Statistics') {
+        const statisticsHidden =
+          this.verticalService.content()?.custom_content?.user_home?.statistics_hide === true;
+        if (statisticsHidden) {
+          return [];
+        }
+        return [item];
+      }
+
       if (item.label !== 'Farming' || !item.children?.length) {
-        return item;
+        return [item];
       }
 
       const netsheetSupported = this.verticalService.content()?.app_config?.['netsheet_support'] !== false;
@@ -49,7 +58,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
         (child) => child.route !== '/farming/saved-net-sheets' || netsheetSupported
       );
 
-      return { ...item, children };
+      return [{ ...item, children }];
     })
   );
   settingsNav = SETTINGS_NAV;
@@ -185,6 +194,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     if (item.action === 'theme') {
       this.themeModalService.open();
+      return;
+    }
+
+  }
+
+  onChildNavAction(child: NavItem): void {
+    if (child.action) {
+      this.onNavAction(child);
     }
   }
 
