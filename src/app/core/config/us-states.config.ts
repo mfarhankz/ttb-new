@@ -55,12 +55,6 @@ export const US_STATE_OPTIONS: SelectOption[] = [
   { label: 'Wyoming', value: 'WY' }
 ];
 
-/** Legacy property search — state abbreviations sorted A–Z (AK, AL, AR…). */
-export const US_STATE_ABBREV_OPTIONS: SelectOption[] = US_STATE_OPTIONS.map((state) => ({
-  label: state.value,
-  value: state.value
-})).sort((a, b) => a.label.localeCompare(b.label));
-
 /** Legacy areaChoicesFactory.staticStatesListRaw — FIPS code by state abbrev. */
 export const US_STATE_FIPS_BY_ABBREV: Record<string, string> = {
   AK: '02',
@@ -116,34 +110,36 @@ export const US_STATE_FIPS_BY_ABBREV: Record<string, string> = {
   WY: '56'
 };
 
+type StateOptionLabelKey = 'name' | 'abbrev';
+type StateOptionValueKey = 'abbrev' | 'fips';
+
+function buildStateOptions(
+  labelKey: StateOptionLabelKey,
+  valueKey: StateOptionValueKey
+): { label: string; value: string }[] {
+  return US_STATE_OPTIONS.map((state) => ({
+    label: labelKey === 'name' ? state.label : String(state.value),
+    value: valueKey === 'abbrev' ? String(state.value) : (US_STATE_FIPS_BY_ABBREV[String(state.value)] ?? '')
+  }))
+    .filter((option) => option.value)
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+/** Legacy property search — state abbreviations sorted A–Z (AK, AL, AR…). */
+export const US_STATE_ABBREV_OPTIONS: SelectOption[] = buildStateOptions('abbrev', 'abbrev');
+
 /** Legacy get_states — FIPS value with full state name label. */
-export const US_STATE_FIPS_OPTIONS: { label: string; value: string }[] = US_STATE_OPTIONS.map(
-  (state) => ({
-    label: state.label,
-    value: US_STATE_FIPS_BY_ABBREV[state.value] ?? ''
-  })
-)
-  .filter((option) => option.value)
-  .sort((a, b) => a.label.localeCompare(b.label));
+export const US_STATE_FIPS_OPTIONS: { label: string; value: string }[] = buildStateOptions('name', 'fips');
 
 /** Legacy area search state dropdown — abbrev label (AK, AL…), FIPS value, sorted A–Z. */
-export const US_STATE_AREA_SEARCH_OPTIONS: { label: string; value: string }[] = US_STATE_OPTIONS.map(
-  (state) => ({
-    label: state.value,
-    value: US_STATE_FIPS_BY_ABBREV[state.value] ?? ''
-  })
-)
-  .filter((option) => option.value)
-  .sort((a, b) => a.label.localeCompare(b.label));
+export const US_STATE_AREA_SEARCH_OPTIONS: { label: string; value: string }[] = buildStateOptions(
+  'abbrev',
+  'fips'
+);
 
-const US_STATE_FIPS_TO_LABEL = new Map(US_STATE_FIPS_OPTIONS.map((option) => [option.value, option.label]));
 const US_STATE_FIPS_TO_ABBREV = new Map(
   US_STATE_AREA_SEARCH_OPTIONS.map((option) => [option.value, option.label])
 );
-
-export function resolveStateLabelFromFips(fips: string): string {
-  return US_STATE_FIPS_TO_LABEL.get(fips) ?? fips;
-}
 
 export function resolveStateAbbrevFromFips(fips: string): string {
   return US_STATE_FIPS_TO_ABBREV.get(fips) ?? fips;

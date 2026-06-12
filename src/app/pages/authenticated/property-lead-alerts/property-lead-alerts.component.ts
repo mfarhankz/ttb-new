@@ -11,7 +11,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { finalize } from 'rxjs';
-import { US_STATE_AREA_SEARCH_OPTIONS } from '@app/core/config/us-states.config';
+import { US_STATE_FIPS_BY_ABBREV } from '@app/core/config/us-states.config';
 import {
   PLA_COUNT_MAX_LIMIT,
   PLA_LEAD_TYPES_LABEL,
@@ -391,7 +391,7 @@ export class PropertyLeadAlertsComponent implements OnInit, AfterViewInit {
       return undefined;
     }
 
-    return US_STATE_AREA_SEARCH_OPTIONS.find((option) => option.label === stateAbbrev)?.value;
+    return US_STATE_FIPS_BY_ABBREV[stateAbbrev.trim().toUpperCase()];
   }
 
   private setStatus(type: 'success' | 'error' | 'info', message: string): void {

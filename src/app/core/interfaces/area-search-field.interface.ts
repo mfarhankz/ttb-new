@@ -1,5 +1,10 @@
 export type AreaSearchFieldType = 'C' | 'CM' | 'CT' | 'R' | 'W' | 'EM' | 'CHB' | 'RDB' | 'geometry';
 
+export interface AreaSearchChoiceOption {
+  label: string;
+  value: string;
+}
+
 export interface AreaSearchFieldChoice {
   label?: string;
   value?: string;

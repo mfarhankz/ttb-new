@@ -1,12 +1,10 @@
 import { AREA_SEARCH_TAB_ICONS } from '@app/core/config/area-search-fields.config';
-import { AreaSearchFieldMeta } from '@app/core/interfaces/area-search-field.interface';
+import {
+  AreaSearchChoiceOption,
+  AreaSearchFieldMeta
+} from '@app/core/interfaces/area-search-field.interface';
 
-export interface AreaSearchChoiceOption {
-  label: string;
-  value: string;
-}
-
-export interface AreaSearchFieldLabelParts {
+interface AreaSearchFieldLabelParts {
   primary: string;
   secondary?: string;
 }
@@ -83,12 +81,6 @@ export function mapTreeChoices(field: AreaSearchFieldMeta): Record<string, AreaS
 
   return grouped;
 }
-
-export {
-  formatExactMatchDateValue,
-  normalizeEmDefaultValue,
-  resolveExactMatchInputType
-} from '@app/core/utils/area-search-field-meta.util';
 
 export function tabIconClass(groupName: string): string {
   const key = (groupName || '').split(' ')[0]?.toLowerCase() ?? 'basic';

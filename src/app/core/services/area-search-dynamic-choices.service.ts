@@ -18,16 +18,17 @@ import {
   AreaSearchFormData,
   AreaSearchFormFieldValue
 } from '../interfaces/area-search-field.interface';
-import { AreaSearchChoiceOption } from '@app/shared/components/area-search-fields/area-search-field.utils';
+import { AreaSearchChoiceOption } from '../interfaces/area-search-field.interface';
+import { extractChoicesRecord } from '../utils/area-choices-response.util';
 import { ApiService } from './api.service';
 
-export interface DynamicChoicesRequest {
+interface DynamicChoicesRequest {
   field: AreaSearchFieldMeta;
   formData: AreaSearchFormData;
   autocompleteQuery?: string;
 }
 
-export const LAZY_LOAD_CHOICE_FIELDS = [
+const LAZY_LOAD_CHOICE_FIELDS = [
   'mm_fips_muni_code',
   'sa_site_city',
   'sa_site_zip',
@@ -521,7 +522,7 @@ export class AreaSearchDynamicChoicesService {
       return formData ? this.cacheAndReturn(field, formData, options) : options;
     }
 
-    const envelope = this.extractChoicesRecord(response);
+    const envelope = extractChoicesRecord(response, { includeDataRoot: true });
     if (!envelope) {
       return [];
     }
@@ -573,44 +574,5 @@ export class AreaSearchDynamicChoicesService {
       this.choiceLabelIndex.set(`${field.field_name}:${dependencyKey}:${option.value}`, option.label);
     }
     return options;
-  }
-
-  private extractChoicesRecord(response: unknown): Record<string, string> | null {
-    if (!response || typeof response !== 'object') {
-      return null;
-    }
-
-    if (Array.isArray(response)) {
-      const fromArray = Object.fromEntries(
-        response
-          .filter((entry): entry is string => typeof entry === 'string' && entry.length > 0)
-          .map((entry) => [entry, entry])
-      );
-      return Object.keys(fromArray).length ? fromArray : null;
-    }
-
-    const root = response as Record<string, unknown>;
-    const envelope = root['response'];
-    if (envelope && typeof envelope === 'object') {
-      const data = (envelope as Record<string, unknown>)['data'];
-      if (data && typeof data === 'object' && !Array.isArray(data)) {
-        return data as Record<string, string>;
-      }
-    }
-
-    const data = root['data'];
-    if (data && typeof data === 'object' && !Array.isArray(data)) {
-      return data as Record<string, string>;
-    }
-
-    const entries = Object.entries(root).filter(([key]) => key !== 'response' && key !== 'data');
-    if (
-      entries.length &&
-      entries.every(([, value]) => typeof value === 'string' || typeof value === 'number')
-    ) {
-      return Object.fromEntries(entries.map(([key, value]) => [key, String(value)]));
-    }
-
-    return null;
   }
 }

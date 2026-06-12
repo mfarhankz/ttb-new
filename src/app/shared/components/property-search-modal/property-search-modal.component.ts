@@ -16,7 +16,6 @@ import {
   PropertySearchTab
 } from '@app/core/interfaces/property-search.interface';
 import { SmartyAddressDetails } from '@app/core/interfaces/smarty.interface';
-import { AreaChoicesService } from '@app/core/services/area-choices.service';
 import { PropertySearchModalService } from '@app/core/services/property-search-modal.service';
 import { VerticalService } from '@app/core/services/vertical.service';
 import { normalizeCountyForDropdown } from '@app/core/utils/address-format.util';
@@ -62,7 +61,6 @@ export class PropertySearchModalComponent {
   private readonly modalService = inject(PropertySearchModalService);
   private readonly propertySearchService = inject(PropertySearchService);
   private readonly sessionService = inject(PropertySearchSessionService);
-  private readonly areaChoicesService = inject(AreaChoicesService);
   private readonly verticalService = inject(VerticalService);
   private readonly modal = viewChild.required<ModalComponent>('modal');
   private readonly geographicFields = viewChild(GeographicAreaFieldsComponent);
@@ -103,6 +101,8 @@ export class PropertySearchModalComponent {
   readonly parcelSearching = signal(false);
 
   readonly smartyResetToken = signal(0);
+
+  private pendingCountyMatch: { countyName?: string; countyFipsFromFips?: string } | null = null;
   readonly highlightUnitField = signal(false);
 
   readonly addressGeographicValue = computed(
@@ -175,15 +175,24 @@ export class PropertySearchModalComponent {
 
     this.patchAddressForm(patch);
 
-    if (stateFips) {
-      this.areaChoicesService.fetchCountiesByFips(stateFips).subscribe({
-        next: (counties) => this.addressCounties.set(counties),
-        error: () => this.addressCounties.set([])
-      });
+    if (!stateFips) {
+      this.addressCounties.set([]);
+    }
+  }
+
+  onGeographicCountiesChange(counties: CountyChoice[]): void {
+    this.addressCounties.set(counties);
+
+    if (!this.pendingCountyMatch) {
       return;
     }
 
-    this.addressCounties.set([]);
+    const countyFips =
+      this.pendingCountyMatch.countyFipsFromFips ??
+      this.matchCountyFips(counties, this.pendingCountyMatch.countyName);
+
+    this.addressCountyFips.set(countyFips);
+    this.pendingCountyMatch = null;
   }
 
   onOwnerCountyFilter(event: { filter: string }): void {
@@ -253,7 +262,7 @@ export class PropertySearchModalComponent {
 
     const addressType = this.addressType();
     const siteStateForMailing = this.siteStateForMailing();
-    const counties = this.addressCounties();
+    const counties = this.geographicFields()?.countyOptions() ?? this.addressCounties();
     const stateFips = this.addressStateFips();
 
     this.propertySearchService
@@ -348,6 +357,7 @@ export class PropertySearchModalComponent {
     this.addressCounties.set([]);
     this.addressStateFips.set(null);
     this.addressCountyFips.set(undefined);
+    this.pendingCountyMatch = null;
     this.geographicFields()?.resetFetchCache();
     this.addressStatus.set(null);
     this.openAccordionSection('manual');
@@ -464,22 +474,22 @@ export class PropertySearchModalComponent {
     if (!stateFips) {
       this.addressCountyFips.set(undefined);
       this.addressCounties.set([]);
+      this.pendingCountyMatch = null;
       return;
     }
 
-    this.areaChoicesService.fetchCountiesByFips(stateFips).subscribe({
-      next: (counties) => {
-        this.addressCounties.set(counties);
+    this.pendingCountyMatch = {
+      countyName: form.county,
+      countyFipsFromFips
+    };
 
-        const countyFips = countyFipsFromFips ?? this.matchCountyFips(counties, form.county);
-
-        this.addressCountyFips.set(countyFips);
-      },
-      error: () => {
-        this.addressCounties.set([]);
-        this.addressCountyFips.set(countyFipsFromFips);
-      }
-    });
+    const counties = this.geographicFields()?.countyOptions() ?? [];
+    if (counties.length) {
+      this.onGeographicCountiesChange(counties);
+    } else if (countyFipsFromFips) {
+      this.addressCountyFips.set(countyFipsFromFips);
+      this.pendingCountyMatch = null;
+    }
   }
 
   private matchCountyFips(counties: CountyChoice[], countyName?: string): string | undefined {

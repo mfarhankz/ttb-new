@@ -17,7 +17,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { MultiSelect } from 'primeng/multiselect';
-import { AreaSearchFieldMeta, AreaSearchFormFieldValue } from '@app/core/interfaces/area-search-field.interface';
+import { AreaSearchChoiceOption, AreaSearchFieldMeta, AreaSearchFormFieldValue } from '@app/core/interfaces/area-search-field.interface';
 import { AreaSearchDynamicChoicesService } from '@app/core/services/area-search-dynamic-choices.service';
 import { AreaSearchFormService } from '@app/core/services/area-search-form.service';
 import { AutocompleteComponent } from '../autocomplete/autocomplete.component';
@@ -29,7 +29,6 @@ import {
 import { AreaSearchControlStyles } from './area-search-control.styles';
 import { AreaSearchFieldLabelComponent } from './area-search-field-label.component';
 import {
-  AreaSearchChoiceOption,
   areaSearchFieldLabelId,
   mapFieldChoices
 } from './area-search-field.utils';

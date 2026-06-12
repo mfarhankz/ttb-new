@@ -56,6 +56,7 @@ export class GeographicAreaFieldsComponent {
 
   readonly value = input<GeographicAreaFieldsValue>({});
   readonly valueChange = output<GeographicAreaFieldsValue>();
+  readonly countiesChange = output<CountyChoice[]>();
 
   readonly countyOptions = signal<CountyChoice[]>([]);
   readonly cityOptions = signal<CountyChoice[]>([]);
@@ -120,6 +121,7 @@ export class GeographicAreaFieldsComponent {
         this.countyOptions.set([]);
         this.countiesLoading.set(false);
         this.lastCountyFetchKey = '';
+        this.countiesChange.emit([]);
         return;
       }
 
@@ -134,10 +136,12 @@ export class GeographicAreaFieldsComponent {
           next: (options) => {
             this.countyOptions.set(options);
             this.countiesLoading.set(false);
+            this.countiesChange.emit(options);
           },
           error: () => {
             this.countyOptions.set([]);
             this.countiesLoading.set(false);
+            this.countiesChange.emit([]);
           }
         });
       });

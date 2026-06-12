@@ -10,9 +10,9 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Checkbox } from 'primeng/checkbox';
-import { AreaSearchFieldMeta, AreaSearchFormFieldValue } from '@app/core/interfaces/area-search-field.interface';
+import { AreaSearchChoiceOption, AreaSearchFieldMeta, AreaSearchFormFieldValue } from '@app/core/interfaces/area-search-field.interface';
 import { AreaSearchFieldLabelComponent } from './area-search-field-label.component';
-import { AreaSearchChoiceOption, mapFieldChoices } from './area-search-field.utils';
+import { mapFieldChoices } from './area-search-field.utils';
 
 @Component({
   selector: 'app-area-search-checkboxes-field',
