@@ -1,0 +1,187 @@
+<div class="flex min-h-screen flex-col bg-background p-4 md:p-6 lg:p-8">
+  <app-card title="Property Lead Alerts" [padding]="'lg'" class="mx-auto w-full max-w-360">
+    @if (loadingSubscription()) {
+      <p class="text-body-sm text-muted">Loading subscription details…</p>
+    } @else {
+      <div class="grid gap-8 lg:grid-cols-5">
+        <div class="space-y-6 lg:col-span-2">
+          @if (subscriptionActive()) {
+            <div class="space-y-4">
+              <div>
+                <h2 class="text-h3 font-semibold text-success">Active Subscription</h2>
+                @if (activeServiceName()) {
+                  <p class="mt-1 text-body-sm text-success">{{ activeServiceName() }}</p>
+                }
+              </div>
+
+              @for (service of subscribedServices(); track $index) {
+                <div class="space-y-2 rounded-md border border-border bg-surface p-4">
+                  <p class="text-body-sm text-foreground">
+                    <span class="font-semibold">
+                      {{ service.source_type === 'farm' ? 'Farm Name:' : 'Search Name:' }}
+                    </span>
+                    <span class="text-success">{{ service.name }}</span>
+                  </p>
+
+                  @if (service.fetching) {
+                    <p class="text-body-sm text-muted">Fetching…</p>
+                  }
+
+                  @if (service.fetchingErr) {
+                    <div class="flex flex-wrap items-center gap-2 text-body-sm text-danger">
+                      <span>{{ service.fetchingErr }}</span>
+                      @if (service.source_type === 'query') {
+                        <button
+                          type="button"
+                          class="cursor-pointer border-0 bg-transparent p-0 text-primary underline"
+                          (click)="retryServiceDetails(service)"
+                        >
+                          Retry
+                        </button>
+                      }
+                    </div>
+                  }
+
+                  <p class="text-body-sm text-foreground">
+                    <span class="font-semibold">Properties Monitored:</span>
+                    @if (countLoading()) {
+                      <span class="text-muted"> Fetching…</span>
+                    } @else {
+                      <span>
+                        {{
+                          service.property_count != null
+                            ? (service.property_count | number)
+                            : propertyCount() != null
+                              ? (propertyCount() | number)
+                              : 'N/A'
+                        }}
+                      </span>
+                    }
+                  </p>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="space-y-6">
+              <div>
+                <h2 class="text-h3 font-semibold text-success">${{ subscriptionPrice }}/mo</h2>
+              </div>
+
+              <div class="space-y-3">
+                <h3 class="text-body font-semibold text-foreground">Preset Criteria</h3>
+                <ul class="space-y-2 text-body-sm text-foreground">
+                  <li><span class="font-semibold">Geometry Type:</span> {{ radiusMiles }}-mile Radius</li>
+                  <li><span class="font-semibold">Property Type:</span> {{ propertyTypesLabel }}</li>
+                  <li><span class="font-semibold">Lead Type:</span> {{ leadTypesLabel }}</li>
+                </ul>
+              </div>
+
+              <div class="space-y-3">
+                <h3 class="text-body font-semibold text-foreground">How it works</h3>
+                <ul class="space-y-2 text-body-sm text-foreground">
+                  <li>
+                    We monitor properties within your {{ radiusMiles }}-mile Radius up to
+                    {{ countMaxLimit | number }} properties.
+                  </li>
+                  <li>
+                    When a new life event is recorded, you will get an email with the type of filing,
+                    date recorded, key details, property address, and owner name(s).
+                  </li>
+                </ul>
+              </div>
+
+              <p class="text-body-sm text-foreground">
+                Be the first to know about new listing opportunities in your area!
+              </p>
+            </div>
+          }
+
+          @if (subscriptionError()) {
+            <app-alert type="error" class="block">{{ subscriptionError() }}</app-alert>
+          }
+        </div>
+
+        <div class="space-y-4 lg:col-span-3">
+          @if (!subscriptionActive()) {
+            <div>
+              <h3 class="text-body font-semibold text-success">Get Started</h3>
+              <p class="text-body-sm text-muted">Enter your Starting Address</p>
+            </div>
+
+            <app-address-autocomplete
+              inputId="pla-starting-address"
+              placeholder="Search for an address..."
+              [resetToken]="addressResetToken()"
+              [enableVerification]="true"
+              (placeChanged)="onAddressSelected($event)"
+            />
+          }
+
+          <div class="h-[440px] overflow-hidden rounded-md border border-border">
+            <div
+              appOlMap
+              class="h-full w-full"
+              [mapObject]="mapObject"
+              [options]="mapOptions"
+            ></div>
+          </div>
+
+          @if (!subscriptionActive()) {
+            <div class="space-y-4">
+              @if (propertyCount() != null) {
+                <h4 class="text-body font-semibold text-foreground">
+                  {{ propertyCount() | number }} Properties Monitored!
+                </h4>
+              }
+
+              @if (countLoading()) {
+                <p class="text-body-sm text-muted">Fetching properties count…</p>
+              }
+
+              @if (countError()) {
+                <div class="flex flex-wrap items-center gap-2 text-body-sm text-danger">
+                  <span>Fetching Properties Count Failed: {{ countError() }}</span>
+                  <button
+                    type="button"
+                    class="cursor-pointer border-0 bg-transparent p-0 text-primary underline"
+                    (click)="fetchPropertyCount()"
+                  >
+                    Retry
+                  </button>
+                </div>
+              }
+
+              @if (statusMessage()) {
+                <app-alert [type]="statusType()" class="block">{{ statusMessage() }}</app-alert>
+              }
+
+              <div class="grid gap-4 md:grid-cols-2 md:items-end">
+                <div class="flex flex-col gap-0.5">
+                  <label [class]="controlStyles.fieldLabel" for="pla-search-name">Search Name</label>
+                  <input
+                    pInputText
+                    id="pla-search-name"
+                    type="text"
+                    [class]="controlStyles.input"
+                    [ngModel]="searchName()"
+                    (ngModelChange)="searchName.set($event)"
+                  />
+                </div>
+
+                <app-button
+                  variant="success"
+                  [fullWidth]="true"
+                  [loading]="submitting()"
+                  [disabled]="countLoading() || !!countError()"
+                  (onClick)="startAlerts()"
+                >
+                  Start My Alerts
+                </app-button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </app-card>
+</div>

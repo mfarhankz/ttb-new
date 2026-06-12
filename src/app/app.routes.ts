@@ -124,9 +124,25 @@ export const routes: Routes = [
         title: 'Buyer Cost Estimate'
       },
       {
+        path: 'property-lead-alerts',
+        loadComponent: () =>
+          import('./pages/authenticated/property-lead-alerts/property-lead-alerts.component').then(
+            (m) => m.PropertyLeadAlertsComponent
+          ),
+        title: 'Property Lead Alerts'
+      },
+      {
+        path: 'property-lead-alerts/history',
+        loadComponent: () =>
+          import('./pages/authenticated/property-lead-alerts/property-lead-alerts-history.component').then(
+            (m) => m.PropertyLeadAlertsHistoryComponent
+          ),
+        title: 'PLA History'
+      },
+      {
         path: 'daily-lead-alerts',
-        loadComponent: () => import('./pages/authenticated/placeholder/placeholder.component').then(m => m.PlaceholderComponent),
-        title: 'Daily Lead Alerts'
+        redirectTo: 'property-lead-alerts',
+        pathMatch: 'full'
       },
       {
         path: 'admin',

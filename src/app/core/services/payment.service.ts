@@ -8,6 +8,7 @@ import {
   RecsPurchaseSuccessData,
   TtbPaymentStepResponse
 } from '../interfaces/payment.interface';
+import { PlaSubscribeSuccessData } from '../interfaces/property-lead-alerts.interface';
 import { ApiService } from './api.service';
 
 @Injectable({ providedIn: 'root' })
@@ -20,6 +21,10 @@ export class PaymentService {
 
   purchaseCreditStep(payload: PaymentStepPayload): Observable<CreditPurchaseSuccessData> {
     return this.postPaymentStep<CreditPurchaseSuccessData>(API_CONFIG.endpoints.creditPurchase, payload);
+  }
+
+  createNewProfileStep(payload: PaymentStepPayload): Observable<PlaSubscribeSuccessData> {
+    return this.postPaymentStep<PlaSubscribeSuccessData>(API_CONFIG.endpoints.createNewProfile, payload);
   }
 
   parsePaymentError(reason: unknown): PaymentErrorResult {

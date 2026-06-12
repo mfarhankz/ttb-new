@@ -332,11 +332,13 @@ export class OlMapService {
     lon: number,
     lat: number,
     details: SmartyAddressDetails,
-    zoom = 14
+    options: { zoom?: number; centerMap?: boolean; panPopup?: boolean } = {}
   ): void {
     if (!refs.map || !refs.vectorLayer || !Number.isFinite(lon) || !Number.isFinite(lat)) {
       return;
     }
+
+    const { zoom = 14, centerMap = true, panPopup = true } = options;
 
     this.clearSearchAddressMarker(refs);
 
@@ -353,8 +355,11 @@ export class OlMapService {
     feature.setStyle(this.createSearchPinStyle());
     refs.vectorLayer.getSource().addFeature(feature);
 
-    this.centerMapOnCoordinates(refs, lon, lat, zoom);
-    this.scheduleSearchAddressPopup(refs, coord, markup);
+    if (centerMap) {
+      this.centerMapOnCoordinates(refs, lon, lat, zoom);
+    }
+
+    this.scheduleSearchAddressPopup(refs, coord, markup, panPopup);
   }
 
   private createSearchPinStyle(): any {
@@ -368,14 +373,24 @@ export class OlMapService {
     });
   }
 
-  private scheduleSearchAddressPopup(refs: MapObjectRefs, coordinate: number[], markup: string): void {
+  private scheduleSearchAddressPopup(
+    refs: MapObjectRefs,
+    coordinate: number[],
+    markup: string,
+    panPopup = true
+  ): void {
     refs.searchAddressPopupTimer = setTimeout(() => {
       refs.searchAddressPopupTimer = undefined;
-      this.openSearchAddressPopup(refs, coordinate, markup);
+      this.openSearchAddressPopup(refs, coordinate, markup, panPopup);
     }, 300);
   }
 
-  private openSearchAddressPopup(refs: MapObjectRefs, coordinate: number[], markup: string): void {
+  private openSearchAddressPopup(
+    refs: MapObjectRefs,
+    coordinate: number[],
+    markup: string,
+    panPopup = true
+  ): void {
     const overlay = this.ensurePopupOverlay(refs);
     const popup = refs.popupElement;
     const content = refs.popupContentElement;
@@ -399,7 +414,9 @@ export class OlMapService {
       });
     }
 
-    overlay.panIntoView?.({ margin: 15, animation: { duration: 0 } });
+    if (panPopup) {
+      overlay.panIntoView?.({ margin: 15, animation: { duration: 0 } });
+    }
   }
 
   private ensurePopupOverlay(refs: MapObjectRefs): any {

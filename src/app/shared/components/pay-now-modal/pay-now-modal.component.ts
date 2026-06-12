@@ -16,7 +16,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { Checkbox } from 'primeng/checkbox';
-import { EMPTY, catchError, finalize, map, of, switchMap } from 'rxjs';
+import { EMPTY, Observable, catchError, finalize, map, of, switchMap } from 'rxjs';
 import {
   BillingConfirmationData,
   CREDIT_AMOUNT_SUGGESTIONS,
@@ -125,6 +125,7 @@ export class PayNowModalComponent {
 
   readonly isCreditRecharge = computed(() => this.options.mode === 'creditRecharge');
   readonly isRecsPurchase = computed(() => this.options.mode === 'recsPurchase');
+  readonly isDlaSubscribe = computed(() => this.options.mode === 'dlaSubscribe');
   readonly isMinimumPurchase = computed(() => this.isRecsPurchase());
 
   readonly insufficientBalance = computed(
@@ -523,11 +524,32 @@ export class PayNowModalComponent {
       this.authService.tbAddress()?.[0]
     );
 
-    return {
+    if (this.options.plan) {
+      billing.plan = this.options.plan;
+    }
+
+    const payload: PaymentStepPayload = {
       TbBilling: billing,
       action: 'verify_cc',
-      payment_method: 'credit card'
+      payment_method: 'credit card',
+      ...(this.options.payloadExtend ?? {})
     };
+
+    return payload;
+  }
+
+  private paymentRequestForStep(
+    payload: PaymentStepPayload
+  ): Observable<RecsPurchaseSuccessData | CreditPurchaseSuccessData | Record<string, unknown>> {
+    if (this.isCreditRecharge()) {
+      return this.paymentService.purchaseCreditStep(payload);
+    }
+
+    if (this.isDlaSubscribe()) {
+      return this.paymentService.createNewProfileStep(payload);
+    }
+
+    return this.paymentService.purchaseRecsStep(payload);
   }
 
   private runVerifyStep(method: PaymentMethod, payload: PaymentStepPayload) {
@@ -535,9 +557,7 @@ export class PayNowModalComponent {
       return of(null);
     }
 
-    const request$ = this.isCreditRecharge()
-      ? this.paymentService.purchaseCreditStep(payload)
-      : this.paymentService.purchaseRecsStep(payload);
+    const request$ = this.paymentRequestForStep(payload);
 
     return request$.pipe(
       switchMap((data) => {
@@ -575,24 +595,40 @@ export class PayNowModalComponent {
     }
 
     if (method === 'card') {
-      confirmPayload.TbBilling = buildTbBillingFromForm(
+      const billing = buildTbBillingFromForm(
         this.form(),
         this.authService.tbUser()?.users_id,
         this.authService.tbAddress()?.[0]
       );
+
+      if (this.options.plan) {
+        billing.plan = this.options.plan;
+      }
+
+      confirmPayload.TbBilling = billing;
     }
 
-    const request$ = this.isCreditRecharge()
-      ? this.paymentService.purchaseCreditStep(confirmPayload)
-      : this.paymentService.purchaseRecsStep(confirmPayload);
+    if (this.options.payloadExtend) {
+      Object.assign(confirmPayload, this.options.payloadExtend);
+    }
+
+    const request$ = this.paymentRequestForStep(confirmPayload);
 
     return request$.pipe(map((data) => this.mapPaymentResult(data, farmName)));
   }
 
   private mapPaymentResult(
-    data: RecsPurchaseSuccessData | CreditPurchaseSuccessData,
+    data: RecsPurchaseSuccessData | CreditPurchaseSuccessData | Record<string, unknown>,
     farmName: string
   ): PayNowResult {
+    if (this.isDlaSubscribe()) {
+      const subscribeData = data as Record<string, unknown>;
+      return {
+        mode: 'dlaSubscribe',
+        message: typeof subscribeData['msg'] === 'string' ? subscribeData['msg'] : 'Subscription activated successfully.'
+      };
+    }
+
     if (this.isCreditRecharge()) {
       const creditData = data as CreditPurchaseSuccessData;
       return {
@@ -624,9 +660,7 @@ export class PayNowModalComponent {
 
   private cancelPayment() {
     const payload: PaymentStepPayload = { action: 'cancel' };
-    const request$ = this.isCreditRecharge()
-      ? this.paymentService.purchaseCreditStep(payload)
-      : this.paymentService.purchaseRecsStep(payload);
+    const request$ = this.paymentRequestForStep(payload);
 
     return request$.pipe(catchError(() => EMPTY));
   }
@@ -637,6 +671,14 @@ export class PayNowModalComponent {
     if (this.isCreditRecharge()) {
       this.hideDisplayRecords.set(true);
       this.successMessage.set(result.message ?? 'Credit has been added successfully.');
+      this.payNowModalService.complete(result);
+      this.closeModalShell();
+      return;
+    }
+
+    if (this.isDlaSubscribe()) {
+      this.hideDisplayRecords.set(true);
+      this.successMessage.set(result.message ?? 'Subscription activated successfully.');
       this.payNowModalService.complete(result);
       this.closeModalShell();
       return;

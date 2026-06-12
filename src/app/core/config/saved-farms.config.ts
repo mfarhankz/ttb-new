@@ -11,7 +11,7 @@ export interface SavedFarmTabDefinition {
 export const SAVED_FARM_TABS: SavedFarmTabDefinition[] = [
   { id: 'main', label: 'Main Farms', icon: 'pi pi-bookmark' },
   { id: 'phoneEmail', label: 'Single Look Up (PH/EM) Farms', icon: 'pi pi-phone' },
-  { id: 'dla', label: 'DLA Farms', icon: 'pi pi-bell' },
+  { id: 'dla', label: 'PLA Farms', icon: 'pi pi-bell' },
   { id: 'riskScore', label: 'Risk Score Farms', icon: 'pi pi-chart-line' }
 ];
 
@@ -59,8 +59,8 @@ export const SAVED_FARM_EMPTY_COPY: Record<SavedFarmTabId, { title: string; desc
     description: 'Single phone or email lookup farms will appear here.'
   },
   dla: {
-    title: 'No DLA farms yet',
-    description: 'Daily Lead Alert farms will appear here once configured.'
+    title: 'No PLA farms yet',
+    description: 'Property Lead Alert farms will appear here once configured.'
   },
   riskScore: {
     title: 'No risk score farms yet',

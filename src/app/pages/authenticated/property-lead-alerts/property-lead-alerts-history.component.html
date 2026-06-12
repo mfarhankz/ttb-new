@@ -1,0 +1,45 @@
+<div class="flex min-h-screen flex-col bg-background p-4 md:p-6 lg:p-8">
+  <app-card title="Property Lead Alert Email History" [padding]="'lg'" class="mx-auto w-full max-w-360">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <p class="text-body-sm text-muted">Review past Property Lead Alert email deliveries.</p>
+
+      @if (currentRecord()) {
+        <div class="flex items-center gap-2">
+          <app-button
+            variant="primary"
+            size="sm"
+            [disabled]="currentIndex() === 0"
+            (onClick)="goToPrevious()"
+          >
+            Previous
+          </app-button>
+          <app-button
+            variant="primary"
+            size="sm"
+            [disabled]="currentIndex() >= records().length - 1"
+            (onClick)="goToNext()"
+          >
+            Next
+          </app-button>
+        </div>
+      }
+    </div>
+
+    @if (loading()) {
+      <p class="text-body-sm text-muted">Fetching…</p>
+    } @else if (error()) {
+      <app-alert type="error" class="block">{{ error() }}</app-alert>
+    } @else if (!currentRecord()) {
+      <p class="text-body-sm text-muted">No PLA email history is available yet.</p>
+    } @else {
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3">
+        <h3 class="text-body font-medium text-muted">{{ currentRecord()!.delivery_date }}</h3>
+        <span class="text-body-sm text-muted">Page: {{ pageLabel() }}</span>
+      </div>
+
+      @if (currentHtml()) {
+        <div class="prose max-w-none text-body-sm" [innerHTML]="currentHtml()"></div>
+      }
+    }
+  </app-card>
+</div>

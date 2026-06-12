@@ -57,6 +57,15 @@ export interface TtbWalletResponse {
 
 export interface SubscribedService {
   service_name?: string;
+  name?: string;
+  source_type?: 'query' | 'farm' | string;
+  id?: string | number;
+  property_count?: number | string;
+  query?: {
+    name?: string;
+    query?: Record<string, unknown>;
+    geometry?: Record<string, unknown>;
+  };
   [key: string]: unknown;
 }
 

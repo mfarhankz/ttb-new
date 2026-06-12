@@ -1,6 +1,6 @@
 <app-modal
   #payNowModal
-  [title]="isCreditRecharge() ? 'Buy Credit' : 'Pay Now'"
+  [title]="isCreditRecharge() ? 'Buy Credit' : isDlaSubscribe() ? ('Monthly Subscription ' + (priceRequired() | currency: 'USD' : 'symbol' : '1.2-2')) : 'Pay Now'"
   size="2xl"
   [showFooter]="false"
   [backdropClickable]="false"
@@ -16,9 +16,15 @@
     </p>
   }
 
-  @if (!isCreditRecharge()) {
+  @if (!isCreditRecharge() && !isDlaSubscribe()) {
     <p class="mb-4 text-body-sm text-muted">
       Please provide billing information to process the payment.
+    </p>
+  }
+
+  @if (isDlaSubscribe()) {
+    <p class="mb-4 text-body-sm text-muted">
+      Please provide billing information to start your Property Lead Alerts subscription.
     </p>
   }
 

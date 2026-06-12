@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnDestroy, OnInit, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, OnInit, output, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -9,6 +9,8 @@ import { LayoutService } from '@app/core/services/layout.service';
 import { VerticalService } from '@app/core/services/vertical.service';
 import { ClearSearchService } from '@app/core/services/clear-search.service';
 import { ClearSearchStateService } from '@app/core/services/clear-search-state.service';
+import { PropertyLeadAlertsService } from '@app/core/services/property-lead-alerts.service';
+import { SubscriptionService } from '@app/core/services/subscription.service';
 import {
   MAIN_NAV,
   SETTINGS_NAV,
@@ -34,6 +36,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   readonly clearSearchState = inject(ClearSearchStateService);
   private clearSearchService = inject(ClearSearchService);
+  private plaService = inject(PropertyLeadAlertsService);
+  private subscriptionService = inject(SubscriptionService);
   private routerSub?: Subscription;
   private flyoutHideTimer?: ReturnType<typeof setTimeout>;
 
@@ -64,6 +68,25 @@ export class SidebarComponent implements OnInit, OnDestroy {
         return [item];
       }
 
+      if (item.label === 'Property Lead Alerts') {
+        const almSupported = this.verticalService.content()?.app_config?.['ALM_DNS_support'] !== false;
+        if (!almSupported) {
+          return [];
+        }
+
+        if (this.plaService.hasActivePlaSubscription()) {
+          return [
+            {
+              label: 'PLA History',
+              icon: 'pi pi-envelope',
+              route: '/property-lead-alerts/history'
+            }
+          ];
+        }
+
+        return [item];
+      }
+
       if (item.label !== 'Farming' || !item.children?.length) {
         return [item];
       }
@@ -81,6 +104,16 @@ export class SidebarComponent implements OnInit, OnDestroy {
   readonly statisticsHidden = computed(
     () => this.verticalService.content()?.custom_content?.user_home?.statistics_hide === true
   );
+
+  constructor() {
+    effect(() => {
+      if (this.subscriptionService.loading()) {
+        return;
+      }
+
+      this.plaService.syncFromBillingHistory(this.subscriptionService.history());
+    });
+  }
 
   tbUser = this.authService.tbUser;
   name = computed(() => this.authService.getUserName() || 'User');
@@ -102,6 +135,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     } else {
       this.applySidebarWidth();
     }
+    this.plaService.loadSubscription();
     this.layoutCollapseSub = this.layoutService.onSidebarCollapseRequest.subscribe((collapsed) => {
       if (this.isCollapsed !== collapsed) {
         this.setCollapsed(collapsed);

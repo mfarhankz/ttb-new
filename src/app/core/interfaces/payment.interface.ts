@@ -1,7 +1,7 @@
 import { SavedFarmRecord } from './saved-farm.interface';
 import { WalletInfo } from './api.interface';
 
-export type PayNowMode = 'recsPurchase' | 'creditRecharge';
+export type PayNowMode = 'recsPurchase' | 'creditRecharge' | 'dlaSubscribe';
 
 export type PaymentMethod = 'credit' | 'card';
 
@@ -85,6 +85,9 @@ export interface PayNowOptions {
   contactIncluded?: boolean;
   note?: string;
   noteType?: 'info' | 'warning' | 'success' | 'error';
+  /** Subscription plan id — used for PLA (`8`). */
+  plan?: string;
+  payloadExtend?: Record<string, unknown>;
   onSuccess?: (result: PayNowResult) => void;
 }
 

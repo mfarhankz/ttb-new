@@ -251,7 +251,7 @@ export class SavedFarmsService {
     return name.indexOf(reserved) === 0;
   }
 
-  /** Daily Lead Alert farms — production uses live_farm_status, not generic notification_config. */
+  /** Property Lead Alert farms — production uses live_farm_status, not generic notification_config. */
   private isDlaFarm(farm: SavedFarmRecord): boolean {
     return this.hasLiveFarmStatus(farm);
   }
