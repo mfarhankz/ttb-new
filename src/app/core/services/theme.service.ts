@@ -18,7 +18,7 @@ import {
   getFontFamilyOption,
   tenantOverrideToCssVars,
   tokensToCssVars
-} from '../theme/theme.config';
+} from '@app/shared/theme/theme.config';
 
 const VALID_VARIANTS = new Set<ThemeVariant>(['light', 'dark', 'main']);
 const THEME_FONT_LINK_ID = 'ttb-theme-font';

@@ -14,21 +14,21 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { ButtonComponent } from '@app/shared/components';
-import { ModalComponent } from '@app/shared/components/modal/modal.component';
-import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
-import { MapTablePipelineComponent } from '@app/shared/components/map-table-pipeline/map-table-pipeline.component';
-import { MapPipelineViewMode } from '@app/shared/components/map-table-pipeline/map-table-pipeline.types';
+import { ModalComponent } from '@app/shared/ui/modal/modal.component';
+import { DataTableComponent } from '@app/shared/ui/data-table/data-table.component';
+import { MapTablePipelineComponent } from '@app/features/map/components/map-table-pipeline/map-table-pipeline.component';
+import { MapPipelineViewMode } from '@app/features/map/components/map-table-pipeline/map-table-pipeline.types';
 import {
   SAVED_NET_SHEETS_DEFAULT_PAGE_SIZE,
   SAVED_NET_SHEETS_EMPTY_COPY,
   SAVED_NET_SHEETS_FILTER_FIELD_OPTIONS,
   SAVED_NET_SHEETS_PAGE_SIZE_OPTIONS
-} from '@app/core/config/saved-net-sheets.config';
+} from '@app/features/farming/config/saved-net-sheets.config';
 import { AuthService } from '@app/core/services/auth.service';
-import { SavedNetSheetsService } from '@app/core/services/saved-net-sheets.service';
+import { SavedNetSheetsService } from '@app/features/farming/services/saved-net-sheets.service';
 import { SessionExpiredService } from '@app/core/services/session-expired.service';
 import { VerticalService } from '@app/core/services/vertical.service';
-import { NetSheetModalService } from '@app/core/services/net-sheet-modal.service';
+import { NetSheetModalService } from '@app/features/net-sheet/services/net-sheet-modal.service';
 import { isMockBlankPropertyId, mapNetsheetTypeToTab } from '@app/core/utils/net-sheet.util';
 
 @Component({

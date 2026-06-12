@@ -16,26 +16,26 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { ButtonComponent } from '@app/shared/components';
-import { ModalComponent } from '@app/shared/components/modal/modal.component';
-import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
-import { MapTablePipelineComponent } from '@app/shared/components/map-table-pipeline/map-table-pipeline.component';
-import { MapPipelineViewMode } from '@app/shared/components/map-table-pipeline/map-table-pipeline.types';
-import { TabNavComponent } from '@app/shared/components/tab-nav/tab-nav.component';
-import { TabNavItem } from '@app/shared/components/tab-nav/tab-nav.types';
-import { OlMapComponent } from '@app/shared/components/ol-map/ol-map.component';
-import { MAP_DEFAULTS } from '@app/core/config/map.config';
+import { ModalComponent } from '@app/shared/ui/modal/modal.component';
+import { DataTableComponent } from '@app/shared/ui/data-table/data-table.component';
+import { MapTablePipelineComponent } from '@app/features/map/components/map-table-pipeline/map-table-pipeline.component';
+import { MapPipelineViewMode } from '@app/features/map/components/map-table-pipeline/map-table-pipeline.types';
+import { TabNavComponent } from '@app/shared/ui/tab-nav/tab-nav.component';
+import { TabNavItem } from '@app/shared/ui/tab-nav/tab-nav.types';
+import { OlMapComponent } from '@app/shared/widgets/ol-map/ol-map.component';
+import { MAP_DEFAULTS } from '@app/features/map/config/map.config';
 import {
   SAVED_FARM_EMPTY_COPY,
   SAVED_FARMS_DEFAULT_PAGE_SIZE,
   SAVED_FARMS_FILTER_FIELD_OPTIONS,
   SAVED_FARMS_PAGE_SIZE_OPTIONS,
   SavedFarmTabId
-} from '@app/core/config/saved-farms.config';
+} from '@app/features/farming/config/saved-farms.config';
 import { AuthService } from '@app/core/services/auth.service';
 import { LayoutService } from '@app/core/services/layout.service';
-import { MapTableSyncService } from '@app/core/services/map-table-sync.service';
-import { OlMapService, type MapObjectRefs } from '@app/core/services/ol-map.service';
-import { SavedFarmsService } from '@app/core/services/saved-farms.service';
+import { MapTableSyncService } from '@app/features/map/services/map-table-sync.service';
+import { OlMapService, type MapObjectRefs } from '@app/features/map/services/ol-map.service';
+import { SavedFarmsService } from '@app/features/farming/services/saved-farms.service';
 import { SessionExpiredService } from '@app/core/services/session-expired.service';
 import { VerticalService } from '@app/core/services/vertical.service';
 

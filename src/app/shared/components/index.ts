@@ -1,55 +1,49 @@
 /**
- * Shared UI Components
- * 
- * This file exports all reusable UI components for easy importing.
- * These components abstract the UI library implementation, making it
- * easy to swap UI libraries in the future.
+ * Shared UI Components — barrel re-exports from shared/ui and shared/widgets.
+ * Import primitives from '@app/shared/components'.
+ * Import domain widgets via deep paths under feature folders or shared/widgets.
  */
 
-// Form Components
-export { InputComponent } from './input/input.component';
-export { SelectComponent, type SelectOption } from './select/select.component';
-export { TextareaComponent } from './textarea/textarea.component';
-export { CheckboxComponent } from './checkbox/checkbox.component';
-export { ToggleComponent } from './toggle/toggle.component';
-export { RadioComponent } from './radio/radio.component';
-export { ButtonComponent, type ButtonVariant, type ButtonSize } from './button/button.component';
+// Form Components (shared/ui)
+export { InputComponent } from '../ui/input/input.component';
+export { SelectComponent, type SelectOption } from '../ui/select/select.component';
+export { CheckboxComponent } from '../ui/checkbox/checkbox.component';
+export { ToggleComponent } from '../ui/toggle/toggle.component';
+export { ButtonComponent, type ButtonVariant, type ButtonSize } from '../ui/button/button.component';
 
 // Layout Components
-export { CardComponent } from './card/card.component';
-export { TabToolbarComponent } from './tab-toolbar/tab-toolbar.component';
-export { ModalComponent } from './modal/modal.component';
-export { PropertySearchModalComponent } from './property-search-modal/property-search-modal.component';
-export { ThemeModalComponent } from './theme-modal/theme-modal.component';
-export { AutocompleteComponent } from './autocomplete/autocomplete.component';
-export { type AutocompleteItem } from './autocomplete/autocomplete.types';
-export { AddressAutocompleteComponent } from './address-autocomplete/address-autocomplete.component';
+export { CardComponent } from '../ui/card/card.component';
+export { TabToolbarComponent } from '../ui/tab-toolbar/tab-toolbar.component';
+export { ModalComponent } from '../ui/modal/modal.component';
+export { ThemeModalComponent } from '../ui/theme-modal/theme-modal.component';
+export { AutocompleteComponent } from '../ui/autocomplete/autocomplete.component';
+export { type AutocompleteItem } from '../ui/autocomplete/autocomplete.types';
+export { AddressAutocompleteComponent } from '../widgets/address-autocomplete/address-autocomplete.component';
 
 // Feedback Components
-export { AlertComponent, type AlertType } from './alert/alert.component';
+export { AlertComponent, type AlertType } from '../ui/alert/alert.component';
 
 // Utility Components
-export { LabelComponent } from './label/label.component';
-export { FormFieldComponent } from './form-field/form-field.component';
+export { LabelComponent } from '../ui/label/label.component';
 
 // Data Display Components
-export { DataTableComponent } from './data-table/data-table.component';
-export { type DataTableColumn } from './data-table/data-table.types';
-export { TabNavComponent } from './tab-nav/tab-nav.component';
-export { type TabNavItem } from './tab-nav/tab-nav.types';
-export { MapTablePipelineComponent } from './map-table-pipeline/map-table-pipeline.component';
-export { MapPipelineViewToggleComponent } from './map-table-pipeline/map-pipeline-view-toggle.component';
+export { DataTableComponent } from '../ui/data-table/data-table.component';
+export { type DataTableColumn } from '../ui/data-table/data-table.types';
+export { TabNavComponent } from '../ui/tab-nav/tab-nav.component';
+export { type TabNavItem } from '../ui/tab-nav/tab-nav.types';
+export { MapTablePipelineComponent } from '../../features/map/components/map-table-pipeline/map-table-pipeline.component';
+export { MapPipelineViewToggleComponent } from '../../features/map/components/map-table-pipeline/map-pipeline-view-toggle.component';
 export {
   type MapPipelineViewMode,
   type MapTablePipelineConfig
-} from './map-table-pipeline/map-table-pipeline.types';
-export { UsageReportTableComponent } from './usage-report-table/usage-report-table.component';
-export { GeographicAreaFieldsComponent } from './geographic-area-fields/geographic-area-fields.component';
+} from '../../features/map/components/map-table-pipeline/map-table-pipeline.types';
+export { UsageReportTableComponent } from '../ui/usage-report-table/usage-report-table.component';
+export { GeographicAreaFieldsComponent } from '../widgets/geographic-area-fields/geographic-area-fields.component';
 export {
   type GeographicAreaCityZipControl,
   type GeographicAreaCityZipMode,
   type GeographicAreaFieldsValue,
   type GeographicAreaGroupType,
   type GeographicAreaLayout
-} from './geographic-area-fields/geographic-area-fields.types';
-
+} from '../widgets/geographic-area-fields/geographic-area-fields.types';
+export { PropertySearchModalComponent } from '../../features/property-search/components/property-search-modal/property-search-modal.component';

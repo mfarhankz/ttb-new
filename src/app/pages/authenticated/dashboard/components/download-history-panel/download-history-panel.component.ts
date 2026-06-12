@@ -12,11 +12,11 @@ import {
 } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { AuthService } from '@app/core/services/auth.service';
-import { DashboardTabToolbarService } from '@app/core/services/dashboard-tab-toolbar.service';
+import { DashboardTabToolbarService } from '@app/features/dashboard/services/dashboard-tab-toolbar.service';
 import { SessionExpiredService } from '@app/core/services/session-expired.service';
-import { UserUsageService } from '@app/core/services/user-usage.service';
+import { UserUsageService } from '@app/features/dashboard/services/user-usage.service';
 import { printSectionElement } from '@app/core/utils/print-section.util';
-import { UsageReportTableComponent } from '@app/shared/components/usage-report-table/usage-report-table.component';
+import { UsageReportTableComponent } from '@app/shared/ui/usage-report-table/usage-report-table.component';
 
 @Component({
   selector: 'app-download-history-panel',

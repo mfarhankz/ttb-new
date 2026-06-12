@@ -6,7 +6,7 @@ import {
   ValidationErrors,
   Validators
 } from '@angular/forms';
-import { AccountInformationService } from '@app/core/services/account-information.service';
+import { AccountInformationService } from '@app/features/dashboard/services/account-information.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { SessionExpiredService } from '@app/core/services/session-expired.service';
 import { VerticalService } from '@app/core/services/vertical.service';

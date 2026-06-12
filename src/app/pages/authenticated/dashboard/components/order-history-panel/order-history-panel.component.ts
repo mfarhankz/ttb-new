@@ -1,7 +1,7 @@
 import { Component, effect, inject } from '@angular/core';
-import { OrderHistoryService } from '@app/core/services/order-history.service';
+import { OrderHistoryService } from '@app/features/dashboard/services/order-history.service';
 import { SessionExpiredService } from '@app/core/services/session-expired.service';
-import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
+import { DataTableComponent } from '@app/shared/ui/data-table/data-table.component';
 
 @Component({
   selector: 'app-order-history-panel',

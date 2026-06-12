@@ -12,7 +12,7 @@ import {
   AREA_SEARCH_RANGE_MATCH_OPTIONS,
   AREA_SEARCH_WILDCARD_DEFAULT_OPTION_INDEX,
   AREA_SEARCH_WILDCARD_MATCH_OPTIONS
-} from '../config/area-search-fields.config';
+} from '@app/features/farming/config/area-search-fields.config';
 import {
   AreaSearchFieldGroup,
   AreaSearchFieldMeta,

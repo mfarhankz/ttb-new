@@ -1,0 +1,122 @@
+@import 'tailwindcss';
+
+@plugin 'tailwindcss-primeui';
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --color-primary: rgb(var(--ttb-primary));
+  --color-primary-foreground: rgb(var(--ttb-primary-foreground));
+
+  --color-secondary: rgb(var(--ttb-secondary));
+  --color-secondary-foreground: rgb(var(--ttb-secondary-foreground));
+
+  --color-accent: rgb(var(--ttb-accent));
+  --color-accent-foreground: rgb(var(--ttb-accent-foreground));
+
+  --color-background: rgb(var(--ttb-background));
+
+  --color-surface: rgb(var(--ttb-surface));
+  --color-surface-elevated: rgb(var(--ttb-surface-elevated));
+
+  --color-overlay: rgb(var(--ttb-overlay));
+  --color-foreground: rgb(var(--ttb-foreground));
+  --color-muted: rgb(var(--ttb-muted));
+  --color-subtle: rgb(var(--ttb-subtle));
+  --color-inverse: rgb(var(--ttb-inverse));
+
+  --color-border: rgb(var(--ttb-border));
+  --color-border-strong: rgb(var(--ttb-border-strong));
+
+  --color-success: rgb(var(--ttb-success));
+  --color-success-foreground: rgb(var(--ttb-success-foreground));
+
+  --color-warning: rgb(var(--ttb-warning));
+  --color-warning-foreground: rgb(var(--ttb-warning-foreground));
+
+  --color-danger: rgb(var(--ttb-danger));
+  --color-danger-foreground: rgb(var(--ttb-danger-foreground));
+
+  --color-info: rgb(var(--ttb-info));
+  --color-info-foreground: rgb(var(--ttb-info-foreground));
+
+  --color-focus: rgb(var(--ttb-focus-ring));
+
+  --color-sidebar: rgb(var(--ttb-sidebar));
+  --color-sidebar-foreground: rgb(var(--ttb-sidebar-foreground));
+  --color-sidebar-muted: rgb(var(--ttb-sidebar-muted));
+  --color-sidebar-active: rgb(var(--ttb-sidebar-active));
+  --color-sidebar-hover: rgb(var(--ttb-sidebar-hover));
+  --color-sidebar-border: rgb(var(--ttb-sidebar-border));
+  --color-sidebar-tooltip: rgb(var(--ttb-sidebar-tooltip));
+  --color-sidebar-tooltip-foreground: rgb(
+    var(--ttb-sidebar-tooltip-foreground)
+  );
+
+  --font-sans: var(--ttb-font-sans);
+  --font-display: var(--ttb-font-display);
+  --font-mono: var(--ttb-font-mono);
+
+  --text-display: 2.25rem;
+  --text-display--line-height: 2.5rem;
+  --text-display--font-weight: 700;
+  --text-h1: 1.875rem;
+  --text-h1--line-height: 2.25rem;
+  --text-h1--font-weight: 700;
+  --text-h2: 1.5rem;
+  --text-h2--line-height: 2rem;
+  --text-h2--font-weight: 600;
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.75rem;
+  --text-h3--font-weight: 600;
+  --text-h4: 1.125rem;
+  --text-h4--line-height: 1.5rem;
+  --text-h4--font-weight: 600;
+  --text-body: var(--font-size-body);
+  --text-body--line-height: var(--line-height-body);
+  --text-body-sm: var(--font-size-body-sm);
+  --text-body-sm--line-height: var(--line-height-body-sm);
+  --text-caption: var(--font-size-caption);
+  --text-caption--line-height: var(--line-height-caption);
+  --text-overline: 0.65rem;
+  --text-overline--line-height: 1rem;
+  --text-overline--letter-spacing: 0.08em;
+  --text-overline--font-weight: 600;
+
+  --radius-sm: var(--ttb-radius-sm);
+  --radius-md: var(--ttb-radius-md);
+  --radius-lg: var(--ttb-radius-lg);
+  --radius-xl: var(--ttb-radius-xl);
+
+  --spacing-sidebar: var(--sidebar-width);
+  --spacing-sidebar-collapsed: var(--sidebar-width-collapsed);
+
+  --width-sidebar: var(--sidebar-width);
+  --width-sidebar-collapsed: var(--sidebar-width-collapsed);
+
+  --margin-sidebar: var(--sidebar-width);
+  --margin-sidebar-collapsed: var(--sidebar-width-collapsed);
+
+  --spacing-18: 4.5rem;
+
+  --z-index-sidebar: 40;
+  --z-index-41: 41;
+  --z-index-toolbar: 10;
+  --z-index-modal: 50;
+  --z-index-tooltip: 50;
+
+  --color-score-tier-1: #e83030;
+  --color-score-tier-2: #f9851f;
+  --color-score-tier-3: #ffd500;
+  --color-score-tier-4: #afdf20;
+  --color-score-tier-5: #21c45d;
+
+  --shadow-xs: 0 1px 2px 0 rgb(var(--ttb-overlay) / 0.05);
+  --shadow-sm: 0 1px 2px 0 rgb(var(--ttb-overlay) / 0.05);
+  --shadow-md:
+    0 4px 6px -1px rgb(var(--ttb-overlay) / 0.1),
+    0 2px 4px -2px rgb(var(--ttb-overlay) / 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgb(var(--ttb-overlay) / 0.1),
+    0 4px 6px -4px rgb(var(--ttb-overlay) / 0.1);
+}

@@ -24,23 +24,23 @@ import {
   DETAIL_FARM_OVERFLOW_MENU_ACTIONS,
   DetailExportActionId,
   DetailToolbarActionId
-} from '@app/core/config/detail-page-toolbar.config';
+} from '@app/features/detail/config/detail-page-toolbar.config';
 import {
   buildQueryOverflowMenuItems,
   buildQuerySaveShareMenuItems,
   QueryOverflowActionId,
   QuerySaveShareActionId
-} from '@app/core/config/detail-page-query-toolbar.config';
+} from '@app/features/detail/config/detail-page-query-toolbar.config';
 import { AreaSearchPayload } from '@app/core/interfaces/area-search-field.interface';
-import { AreaSearchService } from '@app/core/services/area-search.service';
+import { AreaSearchService } from '@app/features/farming/services/area-search.service';
 import { AlertComponent, ButtonComponent } from '@app/shared/components';
-import { ModalComponent } from '@app/shared/components/modal/modal.component';
-import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
-import { DataTableColumn } from '@app/shared/components/data-table/data-table.types';
-import { MapTablePipelineComponent } from '@app/shared/components/map-table-pipeline/map-table-pipeline.component';
-import { MapPipelineViewMode } from '@app/shared/components/map-table-pipeline/map-table-pipeline.types';
-import { OlMapComponent } from '@app/shared/components/ol-map/ol-map.component';
-import { AreaSearchCriteriaChipsComponent } from '@app/shared/components/area-search-fields/area-search-criteria-chips.component';
+import { ModalComponent } from '@app/shared/ui/modal/modal.component';
+import { DataTableComponent } from '@app/shared/ui/data-table/data-table.component';
+import { DataTableColumn } from '@app/shared/ui/data-table/data-table.types';
+import { MapTablePipelineComponent } from '@app/features/map/components/map-table-pipeline/map-table-pipeline.component';
+import { MapPipelineViewMode } from '@app/features/map/components/map-table-pipeline/map-table-pipeline.types';
+import { OlMapComponent } from '@app/shared/widgets/ol-map/ol-map.component';
+import { AreaSearchCriteriaChipsComponent } from '@app/features/farming/components/area-search-fields/area-search-criteria-chips.component';
 import {
   DETAIL_PAGE_DEFAULT_PAGE_SIZE,
   DETAIL_PAGE_EMPTY_COPY,
@@ -51,22 +51,22 @@ import {
   STATISTICS_SEARCH_FIELD_OPTIONS,
   isSellRefiScoresPending,
   shouldHideSellRefiScoresMenuAction
-} from '@app/core/config/detail-page.config';
-import { MAP_DEFAULTS } from '@app/core/config/map.config';
+} from '@app/features/detail/config/detail-page.config';
+import { MAP_DEFAULTS } from '@app/features/map/config/map.config';
 import { DetailPageRouterState } from '@app/core/interfaces/property-record.interface';
-import { AreaSearchSessionService } from '@app/core/services/area-search-session.service';
-import { AreaSearchStateService } from '@app/core/services/area-search-state.service';
-import { DetailPageService } from '@app/core/services/detail-page.service';
+import { AreaSearchSessionService } from '@app/features/farming/services/area-search-session.service';
+import { AreaSearchStateService } from '@app/features/farming/services/area-search-state.service';
+import { DetailPageService } from '@app/features/detail/services/detail-page.service';
 import { LayoutService } from '@app/core/services/layout.service';
-import { MapTableSyncService } from '@app/core/services/map-table-sync.service';
-import { OlMapService, type MapObjectRefs } from '@app/core/services/ol-map.service';
-import { StatsAreaSearchStateService } from '@app/core/services/stats-area-search-state.service';
-import { StatisticsSessionService } from '@app/core/services/statistics-session.service';
-import { ClearSearchService } from '@app/core/services/clear-search.service';
-import { ClearSearchStateService } from '@app/core/services/clear-search-state.service';
-import type { DetailSource } from '@app/core/services/clear-search-state.service';
+import { MapTableSyncService } from '@app/features/map/services/map-table-sync.service';
+import { OlMapService, type MapObjectRefs } from '@app/features/map/services/ol-map.service';
+import { StatsAreaSearchStateService } from '@app/features/statistics/services/stats-area-search-state.service';
+import { StatisticsSessionService } from '@app/features/statistics/services/statistics-session.service';
+import { ClearSearchService } from '@app/features/farming/services/clear-search.service';
+import { ClearSearchStateService } from '@app/features/farming/services/clear-search-state.service';
+import type { DetailSource } from '@app/features/farming/services/clear-search-state.service';
 import { AuthService } from '@app/core/services/auth.service';
-import { NetSheetModalService } from '@app/core/services/net-sheet-modal.service';
+import { NetSheetModalService } from '@app/features/net-sheet/services/net-sheet-modal.service';
 import { downloadCsv } from '@app/core/utils/csv-download.util';
 
 const DETAIL_ACTIONS_COLUMN: DataTableColumn = {

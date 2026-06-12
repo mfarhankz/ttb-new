@@ -1,0 +1,60 @@
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility map-pin {
+  display: inline-flex;
+  height: 1.8125rem;
+  width: 1.5625rem;
+  align-items: flex-start;
+  justify-content: center;
+  background: url('/assets/images/_pin.png') no-repeat center center;
+  background-size: 22px 28px;
+  padding-top: 0.25rem;
+  padding-right: 0.1875rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+}
+
+@utility map-pin--owner {
+  background-image: url('/assets/images/_map-pin-green.png');
+}
+
+@layer utilities {
+  @media print {
+    body.is-printing * {
+      visibility: hidden;
+    }
+
+    body.is-printing .print-element,
+    body.is-printing .print-element * {
+      visibility: visible;
+    }
+
+    body.is-printing .print-element {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      padding: 1rem;
+    }
+
+    body.is-printing .print-hide {
+      display: none !important;
+      visibility: hidden !important;
+    }
+  }
+}

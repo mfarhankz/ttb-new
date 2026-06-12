@@ -1,0 +1,76 @@
+/* Outside @layer so these beat PrimeNG menu item hover/focus (unlayered theme CSS). */
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--success-light:not(.p-disabled) > .p-menu-item-content {
+  background-color: rgb(220 252 231);
+  color: rgb(22 101 52);
+  font-weight: 500;
+}
+
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--success-light:not(.p-disabled) > .p-menu-item-content:hover,
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--success-light.p-focus > .p-menu-item-content {
+  background-color: rgb(74 222 128);
+  color: rgb(20 83 45);
+}
+
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--success-dark:not(.p-disabled) > .p-menu-item-content {
+  background-color: #1b8333;
+  color: #fff;
+  font-weight: 500;
+}
+
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--success-dark:not(.p-disabled) > .p-menu-item-content:hover,
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--success-dark.p-focus > .p-menu-item-content {
+  background-color: #0f5421;
+  color: #fff;
+}
+
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--danger:not(.p-disabled) > .p-menu-item-content {
+  color: rgb(var(--ttb-danger));
+  font-weight: 500;
+}
+
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--danger:not(.p-disabled) > .p-menu-item-content:hover,
+.detail-overflow-menu .p-menu-item.detail-overflow-menu-item--danger.p-focus > .p-menu-item-content {
+  background-color: rgb(var(--ttb-danger) / 0.1);
+  color: rgb(var(--ttb-danger));
+}
+
+/* Outside @layer — beats PrimeNG chip remove-icon width/height tokens. */
+.p-multiselect .p-multiselect-chip-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.p-multiselect .p-multiselect-chip.p-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.25rem;
+}
+
+.p-multiselect .p-multiselect-chip .p-chip-label {
+  display: flex;
+  align-items: center;
+  line-height: 1.25;
+}
+
+.p-multiselect .p-multiselect-chip .p-chip-remove-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  width: 1em !important;
+  height: 1em !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  font-size: 0.65rem !important;
+  line-height: 1 !important;
+  border-radius: 0 !important;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* PrimeNG accordion content — equal padding on all sides (default token sets top to 0). */
+.p-accordioncontent-content {
+  --p-accordion-content-padding: 1.125rem;
+  padding: var(--p-accordion-content-padding) !important;
+}

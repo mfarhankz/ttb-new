@@ -1,6 +1,6 @@
-import { STATS_RANGE_FIELDS } from '../config/statistics.config';
-import { StatsRangeFieldValue, TractStatsFormData, TractStatsInfo } from '../interfaces/statistics.interface';
-import { MapDrawnGeometry } from '../services/ol-map.service';
+import { STATS_RANGE_FIELDS } from '@app/features/statistics/config/statistics.config';
+import { StatsRangeFieldValue, TractStatsFormData, TractStatsInfo } from '@app/core/interfaces/statistics.interface';
+import { MapDrawnGeometry } from '@app/features/map/services/ol-map.service';
 
 function restoreRangeFieldForForm(apiRange: StatsRangeFieldValue): StatsRangeFieldValue {
   if (apiRange.match === 'From-To' && apiRange.value && typeof apiRange.value === 'object') {

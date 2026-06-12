@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { VERTICAL_CONFIG } from '@app/core/config/vertical.config';
-import { AccountSettingsService } from '@app/core/services/account-settings.service';
+import { AccountSettingsService } from '@app/features/dashboard/services/account-settings.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { SessionExpiredService } from '@app/core/services/session-expired.service';
 import { VerticalService } from '@app/core/services/vertical.service';

@@ -10,7 +10,7 @@ This directory contains reusable UI components that abstract the underlying UI l
 Text input component with support for various types, validation, and error messages.
 
 ```typescript
-import { InputComponent } from '@shared/components';
+import { InputComponent } from '@app/shared/components';
 
 // Usage
 <app-input
@@ -43,7 +43,7 @@ import { InputComponent } from '@shared/components';
 Dropdown/select component with options support.
 
 ```typescript
-import { SelectComponent, SelectOption } from '@shared/components';
+import { SelectComponent, SelectOption } from '@app/shared/components';
 
 const options: SelectOption[] = [
   { label: 'Option 1', value: '1' },
@@ -101,7 +101,7 @@ Radio button component (use multiple for radio groups).
 Button component with variants and loading states.
 
 ```typescript
-import { ButtonComponent } from '@shared/components';
+import { ButtonComponent } from '@app/shared/components';
 
 <app-button
   variant="primary"
@@ -133,7 +133,7 @@ Card container component.
 Modal/dialog component.
 
 ```typescript
-import { ModalComponent } from '@shared/components';
+import { ModalComponent } from '@app/shared/components';
 
 <app-modal
   #modal
@@ -156,7 +156,7 @@ modal.open();
 Alert/message component.
 
 ```typescript
-import { AlertComponent, AlertType } from '@shared/components';
+import { AlertComponent, AlertType } from '@app/shared/components';
 
 <app-alert
   type="error"
@@ -200,7 +200,7 @@ import {
   ButtonComponent, 
   AlertComponent,
   CardComponent 
-} from '@shared/components';
+} from '@app/shared/components';
 
 @Component({
   selector: 'app-example',

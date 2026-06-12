@@ -16,12 +16,12 @@ import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
-import { PURCHASE_HISTORY_FILTER_FIELD_OPTIONS } from '@app/core/config/purchase-history-filters.config';
+import { PURCHASE_HISTORY_FILTER_FIELD_OPTIONS } from '@app/features/dashboard/config/purchase-history-filters.config';
 import { AuthService } from '@app/core/services/auth.service';
-import { DashboardTabToolbarService } from '@app/core/services/dashboard-tab-toolbar.service';
-import { PurchaseHistoryService } from '@app/core/services/purchase-history.service';
+import { DashboardTabToolbarService } from '@app/features/dashboard/services/dashboard-tab-toolbar.service';
+import { PurchaseHistoryService } from '@app/features/dashboard/services/purchase-history.service';
 import { SessionExpiredService } from '@app/core/services/session-expired.service';
-import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
+import { DataTableComponent } from '@app/shared/ui/data-table/data-table.component';
 
 @Component({
   selector: 'app-purchase-history-panel',

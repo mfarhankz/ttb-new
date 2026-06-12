@@ -4,8 +4,8 @@ import { InputText } from 'primeng/inputtext';
 import { AuthService } from '@app/core/services/auth.service';
 import { NetSheetConfig } from '@app/core/interfaces/net-sheet.interface';
 import { CardComponent } from '@app/shared/components';
-import { AreaSearchControlStyles } from '@app/shared/components/area-search-fields/area-search-control.styles';
-import { NetSheetComponent } from '@app/shared/components/net-sheet/net-sheet.component';
+import { AreaSearchControlStyles } from '@app/features/farming/components/area-search-fields/area-search-control.styles';
+import { NetSheetComponent } from '@app/features/net-sheet/components/net-sheet/net-sheet.component';
 
 @Component({
   selector: 'app-buyer-cost-estimate',

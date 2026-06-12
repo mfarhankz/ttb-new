@@ -2,8 +2,8 @@ import { CurrencyPipe } from '@angular/common';
 import { Component, computed, effect, inject } from '@angular/core';
 import { SessionExpiredService } from '@app/core/services/session-expired.service';
 import { VerticalService } from '@app/core/services/vertical.service';
-import { WalletService } from '@app/core/services/wallet.service';
-import { PayNowModalService } from '@app/core/services/pay-now-modal.service';
+import { WalletService } from '@app/features/payment/services/wallet.service';
+import { PayNowModalService } from '@app/features/payment/services/pay-now-modal.service';
 import { ButtonComponent, CardComponent } from '@app/shared/components';
 
 @Component({

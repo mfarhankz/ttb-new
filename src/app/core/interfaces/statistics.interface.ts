@@ -1,4 +1,4 @@
-import { MapDrawnGeometry } from '../services/ol-map.service';
+import { MapDrawnGeometry } from '@app/features/map/services/ol-map.service';
 
 export interface StatsRangeFieldValue {
   match?: string;

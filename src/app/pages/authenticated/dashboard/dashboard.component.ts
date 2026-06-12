@@ -13,8 +13,8 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser, NgTemplateOutlet } from '@angular/common';
 import { AuthService } from '@app/core/services/auth.service';
-import { AdminPermissionsService } from '@app/core/services/admin-permissions.service';
-import { DashboardTabToolbarService } from '@app/core/services/dashboard-tab-toolbar.service';
+import { AdminPermissionsService } from '@app/features/admin/services/admin-permissions.service';
+import { DashboardTabToolbarService } from '@app/features/dashboard/services/dashboard-tab-toolbar.service';
 import { ADMIN_NAV, MANAGE_ACCOUNT_NAV, DASHBOARD_SECTION_NAV, NavItem } from '@app/core/config/navigation.config';
 import { CardComponent, TabToolbarComponent } from '@app/shared/components';
 import {
@@ -24,11 +24,13 @@ import {
   AccountInformationPanelComponent,
   DownloadHistoryPanelComponent,
   PurchaseHistoryPanelComponent,
-  AdminUsersPanelComponent,
-  AdminOfficesPanelComponent,
-  AdminAgenciesPanelComponent,
   OrderHistoryPanelComponent
 } from './components';
+import {
+  AdminUsersPanelComponent,
+  AdminOfficesPanelComponent,
+  AdminAgenciesPanelComponent
+} from '@app/features/admin/components';
 
 export type DashboardSectionId = 'admin' | 'manage-reports' | 'manage-account';
 

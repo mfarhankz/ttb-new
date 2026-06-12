@@ -2,12 +2,12 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { LayoutService } from '@app/core/services/layout.service';
-import { TargetOfficeService } from '@app/core/services/target-office.service';
-import { LoginModalComponent } from '@app/shared/components/login-modal/login-modal.component';
-import { PropertySearchModalComponent } from '@app/shared/components/property-search-modal/property-search-modal.component';
-import { ThemeModalComponent } from '@app/shared/components/theme-modal/theme-modal.component';
-import { PayNowHostComponent } from '@app/shared/components/pay-now-modal/pay-now-host.component';
-import { NetSheetModalHostComponent } from '@app/shared/components/net-sheet/net-sheet-modal-host.component';
+import { TargetOfficeService } from '@app/features/dashboard/services/target-office.service';
+import { LoginModalComponent } from '@app/features/auth/components/login-modal/login-modal.component';
+import { PropertySearchModalComponent } from '@app/features/property-search/components/property-search-modal/property-search-modal.component';
+import { ThemeModalComponent } from '@app/shared/ui/theme-modal/theme-modal.component';
+import { PayNowHostComponent } from '@app/features/payment/components/pay-now-modal/pay-now-host.component';
+import { NetSheetModalHostComponent } from '@app/features/net-sheet/components/net-sheet/net-sheet-modal-host.component';
 @Component({
   selector: 'app-authenticated-layout',
   standalone: true,

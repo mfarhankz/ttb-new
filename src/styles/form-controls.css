@@ -1,0 +1,53 @@
+/* Pay Now modal — match 40px field height (area search). */
+app-pay-now-modal input.p-inputtext,
+app-pay-now-modal .p-inputtext,
+app-confirm-billing-modal input.p-inputtext,
+app-confirm-billing-modal .p-inputtext {
+  box-sizing: border-box;
+  height: 2.5rem !important;
+  min-height: 2.5rem !important;
+}
+
+/* Area search form controls — match 40px height; keep multiselect overflow visible for overlay panel. */
+.p-select.h-10 {
+  box-sizing: border-box;
+  height: 2.5rem !important;
+  min-height: 2.5rem !important;
+}
+
+.p-select.h-10 .p-select-label {
+  min-height: calc(2.5rem - 2px) !important;
+}
+
+.p-multiselect.h-10 {
+  box-sizing: border-box;
+  min-height: 2.5rem !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.p-multiselect.h-10.h-auto {
+  height: auto !important;
+}
+
+.p-multiselect.h-10:not(.h-auto) {
+  height: 2.5rem !important;
+}
+
+.p-multiselect.h-10.h-auto .p-multiselect-label-container {
+  min-height: calc(2.5rem - 2px) !important;
+  height: auto !important;
+  padding-block: 0 !important;
+}
+
+.p-multiselect.h-10:not(.h-auto) .p-multiselect-label-container {
+  height: calc(2.5rem - 2px) !important;
+  padding-block: 0 !important;
+}
+
+input.p-inputtext.h-10,
+.p-inputtext.h-10 {
+  box-sizing: border-box;
+  height: 2.5rem !important;
+  min-height: 2.5rem !important;
+}
