@@ -125,109 +125,56 @@
             ></i>
           </button>
           @if (isAccordionOpen('manual')) {
-          <div class="flex flex-col gap-2 border-t border-border px-4 py-3">
-            <div class="grid gap-2 md:grid-cols-2">
+          <div class="flex flex-col gap-3 border-t border-border px-4 py-3">
+            <app-geographic-area-fields
+              layout="row-2"
+              cityZipMode="separate"
+              cityZipControl="text"
+              idPrefix="property-search"
+              selectAppendTo="body"
+              [cityZipOptional]="false"
+              [disabled]="addressSearching()"
+              [value]="addressGeographicValue()"
+              (valueChange)="onAddressGeographicChange($event)"
+            />
+
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div class="flex flex-col gap-0.5">
-                <label class="block text-body-sm font-medium text-foreground" for="site-street-number">
-                  Street Number
-                </label>
+                <label [class]="controlStyles.fieldLabel" for="site-street-number">Street Number</label>
                 <input
                   pInputText
-                  pSize="small"
                   id="site-street-number"
-                  class="w-full"
+                  [class]="controlStyles.input"
                   [ngModel]="addressForm().site_street_number"
                   (ngModelChange)="patchAddressForm({ site_street_number: $event })"
                   [disabled]="addressSearching()"
                 />
               </div>
               <div class="flex flex-col gap-0.5">
-                <label class="block text-body-sm font-medium text-foreground" for="site-route">Street Name</label>
+                <label [class]="controlStyles.fieldLabel" for="site-route">Street Name</label>
                 <input
                   pInputText
-                  pSize="small"
                   id="site-route"
-                  class="w-full"
+                  [class]="controlStyles.input"
                   [ngModel]="addressForm().site_route"
                   (ngModelChange)="patchAddressForm({ site_route: $event })"
                   [disabled]="addressSearching()"
                 />
               </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div class="flex flex-col gap-0.5">
-                <label class="block text-body-sm font-medium text-foreground" for="site-city">City</label>
+                <label [class]="controlStyles.fieldLabel" for="site-unit">Unit or APT</label>
                 <input
                   pInputText
-                  pSize="small"
-                  id="site-city"
-                  class="w-full"
-                  [ngModel]="addressForm().site_city"
-                  (ngModelChange)="patchAddressForm({ site_city: $event })"
-                  [disabled]="addressSearching()"
-                />
-              </div>
-              <div class="flex flex-col gap-0.5">
-                <label class="block text-body-sm font-medium text-foreground" for="site-state">State</label>
-                <p-select
-                  inputId="site-state"
-                  size="small"
-                  class="w-full"
-                  appendTo="body"
-                  [options]="stateOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="State"
-                  [filter]="true"
-                  [autofocusFilter]="true"
-                  filterPlaceholder="Search state"
-                  [disabled]="addressSearching()"
-                  [ngModel]="addressForm().site_state"
-                  (ngModelChange)="onAddressStateChange($event)"
-                />
-              </div>
-              <div class="flex flex-col gap-0.5">
-                <label class="block text-body-sm font-medium text-foreground" for="site-zip">Zip</label>
-                <input
-                  pInputText
-                  pSize="small"
-                  id="site-zip"
-                  class="w-full"
-                  [ngModel]="addressForm().site_zip"
-                  (ngModelChange)="patchAddressForm({ site_zip: $event })"
-                  [disabled]="addressSearching()"
-                />
-              </div>
-              <div class="flex flex-col gap-0.5">
-                <label class="block text-body-sm font-medium text-foreground" for="site-unit">Unit or APT</label>
-                <input
-                  pInputText
-                  pSize="small"
                   id="site-unit"
-                  class="w-full"
+                  [class]="controlStyles.input"
                   [class.ring-2]="highlightUnitField()"
                   [class.ring-warning]="highlightUnitField()"
                   [ngModel]="addressForm().site_unit"
                   (ngModelChange)="patchAddressForm({ site_unit: $event })"
                   [disabled]="addressSearching()"
-                />
-              </div>
-              <div class="flex flex-col gap-0.5">
-                <label class="block text-body-sm font-medium text-foreground" for="site-county">County</label>
-                <p-select
-                  inputId="site-county"
-                  size="small"
-                  class="w-full"
-                  appendTo="body"
-                  [options]="addressCounties()"
-                  optionLabel="value"
-                  optionValue="value"
-                  placeholder="County"
-                  [filter]="true"
-                  [autofocusFilter]="true"
-                  [resetFilterOnHide]="true"
-                  filterPlaceholder="Search county"
-                  [disabled]="addressSearching() || fetchingAddressCounties() || !addressForm().site_state"
-                  [ngModel]="addressForm().county"
-                  (ngModelChange)="patchAddressForm({ county: $event })"
                 />
               </div>
             </div>

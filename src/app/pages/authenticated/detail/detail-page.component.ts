@@ -65,6 +65,8 @@ import { StatisticsSessionService } from '@app/core/services/statistics-session.
 import { ClearSearchService } from '@app/core/services/clear-search.service';
 import { ClearSearchStateService } from '@app/core/services/clear-search-state.service';
 import type { DetailSource } from '@app/core/services/clear-search-state.service';
+import { AuthService } from '@app/core/services/auth.service';
+import { NetSheetModalService } from '@app/core/services/net-sheet-modal.service';
 import { downloadCsv } from '@app/core/utils/csv-download.util';
 
 const DETAIL_ACTIONS_COLUMN: DataTableColumn = {
@@ -144,6 +146,8 @@ export class DetailPageComponent implements OnInit, OnDestroy {
   private readonly statsAreaSearchStateService = inject(StatsAreaSearchStateService);
   private readonly clearSearchService = inject(ClearSearchService);
   private readonly clearSearchState = inject(ClearSearchStateService);
+  private readonly authService = inject(AuthService);
+  private readonly netSheetModalService = inject(NetSheetModalService);
 
   readonly rows = this.detailPageService.rows;
   readonly loading = this.detailPageService.loading;
@@ -497,7 +501,36 @@ export class DetailPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  onRowAction(_event: { actionId: string; row: Record<string, unknown> }): void {}
+  onRowAction(event: { actionId: string; row: Record<string, unknown> }): void {
+    if (event.actionId !== 'net-sheet') {
+      return;
+    }
+
+    const propertyId = String(event.row['propertyId'] ?? event.row['sa_property_id'] ?? '').trim();
+    if (!propertyId) {
+      return;
+    }
+
+    const addressParts = [
+      event.row['customAddress'],
+      event.row['customCity'],
+      event.row['sa_site_zip']
+    ]
+      .map((part) => (part != null ? String(part).trim() : ''))
+      .filter(Boolean);
+
+    const lat = Number(event.row['sa_y_coord']);
+    const lng = Number(event.row['sa_x_coord']);
+
+    this.netSheetModalService.open({
+      isBlankMode: false,
+      propertyId,
+      propertyAddress: addressParts.join(', '),
+      latitude: Number.isFinite(lat) ? lat : undefined,
+      longitude: Number.isFinite(lng) ? lng : undefined,
+      preparedByName: this.authService.getUserName() ?? undefined
+    });
+  }
 
   onPropertyNotesClick(_event: { row: Record<string, unknown> }): void {}
 

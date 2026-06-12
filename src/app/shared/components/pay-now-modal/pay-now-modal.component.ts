@@ -302,7 +302,7 @@ export class PayNowModalComponent {
 
   amountSuggestionButtonClass(amount: number): string {
     const base =
-      'inline-flex h-9.5 min-h-9.5 items-center rounded-md border-2 border-primary px-3 text-sm font-medium transition-colors';
+      'inline-flex h-10 min-h-10 items-center rounded-md border-2 border-primary px-3 text-sm font-medium transition-colors';
 
     return this.isAmountSelected(amount)
       ? `${base} bg-primary text-primary-foreground shadow-sm`

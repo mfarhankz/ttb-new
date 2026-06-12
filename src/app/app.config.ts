@@ -51,11 +51,11 @@ export const appConfig: ApplicationConfig = {
     },
     {
       provide: APP_INITIALIZER,
-      useFactory: (loader: MapScriptsLoaderService) => () => {
-        loader.load();
-        return Promise.resolve();
+      useFactory: (loader: MapScriptsLoaderService, vertical: VerticalService) => async () => {
+        await vertical.init();
+        loader.load(vertical.googleApiKey());
       },
-      deps: [MapScriptsLoaderService],
+      deps: [MapScriptsLoaderService, VerticalService],
       multi: true
     }
   ]

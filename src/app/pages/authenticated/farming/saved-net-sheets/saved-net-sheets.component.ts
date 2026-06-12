@@ -28,6 +28,8 @@ import { AuthService } from '@app/core/services/auth.service';
 import { SavedNetSheetsService } from '@app/core/services/saved-net-sheets.service';
 import { SessionExpiredService } from '@app/core/services/session-expired.service';
 import { VerticalService } from '@app/core/services/vertical.service';
+import { NetSheetModalService } from '@app/core/services/net-sheet-modal.service';
+import { isMockBlankPropertyId, mapNetsheetTypeToTab } from '@app/core/utils/net-sheet.util';
 
 @Component({
   selector: 'app-saved-net-sheets',
@@ -53,6 +55,7 @@ export class SavedNetSheetsComponent {
   private readonly sessionExpiredService = inject(SessionExpiredService);
   private readonly verticalService = inject(VerticalService);
   private readonly router = inject(Router);
+  private readonly netSheetModalService = inject(NetSheetModalService);
 
   readonly columns = this.savedNetSheetsService.columns;
   readonly rows = this.savedNetSheetsService.rows;
@@ -142,9 +145,23 @@ export class SavedNetSheetsComponent {
     }
 
     switch (event.actionId) {
-      case 'open':
-        this.showActionNotice('Opening a net sheet will be available once the Net Sheet modal is ported.');
+      case 'open': {
+        const propertyId = String(event.row['propertyId'] ?? '');
+        if (!propertyId) {
+          return;
+        }
+
+        this.netSheetModalService.open({
+          isBlankMode: isMockBlankPropertyId(propertyId),
+          savedMode: true,
+          propertyId,
+          netSheetId: String(netsheetId),
+          propertyAddress: String(event.row['propertyAddress'] ?? ''),
+          activeTabFieldName: mapNetsheetTypeToTab(String(event.row['netsheetType'] ?? '')),
+          preparedByName: this.authService.getUserName() ?? undefined
+        });
         break;
+      }
       case 'delete':
         this.openDeleteConfirm([netsheetId]);
         break;

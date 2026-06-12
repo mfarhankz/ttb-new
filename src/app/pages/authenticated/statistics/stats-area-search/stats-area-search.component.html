@@ -16,109 +16,22 @@
       <p class="text-body-sm text-muted">Loading search filters…</p>
     } @else {
       <div class="grid gap-6 md:grid-cols-2">
-        <div class="space-y-4">
-          <div class="flex flex-col gap-0.5">
-            <label [class]="controlStyles.fieldLabel" for="stats-state">State</label>
-            <p-select
-              size="small"
-              inputId="stats-state"
-              name="stats-state"
-              [options]="stateOptions"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Select state"
-              [disabled]="initializing() || submitting()"
-              [ngModel]="formData().mm_fips_state_code"
-              [ngModelOptions]="{ standalone: true }"
-              [panelStyleClass]="controlStyles.selectPanel"
-              [class]="controlStyles.select"
-              (ngModelChange)="onStateChange($event)"
-            />
-          </div>
+        <div class="flex flex-col">
+          <app-geographic-area-fields
+            layout="column"
+            cityZipMode="grouped"
+            cityZipControl="multiselect"
+            idPrefix="stats"
+            [cityZipOptional]="false"
+            [disabled]="isGeometryAvailable() || initializing() || submitting()"
+            [disabledTooltip]="geometryDisabledTooltip"
+            [value]="geographicValue()"
+            (valueChange)="onGeographicValueChange($event)"
+          />
 
-          <div class="flex flex-col gap-0.5">
-            <label [class]="controlStyles.fieldLabel" for="stats-county">County</label>
-            <p-select
-              size="small"
-              inputId="stats-county"
-              name="stats-county"
-              [options]="countyOptions()"
-              optionLabel="value"
-              optionValue="key"
-              placeholder="Select county"
-              [disabled]="
-                isGeometryAvailable() ||
-                initializing() ||
-                submitting() ||
-                !formData().mm_fips_state_code ||
-                loadingCounties()
-              "
-              [ngModel]="formData().mm_fips_muni_code"
-              [ngModelOptions]="{ standalone: true }"
-              [panelStyleClass]="controlStyles.selectPanel"
-              [class]="controlStyles.select"
-              (ngModelChange)="onCountyChange($event)"
-              [title]="isGeometryAvailable() ? geometryDisabledTooltip : ''"
-            />
-          </div>
-
-          <div class="flex flex-col gap-0.5">
-            <span [class]="controlStyles.fieldLabel">City / Zip Code</span>
-            <div class="mb-1 flex gap-4 text-body-sm text-foreground">
-              <label class="inline-flex cursor-pointer items-center gap-2">
-                <input
-                  type="radio"
-                  name="stats-group-type"
-                  value="sa_site_city"
-                  [disabled]="isGeometryAvailable() || initializing() || submitting()"
-                  [ngModel]="groupType()"
-                  [ngModelOptions]="{ standalone: true }"
-                  (ngModelChange)="onGroupTypeChange('sa_site_city')"
-                />
-                City
-              </label>
-              <label class="inline-flex cursor-pointer items-center gap-2">
-                <input
-                  type="radio"
-                  name="stats-group-type"
-                  value="sa_site_zip"
-                  [disabled]="isGeometryAvailable() || initializing() || submitting()"
-                  [ngModel]="groupType()"
-                  [ngModelOptions]="{ standalone: true }"
-                  (ngModelChange)="onGroupTypeChange('sa_site_zip')"
-                />
-                Zip Code
-              </label>
-            </div>
-            <p-multiSelect
-              size="small"
-              name="stats-group-values"
-              [options]="groupChoices()"
-              optionLabel="value"
-              optionValue="key"
-              placeholder="Select"
-              [showToggleAll]="false"
-              [showHeader]="false"
-              [filter]="false"
-              [disabled]="
-                isGeometryAvailable() ||
-                initializing() ||
-                submitting() ||
-                !formData().mm_fips_state_code ||
-                !formData().mm_fips_muni_code ||
-                loadingGroupChoices()
-              "
-              [ngModel]="selectedGroupValues()"
-              [ngModelOptions]="{ standalone: true }"
-              [panelStyleClass]="controlStyles.multiSelectPanel"
-              [class]="controlStyles.multiSelect"
-              (ngModelChange)="onGroupValuesChange($event)"
-              [title]="isGeometryAvailable() ? geometryDisabledTooltip : ''"
-            />
-          </div>
-
-          <div class="flex flex-col gap-0.5">
-            <label [class]="controlStyles.fieldLabel" for="stats-property-type">Property Type</label>
+          <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-0.5">
+              <label [class]="controlStyles.fieldLabel" for="stats-property-type">Property Type</label>
             <p-multiSelect
               inputId="stats-property-type"
               name="stats-property-type"
@@ -141,10 +54,10 @@
               [class]="controlStyles.treeMultiSelect"
               (ngModelChange)="onPropertyTypesChange($event)"
             />
-          </div>
+            </div>
 
-          <div class="flex flex-col gap-0.5">
-            <label [class]="controlStyles.fieldLabel" for="stats-tract-type">Area Type</label>
+            <div class="flex flex-col gap-0.5">
+              <label [class]="controlStyles.fieldLabel" for="stats-tract-type">Area Type</label>
             <p-select
               size="small"
               inputId="stats-tract-type"
@@ -160,6 +73,7 @@
               [class]="controlStyles.select"
               (ngModelChange)="updateFormField('tract_type', $event)"
             />
+            </div>
           </div>
         </div>
 

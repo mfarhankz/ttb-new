@@ -27,6 +27,7 @@ export class VerticalService {
   private readonly _agencyConfig = signal<AgencyConfig | null>(null);
   private readonly _initialized = signal(false);
   private readonly _initError = signal<string | null>(null);
+  private initPromise: Promise<void> | null = null;
 
   readonly meta = this._meta.asReadonly();
   readonly content = this._content.asReadonly();
@@ -85,6 +86,12 @@ export class VerticalService {
     return key != null ? String(key) : '';
   });
 
+  /** Legacy appConstant.GOOGLE_API_KEY — used for Maps / Street View / geocoding. */
+  readonly googleApiKey = computed(() => {
+    const key = this._content()?.app_config?.GOOGLE_API_KEY;
+    return key != null ? String(key).trim() : '';
+  });
+
   /** Legacy app_config.grayout_primary_fields — disables email/password on profile pages. */
   readonly grayoutPrimaryFields = computed(() => {
     const value = this._content()?.app_config?.['grayout_primary_fields'];
@@ -95,7 +102,16 @@ export class VerticalService {
     return this.verticalName() === VERTICAL_CONFIG.defaultVerticalName;
   });
 
-  async init(): Promise<void> {
+  init(): Promise<void> {
+    if (this.initPromise) {
+      return this.initPromise;
+    }
+
+    this.initPromise = this.runInit();
+    return this.initPromise;
+  }
+
+  private async runInit(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) {
       this._initialized.set(true);
       return;

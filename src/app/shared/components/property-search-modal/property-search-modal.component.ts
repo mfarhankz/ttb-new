@@ -1,10 +1,10 @@
-import { Component, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { finalize } from 'rxjs';
-import { US_STATE_ABBREV_OPTIONS } from '@app/core/config/us-states.config';
+import { US_STATE_ABBREV_OPTIONS, US_STATE_FIPS_BY_ABBREV } from '@app/core/config/us-states.config';
 import {
   AddressSearchFormData,
   AddressSearchHistoryEntry,
@@ -27,7 +27,9 @@ import {
   loadAddressSearchHistory,
   saveAddressSearchHistory
 } from '@app/core/utils/property-search-history.util';
-import { AlertComponent, ButtonComponent } from '@app/shared/components';
+import { AlertComponent, ButtonComponent, GeographicAreaFieldsComponent } from '@app/shared/components';
+import { AreaSearchControlStyles } from '@app/shared/components/area-search-fields/area-search-control.styles';
+import { GeographicAreaFieldsValue } from '@app/shared/components/geographic-area-fields/geographic-area-fields.types';
 import { AddressAutocompleteComponent } from '@app/shared/components/address-autocomplete/address-autocomplete.component';
 import { TabNavComponent } from '@app/shared/components/tab-nav/tab-nav.component';
 import { TabNavItem } from '@app/shared/components/tab-nav/tab-nav.types';
@@ -47,12 +49,15 @@ type PropertySearchAccordionSection = 'manual' | 'history' | 'map';
     TabNavComponent,
     Select,
     InputText,
-    AddressAutocompleteComponent
+    AddressAutocompleteComponent,
+    GeographicAreaFieldsComponent
   ],
   templateUrl: './property-search-modal.component.html',
   styles: []
 })
 export class PropertySearchModalComponent {
+  protected readonly controlStyles = AreaSearchControlStyles;
+
   private readonly router = inject(Router);
   private readonly modalService = inject(PropertySearchModalService);
   private readonly propertySearchService = inject(PropertySearchService);
@@ -60,6 +65,7 @@ export class PropertySearchModalComponent {
   private readonly areaChoicesService = inject(AreaChoicesService);
   private readonly verticalService = inject(VerticalService);
   private readonly modal = viewChild.required<ModalComponent>('modal');
+  private readonly geographicFields = viewChild(GeographicAreaFieldsComponent);
 
   readonly tabNavItems: TabNavItem[] = [
     { id: 'address', label: 'Address', icon: 'pi pi-map-marker' },
@@ -78,7 +84,7 @@ export class PropertySearchModalComponent {
 
   readonly addressCounties = signal<CountyChoice[]>([]);
   readonly addressStateFips = signal<string | null>(null);
-  readonly fetchingAddressCounties = signal(false);
+  readonly addressCountyFips = signal<string | undefined>(undefined);
 
   readonly ownerCountyOptions = signal<CountyFipsOption[]>([]);
   readonly parcelCountyOptions = signal<CountyFipsOption[]>([]);
@@ -98,6 +104,17 @@ export class PropertySearchModalComponent {
 
   readonly smartyResetToken = signal(0);
   readonly highlightUnitField = signal(false);
+
+  readonly addressGeographicValue = computed(
+    (): GeographicAreaFieldsValue => ({
+      stateFips: this.addressStateFips() ?? undefined,
+      countyFips: this.addressCountyFips(),
+      stateAbbrev: this.addressForm().site_state,
+      countyLabel: this.addressForm().county,
+      siteCity: this.addressForm().site_city,
+      siteZip: this.addressForm().site_zip
+    })
+  );
 
   private ownerCountyDebounce?: ReturnType<typeof setTimeout>;
   private parcelCountyDebounce?: ReturnType<typeof setTimeout>;
@@ -138,16 +155,35 @@ export class PropertySearchModalComponent {
     this.openAccordion.set(section);
   }
 
-  onAddressStateChange(stateAbbrev: string | null): void {
-    this.patchAddressForm({ site_state: stateAbbrev ?? undefined, county: undefined });
-    this.addressCounties.set([]);
-    this.addressStateFips.set(null);
+  onAddressGeographicChange(value: GeographicAreaFieldsValue): void {
+    const stateFips = value.stateFips ?? null;
+    this.addressStateFips.set(stateFips);
+    this.addressCountyFips.set(value.countyFips);
 
-    if (!stateAbbrev) {
+    const patch: Partial<AddressSearchFormData> = {
+      site_state: value.stateAbbrev ?? this.addressForm().site_state,
+      site_city: value.siteCity,
+      site_zip: value.siteZip,
+      county: value.countyLabel ? normalizeCountyForDropdown(value.countyLabel) : undefined
+    };
+
+    if (stateFips && value.countyFips) {
+      patch.state_county_fips = `${stateFips}${value.countyFips}`;
+    } else if (!value.countyFips) {
+      patch.state_county_fips = undefined;
+    }
+
+    this.patchAddressForm(patch);
+
+    if (stateFips) {
+      this.areaChoicesService.fetchCountiesByFips(stateFips).subscribe({
+        next: (counties) => this.addressCounties.set(counties),
+        error: () => this.addressCounties.set([])
+      });
       return;
     }
 
-    this.loadAddressCounties(stateAbbrev);
+    this.addressCounties.set([]);
   }
 
   onOwnerCountyFilter(event: { filter: string }): void {
@@ -311,6 +347,8 @@ export class PropertySearchModalComponent {
     this.siteStateForMailing.set('CA');
     this.addressCounties.set([]);
     this.addressStateFips.set(null);
+    this.addressCountyFips.set(undefined);
+    this.geographicFields()?.resetFetchCache();
     this.addressStatus.set(null);
     this.openAccordionSection('manual');
   }
@@ -335,7 +373,8 @@ export class PropertySearchModalComponent {
       site_state: entry.site_state,
       site_zip: entry.site_zip,
       site_unit: entry.site_unit,
-      county: entry.county
+      county: entry.county,
+      state_county_fips: entry.state_county_fips
     });
 
     if (entry.address_type) {
@@ -346,10 +385,7 @@ export class PropertySearchModalComponent {
       this.siteStateForMailing.set(entry.siteStateForMailing);
     }
 
-    if (entry.site_state) {
-      this.onAddressStateChange(entry.site_state);
-    }
-
+    this.syncGeographicFromAddressForm(entry.state_county_fips);
     this.openAccordionSection('manual');
     this.activeTab.set('address');
   }
@@ -400,19 +436,12 @@ export class PropertySearchModalComponent {
 
     this.addressForm.set(nextForm);
 
-    if (details.state_county_fips && details.state_county_fips.length >= 2) {
-      this.addressStateFips.set(details.state_county_fips.slice(0, 2));
-    }
-
     if (details.site_unit) {
       this.highlightUnitField.set(true);
       setTimeout(() => this.highlightUnitField.set(false), 2500);
     }
 
-    if (nextForm.site_state) {
-      this.loadAddressCounties(nextForm.site_state, county);
-    }
-
+    this.syncGeographicFromAddressForm(details.state_county_fips);
     this.openAccordionSection('manual');
   }
 
@@ -420,25 +449,53 @@ export class PropertySearchModalComponent {
     return this.verticalService.smartyVerificationEnabled();
   }
 
-  private loadAddressCounties(stateAbbrev: string, preserveCounty?: string): void {
-    this.fetchingAddressCounties.set(true);
-    this.areaChoicesService.resolveStateFips(stateAbbrev).subscribe((stateFips) => {
-      this.addressStateFips.set(stateFips);
-    });
+  private syncGeographicFromAddressForm(stateCountyFips?: string): void {
+    const form = this.addressForm();
+    const stateFips =
+      stateCountyFips?.slice(0, 2) ??
+      (form.site_state ? US_STATE_FIPS_BY_ABBREV[form.site_state.toUpperCase()] : undefined);
+    const countyFipsFromFips = stateCountyFips && stateCountyFips.length > 2
+      ? stateCountyFips.slice(2)
+      : undefined;
 
-    this.areaChoicesService.fetchCountiesForStateAbbrev(stateAbbrev).subscribe({
+    this.geographicFields()?.resetFetchCache();
+    this.addressStateFips.set(stateFips ?? null);
+
+    if (!stateFips) {
+      this.addressCountyFips.set(undefined);
+      this.addressCounties.set([]);
+      return;
+    }
+
+    this.areaChoicesService.fetchCountiesByFips(stateFips).subscribe({
       next: (counties) => {
         this.addressCounties.set(counties);
-        this.fetchingAddressCounties.set(false);
-        if (preserveCounty) {
-          this.patchAddressForm({ county: preserveCounty });
-        }
+
+        const countyFips = countyFipsFromFips ?? this.matchCountyFips(counties, form.county);
+
+        this.addressCountyFips.set(countyFips);
       },
       error: () => {
         this.addressCounties.set([]);
-        this.fetchingAddressCounties.set(false);
+        this.addressCountyFips.set(countyFipsFromFips);
       }
     });
+  }
+
+  private matchCountyFips(counties: CountyChoice[], countyName?: string): string | undefined {
+    if (!countyName?.trim()) {
+      return undefined;
+    }
+
+    const normalized = normalizeCountyForDropdown(countyName);
+    const match = counties.find(
+      (county) =>
+        county.value.toUpperCase() === normalized ||
+        county.value === countyName ||
+        county.value.toUpperCase() === countyName.toUpperCase()
+    );
+
+    return match?.key;
   }
 
   private initializeModal(): void {

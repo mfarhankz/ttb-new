@@ -53,6 +53,17 @@ export class SidebarComponent implements OnInit, OnDestroy {
         return [item];
       }
 
+      if (item.label === 'Buyer Cost Estimate') {
+        const netsheetSupported = this.verticalService.content()?.app_config?.['netsheet_support'] !== false;
+        const buyerCostSupported =
+          this.verticalService.content()?.app_config?.['buyer_cost_estimate_support'] !== false;
+        const rateAdvisor = this.verticalService.content()?.app_config?.['rateadvisor_support'] === true;
+        if (!netsheetSupported || !buyerCostSupported || rateAdvisor) {
+          return [];
+        }
+        return [item];
+      }
+
       if (item.label !== 'Farming' || !item.children?.length) {
         return [item];
       }

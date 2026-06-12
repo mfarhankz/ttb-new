@@ -1,5 +1,5 @@
-/** 38px — legacy Query Tool control height. */
-const height = 'h-9.5 min-h-9.5';
+/** 40px (2.5rem) — standard form control height. */
+const height = 'h-10 min-h-10';
 
 const fieldLabel =
   'min-h-5 text-body-sm font-medium leading-snug text-pretty text-foreground';
@@ -15,15 +15,15 @@ export const AreaSearchControlStyles = {
     'w-full min-w-0',
     height,
     '[&_.p-select-label]:flex [&_.p-select-label]:items-center',
-    '[&_.p-select-label]:min-h-[calc(2.375rem-2px)] [&_.p-select-label]:px-2.5',
+    '[&_.p-select-label]:min-h-[calc(2.5rem-2px)] [&_.p-select-label]:px-2.5',
     '[&_.p-select-label]:text-sm! [&_.p-select-label]:leading-5',
     '[&_.p-select-dropdown]:w-8'
   ].join(' '),
   multiSelect: [
     'w-full text-body-sm',
     height,
-    '[&_.p-multiselect-label]:flex [&_.p-multiselect-label]:h-[calc(2.375rem-2px)] [&_.p-multiselect-label]:items-center',
-    '[&_.p-multiselect-label-container]:flex [&_.p-multiselect-label-container]:h-[calc(2.375rem-2px)]',
+    '[&_.p-multiselect-label]:flex [&_.p-multiselect-label]:h-[calc(2.5rem-2px)] [&_.p-multiselect-label]:items-center',
+    '[&_.p-multiselect-label-container]:flex [&_.p-multiselect-label-container]:h-[calc(2.5rem-2px)]',
     '[&_.p-multiselect-label-container]:items-center [&_.p-multiselect-label-container]:py-0',
     '[&_.p-multiselect-dropdown]:w-8',
     '[&_.p-multiselect-chip]:hidden [&_.p-multiselect-chip-item]:hidden'
@@ -42,13 +42,14 @@ export const AreaSearchControlStyles = {
     '[&_.p-multiselect-option[data-p-highlight=true]]:text-primary'
   ].join(' '),
   treeMultiSelect: [
-    'w-full min-h-9.5 text-body-sm',
-    '[&]:h-auto [&]:items-center',
-    '[&_.p-multiselect-label-container]:flex [&_.p-multiselect-label-container]:min-h-[calc(2.375rem-2px)]',
+    'box-border w-full min-h-10 h-auto max-h-none text-body-sm',
+    '[&]:items-center',
+    '[&_.p-multiselect-label-container]:flex [&_.p-multiselect-label-container]:min-h-[calc(2.5rem-2px)]',
+    '[&_.p-multiselect-label-container]:h-auto',
     '[&_.p-multiselect-label-container]:min-w-0 [&_.p-multiselect-label-container]:flex-1',
     '[&_.p-multiselect-label-container]:flex-wrap [&_.p-multiselect-label-container]:items-center',
     '[&_.p-multiselect-label-container]:gap-1',
-    '[&_.p-multiselect-label-container]:py-1 [&_.p-multiselect-label-container]:pl-2',
+    '[&_.p-multiselect-label-container]:py-0 [&_.p-multiselect-label-container]:px-2.5',
     '[&_.p-multiselect-label]:flex [&_.p-multiselect-label]:min-w-0',
     '[&_.p-multiselect-label]:flex-wrap [&_.p-multiselect-label]:items-center [&_.p-multiselect-label]:gap-1',
     '[&_.p-multiselect-dropdown]:w-8 [&_.p-multiselect-dropdown]:shrink-0',

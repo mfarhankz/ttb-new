@@ -6,7 +6,8 @@ import {
   computed,
   effect,
   inject,
-  signal
+  signal,
+  viewChild
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,10 +20,8 @@ import {
   STATS_RANGE_FIELDS,
   STATS_TRACT_TYPE_OPTIONS
 } from '@app/core/config/statistics.config';
-import { US_STATE_FIPS_BY_ABBREV, US_STATE_FIPS_OPTIONS } from '@app/core/config/us-states.config';
-import { CountyChoice } from '@app/core/interfaces/property-search.interface';
+import { US_STATE_FIPS_BY_ABBREV } from '@app/core/config/us-states.config';
 import { StatsRangeFieldValue, TractStatsFormData } from '@app/core/interfaces/statistics.interface';
-import { AreaChoicesService } from '@app/core/services/area-choices.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { StatsAreaSearchService } from '@app/core/services/stats-area-search.service';
 import { StatsAreaSearchStateService } from '@app/core/services/stats-area-search-state.service';
@@ -34,8 +33,9 @@ import {
   createDefaultStatsFormData,
   restoreStatsFormFromPayload
 } from '@app/core/utils/stats-area-search-form.util';
-import { AlertComponent, ButtonComponent, CardComponent } from '@app/shared/components';
+import { AlertComponent, ButtonComponent, CardComponent, GeographicAreaFieldsComponent } from '@app/shared/components';
 import { AreaSearchControlStyles } from '@app/shared/components/area-search-fields/area-search-control.styles';
+import { GeographicAreaFieldsValue } from '@app/shared/components/geographic-area-fields/geographic-area-fields.types';
 import { ClearSearchStateService } from '@app/core/services/clear-search-state.service';
 
 @Component({
@@ -48,7 +48,8 @@ import { ClearSearchStateService } from '@app/core/services/clear-search-state.s
     ButtonComponent,
     Select,
     MultiSelect,
-    InputText
+    InputText,
+    GeographicAreaFieldsComponent
   ],
   templateUrl: './stats-area-search.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -62,8 +63,8 @@ export class StatsAreaSearchComponent implements OnInit, OnDestroy {
   private readonly stateService = inject(StatsAreaSearchStateService);
   private readonly statsAreaSearchService = inject(StatsAreaSearchService);
   private readonly statisticsSessionService = inject(StatisticsSessionService);
-  private readonly areaChoicesService = inject(AreaChoicesService);
   private readonly authService = inject(AuthService);
+  private readonly geographicFields = viewChild(GeographicAreaFieldsComponent);
   private readonly clearSearchState = inject(ClearSearchStateService);
 
   readonly rangeFields = STATS_RANGE_FIELDS;
@@ -71,7 +72,6 @@ export class StatsAreaSearchComponent implements OnInit, OnDestroy {
     key: option.key,
     value: option.value
   }));
-  readonly stateOptions = US_STATE_FIPS_OPTIONS;
   readonly geometryDisabledTooltip = 'This field is unavailable when doing a Radius/Boundary.';
 
   readonly geometry = signal<MapDrawnGeometry | undefined>(undefined);
@@ -80,14 +80,8 @@ export class StatsAreaSearchComponent implements OnInit, OnDestroy {
   readonly groupType = signal<'sa_site_city' | 'sa_site_zip'>('sa_site_city');
   readonly selectedPropertyTypes = signal<string[]>([...createDefaultStatsFormData().use_code_std!]);
   readonly selectedGroupValues = signal<string[]>(StatsAreaSearchComponent.EMPTY_SELECTION);
-  readonly countyOptions = signal<CountyChoice[]>([]);
-  readonly cityChoices = signal<CountyChoice[]>([]);
-  readonly zipChoices = signal<CountyChoice[]>([]);
   readonly initializing = signal(true);
   readonly submitting = signal(false);
-  readonly loadingCounties = signal(false);
-  readonly loadingCities = signal(false);
-  readonly loadingZips = signal(false);
   readonly statusMessage = signal<string | null>(null);
   readonly statusType = signal<'success' | 'error'>('success');
 
@@ -100,12 +94,13 @@ export class StatsAreaSearchComponent implements OnInit, OnDestroy {
     this.isGeometryAvailable() ? 'Statistic — Available Filters' : 'Statistic — Area Search'
   );
 
-  readonly groupChoices = computed(() =>
-    this.groupType() === 'sa_site_city' ? this.cityChoices() : this.zipChoices()
-  );
-
-  readonly loadingGroupChoices = computed(() =>
-    this.groupType() === 'sa_site_city' ? this.loadingCities() : this.loadingZips()
+  readonly geographicValue = computed(
+    (): GeographicAreaFieldsValue => ({
+      stateFips: this.formData().mm_fips_state_code,
+      countyFips: this.formData().mm_fips_muni_code,
+      groupType: this.groupType(),
+      groupValues: [...this.selectedGroupValues()]
+    })
   );
 
   readonly tractTypeOptions = computed(() => {
@@ -187,63 +182,36 @@ export class StatsAreaSearchComponent implements OnInit, OnDestroy {
     }));
   }
 
-  onStateChange(stateFips: string | null): void {
-    this.formData.update((current) => ({
-      ...current,
-      mm_fips_state_code: stateFips ?? undefined,
-      mm_fips_muni_code: undefined,
-      sa_site_city_value: undefined,
-      sa_site_zip_value: undefined
-    }));
-    this.selectedGroupValues.set(StatsAreaSearchComponent.EMPTY_SELECTION);
-    this.countyOptions.set([]);
-    this.cityChoices.set([]);
-    this.zipChoices.set([]);
+  onGeographicValueChange(value: GeographicAreaFieldsValue): void {
+    const groupType = value.groupType ?? 'sa_site_city';
+    const groupValues = value.groupValues ?? StatsAreaSearchComponent.EMPTY_SELECTION;
+    const groupTypeChanged = groupType !== this.groupType();
 
-    if (stateFips) {
-      this.loadCounties(stateFips);
-    }
-  }
+    this.groupType.set(groupType);
 
-  onCountyChange(countyFips: string | null): void {
-    this.formData.update((current) => ({
-      ...current,
-      mm_fips_muni_code: countyFips ?? undefined,
-      sa_site_city_value: undefined,
-      sa_site_zip_value: undefined
-    }));
-    this.selectedGroupValues.set(StatsAreaSearchComponent.EMPTY_SELECTION);
-
-    const stateFips = this.formData().mm_fips_state_code;
-    if (stateFips && countyFips) {
-      void this.loadCitiesAndZips(stateFips, countyFips);
-    }
-  }
-
-  onGroupTypeChange(type: 'sa_site_city' | 'sa_site_zip'): void {
-    if (this.groupType() === type) {
-      return;
-    }
-
-    this.groupType.set(type);
-    this.syncSelectedGroupValuesFromForm();
-    this.syncTractTypeForGroupSelection();
-  }
-
-  onGroupValuesChange(values: string[] | null | undefined): void {
-    const normalized = values ?? [];
-    if (this.arraysEqual(normalized, this.selectedGroupValues())) {
+    if (groupTypeChanged) {
+      this.formData.update((current) => ({
+        ...current,
+        mm_fips_state_code: value.stateFips,
+        mm_fips_muni_code: value.countyFips
+      }));
+      this.syncSelectedGroupValuesFromForm();
+      this.syncTractTypeForGroupSelection();
       return;
     }
 
     this.selectedGroupValues.set(
-      normalized.length ? [...normalized] : StatsAreaSearchComponent.EMPTY_SELECTION
+      groupValues.length ? [...groupValues] : StatsAreaSearchComponent.EMPTY_SELECTION
     );
 
-    const key = `${this.groupType()}_value` as 'sa_site_city_value' | 'sa_site_zip_value';
     this.formData.update((current) => ({
       ...current,
-      [key]: normalized.length ? [...normalized] : undefined
+      mm_fips_state_code: value.stateFips,
+      mm_fips_muni_code: value.countyFips,
+      sa_site_city_value:
+        groupType === 'sa_site_city' && groupValues.length ? [...groupValues] : undefined,
+      sa_site_zip_value:
+        groupType === 'sa_site_zip' && groupValues.length ? [...groupValues] : undefined
     }));
     this.syncTractTypeForGroupSelection();
   }
@@ -268,6 +236,7 @@ export class StatsAreaSearchComponent implements OnInit, OnDestroy {
     this.groupType.set('sa_site_city');
     this.selectedPropertyTypes.set(defaults.use_code_std ? [...defaults.use_code_std] : []);
     this.selectedGroupValues.set(StatsAreaSearchComponent.EMPTY_SELECTION);
+    this.geographicFields()?.resetFetchCache();
   }
 
   onCancel(): void {
@@ -344,13 +313,7 @@ export class StatsAreaSearchComponent implements OnInit, OnDestroy {
     this.groupType.set('sa_site_city');
     this.selectedPropertyTypes.set(defaults.use_code_std ? [...defaults.use_code_std] : []);
     this.selectedGroupValues.set(StatsAreaSearchComponent.EMPTY_SELECTION);
-    this.countyOptions.set([]);
-    this.cityChoices.set([]);
-    this.zipChoices.set([]);
-
-    if (defaults.mm_fips_state_code) {
-      await this.loadCounties(defaults.mm_fips_state_code);
-    }
+    this.geographicFields()?.resetFetchCache();
 
     this.initializing.set(false);
     this.scheduleDirectSubmitIfNeeded(runDirectSubmit);
@@ -376,17 +339,7 @@ export class StatsAreaSearchComponent implements OnInit, OnDestroy {
     this.groupType.set(groupType);
     this.selectedPropertyTypes.set(formData.use_code_std ? [...formData.use_code_std] : []);
     this.syncSelectedGroupValuesFromForm();
-    this.countyOptions.set([]);
-    this.cityChoices.set([]);
-    this.zipChoices.set([]);
-
-    if (formData.mm_fips_state_code) {
-      await this.loadCounties(formData.mm_fips_state_code);
-    }
-
-    if (!this.isGeometryAvailable() && formData.mm_fips_state_code && formData.mm_fips_muni_code) {
-      await this.loadCitiesAndZips(formData.mm_fips_state_code, formData.mm_fips_muni_code);
-    }
+    this.geographicFields()?.resetFetchCache();
 
     this.initializing.set(false);
 
@@ -404,46 +357,6 @@ export class StatsAreaSearchComponent implements OnInit, OnDestroy {
     }
   }
 
-  private loadCitiesAndZips(stateFips: string, countyFips: string): Promise<void> {
-    return new Promise((resolve) => {
-      let pending = 2;
-      const done = () => {
-        pending -= 1;
-        if (pending === 0) {
-          resolve();
-        }
-      };
-
-      this.loadingCities.set(true);
-      this.areaChoicesService.fetchCitiesByFips(stateFips, countyFips).subscribe({
-        next: (choices) => {
-          this.cityChoices.set(choices);
-          this.loadingCities.set(false);
-          done();
-        },
-        error: () => {
-          this.cityChoices.set([]);
-          this.loadingCities.set(false);
-          done();
-        }
-      });
-
-      this.loadingZips.set(true);
-      this.areaChoicesService.fetchZipCodesByFips(stateFips, countyFips).subscribe({
-        next: (choices) => {
-          this.zipChoices.set(choices);
-          this.loadingZips.set(false);
-          done();
-        },
-        error: () => {
-          this.zipChoices.set([]);
-          this.loadingZips.set(false);
-          done();
-        }
-      });
-    });
-  }
-
   private resolveDefaultStateFips(): string {
     const profileState = this.authService.tbUser()?.state;
     if (typeof profileState === 'string' && profileState.trim()) {
@@ -451,24 +364,6 @@ export class StatsAreaSearchComponent implements OnInit, OnDestroy {
     }
 
     return '06';
-  }
-
-  private loadCounties(stateFips: string): Promise<void> {
-    this.loadingCounties.set(true);
-    return new Promise((resolve) => {
-      this.areaChoicesService.fetchCountiesByFips(stateFips).subscribe({
-        next: (choices) => {
-          this.countyOptions.set(choices);
-          this.loadingCounties.set(false);
-          resolve();
-        },
-        error: () => {
-          this.countyOptions.set([]);
-          this.loadingCounties.set(false);
-          resolve();
-        }
-      });
-    });
   }
 
   private syncTractTypeForGroupSelection(): void {

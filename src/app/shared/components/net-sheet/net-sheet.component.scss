@@ -1,0 +1,360 @@
+.net-sheet-root {
+  padding-bottom: 1rem;
+}
+
+.net-sheet-alert {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.net-sheet-pdf-banner {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 0.375rem;
+  background: var(--surface, #fff);
+  text-align: center;
+
+  a {
+    font-weight: 600;
+    color: var(--primary, #2563eb);
+    text-decoration: underline;
+  }
+}
+
+.net-sheet-header-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.net-sheet-header-field {
+  label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+    color: #4e4e4e;
+  }
+
+  input {
+    width: 100%;
+    color: var(--primary, #3db5d9);
+  }
+}
+
+.net-sheet-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+
+  li {
+    margin-left: 2px;
+
+    button {
+      display: block;
+      padding: 0.625rem 1.125rem;
+      border: 1px solid #eee;
+      border-radius: 0;
+      background: #eee;
+      color: #4e4e4e;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    &.active button {
+      color: #fff;
+      background: #3db5d9;
+      border-color: #3db5d9;
+    }
+  }
+}
+
+.net-sheet-loading {
+  padding: 3rem 0;
+  text-align: center;
+  color: #6b7280;
+}
+
+.net-sheet-worksheet {
+  position: relative;
+}
+
+.net-sheet-worksheet--busy {
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.net-sheet-worksheet-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 2rem;
+  background: rgba(255, 255, 255, 0.45);
+
+  span {
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.net-sheet-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.net-sheet-section--refinance {
+  align-items: start;
+}
+
+.net-sheet-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.fee-fields-section {
+  h3 {
+    margin: 1.25rem 0 0.625rem;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111;
+  }
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 2rem;
+  margin-bottom: 0.25rem;
+}
+
+.field-row--total {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed #d1d5db;
+}
+
+.field-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: calc(100% - 190px);
+  padding-right: 0.5rem;
+  text-align: right;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: #4e4e4e;
+}
+
+@media (min-width: 992px) {
+  .field-label {
+    min-width: 200px;
+    max-width: 277px;
+  }
+}
+
+.field-total {
+  width: 170px;
+  text-align: right;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.field-inputs {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  width: 170px;
+  flex-shrink: 0;
+}
+
+.field-inputs--split {
+  width: auto;
+  min-width: 170px;
+}
+
+.field-currency {
+  display: flex;
+  align-items: stretch;
+  width: 170px;
+  flex-shrink: 0;
+}
+
+.field-currency--short {
+  width: 80px;
+}
+
+.field-prefix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  padding: 0 0.375rem;
+  font-size: 0.8125rem;
+  color: #495057;
+  background: #e9ecef;
+  border: 1px solid #ced4da;
+  border-right: 0;
+  border-radius: 2px 0 0 2px;
+}
+
+.field-control {
+  width: 100%;
+  height: 28px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4e4e4e;
+  background: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 0 2px 2px 0;
+
+  &:focus {
+    outline: 2px solid color-mix(in srgb, var(--primary, #3b82f6) 35%, transparent);
+    outline-offset: 0;
+  }
+
+  &:disabled,
+  &[readonly] {
+    background: #ced4da;
+    cursor: not-allowed;
+  }
+
+  &--solo {
+    width: 170px;
+    flex-shrink: 0;
+    border-radius: 2px;
+  }
+}
+
+.field-select {
+  height: 28px;
+  min-width: 5.5rem;
+  padding: 0 0.375rem;
+  font-size: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 2px;
+  background: #fff;
+}
+
+.field-inputs--go {
+  width: auto;
+  min-width: 200px;
+  max-width: 220px;
+}
+
+.field-currency--green {
+  flex: 1 1 auto;
+  max-width: calc(100% - 3.5rem);
+}
+
+.field-prefix--green {
+  background: #008003;
+  border-color: #008003;
+  color: #fff;
+}
+
+.field-control--green {
+  border-color: #008003;
+}
+
+.net-sheet-go-btn {
+  height: 28px;
+  min-width: 3rem;
+  padding: 0 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #fff;
+  background: #008003;
+  border: 1px solid #008003;
+  border-radius: 2px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
+
+.field-row--sales-price {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #d1d5db;
+}
+
+.field-label--sales-price,
+.field-total--sales-price {
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.net-sheet-disclaimer {
+  margin: 1.25rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid #b2b2b2;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: #666;
+  text-align: center;
+}
+
+.net-sheet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border, #e5e7eb);
+}
+
+@media (max-width: 991px) {
+  .net-sheet-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .net-sheet-header-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .field-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .field-label {
+    max-width: none;
+    text-align: left;
+  }
+
+  .field-currency,
+  .field-control--solo,
+  .field-inputs,
+  .field-total {
+    width: 100%;
+  }
+
+  .field-inputs--split {
+    min-width: 0;
+  }
+}

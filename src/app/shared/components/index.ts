@@ -44,4 +44,12 @@ export {
   type MapTablePipelineConfig
 } from './map-table-pipeline/map-table-pipeline.types';
 export { UsageReportTableComponent } from './usage-report-table/usage-report-table.component';
+export { GeographicAreaFieldsComponent } from './geographic-area-fields/geographic-area-fields.component';
+export {
+  type GeographicAreaCityZipControl,
+  type GeographicAreaCityZipMode,
+  type GeographicAreaFieldsValue,
+  type GeographicAreaGroupType,
+  type GeographicAreaLayout
+} from './geographic-area-fields/geographic-area-fields.types';
 

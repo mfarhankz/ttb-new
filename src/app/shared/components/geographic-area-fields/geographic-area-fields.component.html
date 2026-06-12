@@ -1,0 +1,231 @@
+<div [class]="containerClass()">
+  <div class="flex min-w-0 flex-col gap-0.5">
+    <label [class]="controlStyles.fieldLabel" [attr.for]="fieldId('state')">State</label>
+    <p-select
+      size="small"
+      [inputId]="fieldId('state')"
+      [name]="fieldId('state')"
+      [options]="stateOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Select state"
+      [disabled]="disabled()"
+      [ngModel]="value().stateFips"
+      [ngModelOptions]="{ standalone: true }"
+      [panelStyleClass]="controlStyles.selectPanel"
+      [class]="controlStyles.select"
+      [appendTo]="selectAppendTo()"
+      [title]="disabled() && disabledTooltip() ? disabledTooltip() : ''"
+      (ngModelChange)="onStateChange($event)"
+    />
+  </div>
+
+  <div class="flex min-w-0 flex-col gap-0.5">
+    <label [class]="controlStyles.fieldLabel" [attr.for]="fieldId('county')">County</label>
+    <p-select
+      size="small"
+      [inputId]="fieldId('county')"
+      [name]="fieldId('county')"
+      [options]="countyOptions()"
+      optionLabel="value"
+      optionValue="key"
+      [placeholder]="countiesLoading() ? choiceLoadingPlaceholder : 'Select county'"
+      [loading]="countiesLoading()"
+      [disabled]="disabled() || !value().stateFips"
+      [ngModel]="value().countyFips"
+      [ngModelOptions]="{ standalone: true }"
+      [panelStyleClass]="controlStyles.selectPanel"
+      [class]="controlStyles.select"
+      [appendTo]="selectAppendTo()"
+      [title]="disabled() && disabledTooltip() ? disabledTooltip() : ''"
+      (ngModelChange)="onCountyChange($event)"
+    />
+  </div>
+
+  @if (useSeparateSelect()) {
+    <div class="flex min-w-0 flex-col gap-0.5">
+      <label [class]="controlStyles.fieldLabel" [attr.for]="fieldId('city')">{{ cityLabel() }}</label>
+      <p-select
+        size="small"
+        [inputId]="fieldId('city')"
+        [name]="fieldId('city')"
+        [options]="cityOptions()"
+        optionLabel="value"
+        optionValue="key"
+        [placeholder]="citiesLoading() ? choiceLoadingPlaceholder : 'Select city'"
+        [loading]="citiesLoading()"
+        [showClear]="true"
+        [disabled]="disabled() || !value().countyFips"
+        [ngModel]="value().siteCity"
+        [ngModelOptions]="{ standalone: true }"
+        [panelStyleClass]="controlStyles.selectPanel"
+        [class]="controlStyles.select"
+        [title]="disabled() && disabledTooltip() ? disabledTooltip() : ''"
+        (ngModelChange)="onSiteCityChange($event)"
+      />
+    </div>
+
+    <div class="flex min-w-0 flex-col gap-0.5">
+      <label [class]="controlStyles.fieldLabel" [attr.for]="fieldId('zip')">{{ zipLabel() }}</label>
+      <p-select
+        size="small"
+        [inputId]="fieldId('zip')"
+        [name]="fieldId('zip')"
+        [options]="zipOptions()"
+        optionLabel="value"
+        optionValue="key"
+        [placeholder]="zipsLoading() ? choiceLoadingPlaceholder : 'Select zip code'"
+        [loading]="zipsLoading()"
+        [showClear]="true"
+        [disabled]="disabled() || !value().countyFips"
+        [ngModel]="value().siteZip"
+        [ngModelOptions]="{ standalone: true }"
+        [panelStyleClass]="controlStyles.selectPanel"
+        [class]="controlStyles.select"
+        [title]="disabled() && disabledTooltip() ? disabledTooltip() : ''"
+        (ngModelChange)="onSiteZipChange($event)"
+      />
+    </div>
+  } @else if (useSeparateMultiselect()) {
+    <div class="flex min-w-0 flex-col gap-0.5">
+      <label [class]="controlStyles.fieldLabel" [attr.for]="fieldId('city')">{{ cityLabel() }}</label>
+      <p-multiSelect
+        [inputId]="fieldId('city')"
+        [name]="fieldId('city')"
+        [options]="cityOptions()"
+        optionLabel="value"
+        optionValue="key"
+        [placeholder]="citiesLoading() ? choiceLoadingPlaceholder : 'Select city'"
+        [loading]="citiesLoading()"
+        display="chip"
+        scrollHeight="250px"
+        [showToggleAll]="false"
+        [showHeader]="false"
+        [filter]="false"
+        [highlightOnSelect]="true"
+        [maxSelectedLabels]="100"
+        [chipIcon]="controlStyles.chipRemoveIcon"
+        [disabled]="disabled() || !value().countyFips"
+        [ngModel]="value().siteCities ?? []"
+        [ngModelOptions]="{ standalone: true }"
+        [panelStyleClass]="controlStyles.treeMultiSelectPanel"
+        [class]="controlStyles.treeMultiSelect"
+        [title]="disabled() && disabledTooltip() ? disabledTooltip() : ''"
+        (ngModelChange)="onSiteCitiesChange($event)"
+      />
+    </div>
+
+    <div class="flex min-w-0 flex-col gap-0.5">
+      <label [class]="controlStyles.fieldLabel" [attr.for]="fieldId('zip')">{{ zipLabel() }}</label>
+      <p-multiSelect
+        [inputId]="fieldId('zip')"
+        [name]="fieldId('zip')"
+        [options]="zipOptions()"
+        optionLabel="value"
+        optionValue="key"
+        [placeholder]="zipsLoading() ? choiceLoadingPlaceholder : 'Select zip code'"
+        [loading]="zipsLoading()"
+        display="chip"
+        scrollHeight="250px"
+        [showToggleAll]="false"
+        [showHeader]="false"
+        [filter]="false"
+        [highlightOnSelect]="true"
+        [maxSelectedLabels]="100"
+        [chipIcon]="controlStyles.chipRemoveIcon"
+        [disabled]="disabled() || !value().countyFips"
+        [ngModel]="value().siteZips ?? []"
+        [ngModelOptions]="{ standalone: true }"
+        [panelStyleClass]="controlStyles.treeMultiSelectPanel"
+        [class]="controlStyles.treeMultiSelect"
+        [title]="disabled() && disabledTooltip() ? disabledTooltip() : ''"
+        (ngModelChange)="onSiteZipsChange($event)"
+      />
+    </div>
+  } @else if (useSeparateText()) {
+    <div class="flex min-w-0 flex-col gap-0.5">
+      <label [class]="controlStyles.fieldLabel" [attr.for]="fieldId('city')">City</label>
+      <input
+        pInputText
+        [id]="fieldId('city')"
+        [name]="fieldId('city')"
+        [class]="controlStyles.input"
+        placeholder="City"
+        [disabled]="disabled()"
+        [ngModel]="value().siteCity"
+        [ngModelOptions]="{ standalone: true }"
+        (ngModelChange)="onSiteCityChange($event)"
+      />
+    </div>
+
+    <div class="flex min-w-0 flex-col gap-0.5">
+      <label [class]="controlStyles.fieldLabel" [attr.for]="fieldId('zip')">Zip</label>
+      <input
+        pInputText
+        [id]="fieldId('zip')"
+        [name]="fieldId('zip')"
+        [class]="controlStyles.input"
+        placeholder="Zip"
+        [disabled]="disabled()"
+        [ngModel]="value().siteZip"
+        [ngModelOptions]="{ standalone: true }"
+        (ngModelChange)="onSiteZipChange($event)"
+      />
+    </div>
+  } @else {
+    <div
+      class="flex min-w-0 flex-col gap-0.5"
+      [class.lg:col-span-1]="layout() === 'row'"
+    >
+      <div class="flex gap-4 text-body-sm text-foreground">
+        <label class="inline-flex cursor-pointer items-center gap-2">
+          <input
+            type="radio"
+            [name]="fieldId('group-type')"
+            value="sa_site_city"
+            [disabled]="disabled()"
+            [ngModel]="value().groupType ?? 'sa_site_city'"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onGroupTypeChange('sa_site_city')"
+          />
+          City
+        </label>
+        <label class="inline-flex cursor-pointer items-center gap-2">
+          <input
+            type="radio"
+            [name]="fieldId('group-type')"
+            value="sa_site_zip"
+            [disabled]="disabled()"
+            [ngModel]="value().groupType ?? 'sa_site_city'"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onGroupTypeChange('sa_site_zip')"
+          />
+          Zip Code
+        </label>
+      </div>
+      <p-multiSelect
+        [name]="fieldId('group-values')"
+        [options]="groupChoices()"
+        optionLabel="value"
+        optionValue="key"
+        display="chip"
+        scrollHeight="250px"
+        [showToggleAll]="false"
+        [showHeader]="false"
+        [filter]="false"
+        [highlightOnSelect]="true"
+        [maxSelectedLabels]="100"
+        [chipIcon]="controlStyles.chipRemoveIcon"
+        [placeholder]="groupLoading() ? choiceLoadingPlaceholder : 'Select'"
+        [loading]="groupLoading()"
+        [disabled]="disabled() || !value().stateFips || !value().countyFips"
+        [ngModel]="value().groupValues ?? []"
+        [ngModelOptions]="{ standalone: true }"
+        [panelStyleClass]="controlStyles.treeMultiSelectPanel"
+        [class]="controlStyles.treeMultiSelect"
+        [title]="disabled() && disabledTooltip() ? disabledTooltip() : ''"
+        (ngModelChange)="onGroupValuesChange($event)"
+      />
+    </div>
+  }
+</div>

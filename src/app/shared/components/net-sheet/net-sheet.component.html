@@ -1,0 +1,399 @@
+<div class="net-sheet-root">
+  @if (config().isBlankMode && config().blankNameInHeader && nameError()) {
+    <app-alert type="error" class="net-sheet-alert">Please provide the name.</app-alert>
+  }
+
+  @if (config().isBlankMode && !config().blankNameInHeader) {
+    <div class="mb-4 grid gap-6 md:grid-cols-2">
+      <div class="flex flex-col gap-0.5">
+        <label [class]="controlStyles.fieldLabel" for="net-sheet-blank-name">Net Sheet Name</label>
+        <input
+          pInputText
+          id="net-sheet-blank-name"
+          type="text"
+          placeholder="Net Sheet Name here..."
+          [class]="controlStyles.input"
+          [ngModel]="blankMode().site_address"
+          (ngModelChange)="updateBlankSiteAddress($event)"
+        />
+        @if (nameError()) {
+          <p class="text-body-sm text-danger">Please provide the name.</p>
+        }
+      </div>
+    </div>
+  }
+
+  @if (config().isBlankMode) {
+    <div class="mb-4 grid gap-6 md:grid-cols-2">
+      <div class="flex flex-col gap-0.5">
+        <label [class]="controlStyles.fieldLabel" for="net-sheet-prepared-by-blank">Prepared By:</label>
+        <input
+          pInputText
+          id="net-sheet-prepared-by-blank"
+          [class]="controlStyles.input"
+          [ngModel]="config().preparedByName ?? ''"
+          disabled
+        />
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <label [class]="controlStyles.fieldLabel" for="net-sheet-prepared-for-blank">Prepared For:</label>
+        <input
+          pInputText
+          id="net-sheet-prepared-for-blank"
+          [class]="controlStyles.input"
+          [ngModel]="preparedForName()"
+          (ngModelChange)="preparedForName.set($event)"
+        />
+      </div>
+    </div>
+  }
+
+  @if (error()) {
+    <app-alert type="error" class="net-sheet-alert">{{ error() }}</app-alert>
+  }
+
+  @if (statusMessage()) {
+    <app-alert class="net-sheet-alert" [type]="statusType() === 'success' ? 'success' : 'error'">{{ statusMessage() }}</app-alert>
+  }
+
+  @if (pdfLink()) {
+    <div class="net-sheet-pdf-banner">
+      <a [href]="pdfLink()!" target="_blank" rel="noopener noreferrer">Open generated PDF</a>
+    </div>
+  }
+
+  @if (!config().isBlankMode) {
+    <div class="net-sheet-header-fields">
+      <div class="net-sheet-header-field">
+        <label for="net-sheet-prepared-by">Prepared By:</label>
+        <input pInputText id="net-sheet-prepared-by" [ngModel]="config().preparedByName ?? ''" disabled />
+      </div>
+      <div class="net-sheet-header-field">
+        <label for="net-sheet-prepared-for">Prepared For:</label>
+        <input
+          pInputText
+          id="net-sheet-prepared-for"
+          [ngModel]="preparedForName()"
+          (ngModelChange)="preparedForName.set($event)"
+          [disabled]="!showWorksheet()"
+        />
+      </div>
+    </div>
+
+    <app-net-sheet-maps
+      [address]="headlineAddress()"
+      [latitude]="config().latitude"
+      [longitude]="config().longitude"
+    />
+  }
+
+  @if (showWorksheet() && !config().isBlankMode && visibleTabs().length) {
+    <ul class="net-sheet-tabs" role="tablist">
+      @for (tab of visibleTabs(); track tab.id) {
+        <li role="presentation" [class.active]="activeTab() === tab.id">
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="activeTab() === tab.id"
+            (click)="selectTab(tab.id)"
+          >
+            {{ tab.label }}
+          </button>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (config().isBlankMode && !blankOnceLoaded()) {
+    <div class="space-y-4">
+      <app-geographic-area-fields
+        layout="row"
+        cityZipMode="separate"
+        cityZipControl="select"
+        idPrefix="net-sheet-blank"
+        [disabled]="loading()"
+        [value]="blankGeographicValue()"
+        (valueChange)="onBlankGeographicChange($event)"
+      />
+
+      <div class="grid gap-6 md:grid-cols-2">
+        <div class="flex flex-col gap-0.5">
+          <label [class]="controlStyles.fieldLabel" for="net-sheet-blank-sales-price">Sales Price</label>
+          <input
+            pInputText
+            id="net-sheet-blank-sales-price"
+            type="number"
+            [disabled]="loading()"
+            [class]="controlStyles.input"
+            [ngModel]="activeTabData()?.['General Info']?.['Sales Price']"
+            (ngModelChange)="updateField('General Info', 'Sales Price', $event)"
+          />
+        </div>
+
+        <div class="flex flex-col gap-0.5">
+          <label [class]="controlStyles.fieldLabel" for="net-sheet-blank-loan-type">Loan Type</label>
+          <p-select
+            size="small"
+            inputId="net-sheet-blank-loan-type"
+            name="net-sheet-blank-loan-type"
+            [options]="loanTypes"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select loan type"
+            [disabled]="loading()"
+            [ngModel]="activeTabData()?.['New Loan']?.['First Loan Type']"
+            [ngModelOptions]="{ standalone: true }"
+            [panelStyleClass]="controlStyles.selectPanel"
+            [class]="controlStyles.select"
+            (ngModelChange)="updateField('New Loan', 'First Loan Type', $event)"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 flex flex-wrap items-center justify-end gap-2">
+      <app-button
+        type="button"
+        variant="success"
+        size="sm"
+        [loading]="loading() || fetchingFees()"
+        (onClick)="calculateBlankNetSheet()"
+      >
+        Calculate Now
+      </app-button>
+    </div>
+  }
+
+  @if (loading() && !showWorksheet()) {
+    <div class="net-sheet-loading">Loading net sheet...</div>
+  }
+
+  @if (showWorksheet()) {
+    <div class="net-sheet-worksheet" [class.net-sheet-worksheet--busy]="fetchingFees()">
+      @if (fetchingFees()) {
+        <div class="net-sheet-worksheet-overlay">Updating fees...</div>
+      }
+
+      @if (useRefinanceLayout()) {
+        <div class="net-sheet-section net-sheet-section--refinance">
+          <div class="net-sheet-column">
+            @for (section of leftWorksheetSections(); track section.groupName) {
+              <ng-container
+                *ngTemplateOutlet="worksheetSection; context: { section: section }"
+              ></ng-container>
+            }
+          </div>
+          <div class="net-sheet-column">
+            @for (section of rightWorksheetSections(); track section.groupName) {
+              <ng-container
+                *ngTemplateOutlet="worksheetSection; context: { section: section }"
+              ></ng-container>
+            }
+          </div>
+        </div>
+      } @else {
+        @for (row of worksheetRows(); track row) {
+          <div class="net-sheet-section">
+            @for (section of sectionsInRow(row); track section.groupName) {
+              <ng-container
+                *ngTemplateOutlet="worksheetSection; context: { section: section }"
+              ></ng-container>
+            }
+          </div>
+        }
+      }
+    </div>
+
+    @if (showNetSheetDisclaimer()) {
+      <p class="net-sheet-disclaimer">
+        This Net Sheet is to be used for estimation purpose only, It may or may not reflect actual fees and values.
+        Tax Proration is prorated Monthly calculations.
+      </p>
+    }
+
+    <div class="net-sheet-actions">
+      @if (showSaveButton()) {
+        <app-button variant="success" [loading]="saving()" (onClick)="saveActiveTab()">Save</app-button>
+      }
+      <app-button variant="primary" [loading]="printing()" (onClick)="printActiveTab()">Generate PDF</app-button>
+    </div>
+  }
+</div>
+
+<ng-template #worksheetSection let-section="section">
+  <div class="fee-fields-section">
+    <h3>{{ section.title }}</h3>
+    @for (fieldName of groupEntries(section.groupName); track fieldName) {
+      @if (isRefinanceTab() && section.groupName === 'Settlement Services' && isSettlementPairField(fieldName)) {
+        <div class="field-row">
+          <span class="field-label">{{ displayLabelFor(section.groupName, fieldName) }}</span>
+          <div class="field-inputs field-inputs--split">
+            <div class="field-currency field-currency--short">
+              <span class="field-prefix">%</span>
+              <input
+                type="number"
+                class="field-control"
+                [ngModel]="fieldValue(section.groupName, settlementPercentField(fieldName))"
+                (ngModelChange)="updateField(section.groupName, settlementPercentField(fieldName), $event)"
+              />
+            </div>
+            <div class="field-currency">
+              <span class="field-prefix">$</span>
+              <input
+                type="number"
+                class="field-control"
+                [ngModel]="fieldValue(section.groupName, fieldName)"
+                (ngModelChange)="updateField(section.groupName, fieldName, $event)"
+              />
+            </div>
+          </div>
+        </div>
+      } @else {
+        <ng-container *ngTemplateOutlet="fieldRow; context: { section: section, fieldName: fieldName }"></ng-container>
+      }
+    }
+
+    @if (sectionSubtotalValue(section); as subtotal) {
+      <div class="field-row field-row--total">
+        <span class="field-label">{{ subtotalLabel(section) }}</span>
+        <strong class="field-total">{{ subtotal }}</strong>
+      </div>
+    }
+
+    @if (isNet2SellTab() && section.groupName === 'Totals') {
+      <div class="field-row field-row--sales-price">
+        <span class="field-label field-label--sales-price">Sales Price:</span>
+        <strong class="field-total field-total--sales-price">{{ net2SellSalesPrice() }}</strong>
+      </div>
+    }
+  </div>
+</ng-template>
+
+<ng-template #fieldRow let-section="section" let-fieldName="fieldName">
+  @if (isDisplayOnlyField(section.groupName, fieldName)) {
+    <div class="field-row field-row--total">
+      <span class="field-label">{{ displayLabelFor(section.groupName, fieldName) }}</span>
+      <strong class="field-total">{{ formatCurrency(fieldValue(section.groupName, fieldName)) }}</strong>
+    </div>
+  } @else if (isNet2SellTab() && section.groupName === 'General Info' && fieldName === 'Net Goal For Seller') {
+    <div class="field-row">
+      <span class="field-label"><strong>{{ displayLabelFor(section.groupName, fieldName) }}:</strong></span>
+      <div class="field-inputs field-inputs--go">
+        <div class="field-currency field-currency--green">
+          <span class="field-prefix field-prefix--green">$</span>
+          <input
+            type="number"
+            class="field-control field-control--green"
+            [ngModel]="fieldValue(section.groupName, fieldName)"
+            (ngModelChange)="updateField(section.groupName, fieldName, $event)"
+          />
+        </div>
+        <button type="button" class="net-sheet-go-btn" [disabled]="solvingNetGoal()" (click)="onNetGoalGo()">
+          Go
+        </button>
+      </div>
+    </div>
+  } @else if (section.groupName === 'Settlement Services' && isPayerBasedField(fieldName)) {
+    <div class="field-row">
+      <span class="field-label">{{ displayLabelFor(section.groupName, fieldName) }}</span>
+      <div class="field-inputs field-inputs--split">
+        <select class="field-select" [ngModel]="payerFieldValue(fieldName)" (ngModelChange)="onPayerChange(fieldName, $event)">
+          @for (choice of activePayerChoices(); track choice.label) {
+            <option [ngValue]="choice.value">{{ choice.label }}</option>
+          }
+        </select>
+        <div class="field-currency">
+          <span class="field-prefix">$</span>
+          <input type="number" class="field-control" [ngModel]="fieldValue(section.groupName, fieldName)" (ngModelChange)="updateField(section.groupName, fieldName, $event)" />
+        </div>
+      </div>
+    </div>
+  } @else if (section.groupName === 'New Loan' && isNewLoanAmountField(fieldName)) {
+    <div class="field-row">
+      <span class="field-label">{{ displayLabelFor(section.groupName, fieldName) }}</span>
+      <div class="field-inputs field-inputs--split">
+        <div class="field-currency field-currency--short">
+          <span class="field-prefix">%</span>
+          <input
+            type="number"
+            class="field-control"
+            [ngModel]="fieldValue(section.groupName, newLoanPercentField(fieldName)!)"
+            (ngModelChange)="updateField(section.groupName, newLoanPercentField(fieldName)!, $event)"
+          />
+        </div>
+        <div class="field-currency">
+          <span class="field-prefix">$</span>
+          <input
+            type="number"
+            class="field-control"
+            [ngModel]="fieldValue(section.groupName, fieldName)"
+            (ngModelChange)="updateField(section.groupName, fieldName, $event)"
+          />
+        </div>
+      </div>
+    </div>
+  } @else if (section.groupName === 'Payment' && isPmiPercentField(fieldName)) {
+    <div class="field-row">
+      <span class="field-label">{{ displayLabelFor(section.groupName, fieldName) }}</span>
+      <div class="field-inputs field-inputs--split">
+        <div class="field-currency field-currency--short">
+          <span class="field-prefix">%</span>
+          <input
+            type="number"
+            class="field-control"
+            [ngModel]="fieldValue(section.groupName, fieldName)"
+            (ngModelChange)="updateField(section.groupName, fieldName, $event)"
+          />
+        </div>
+        <div class="field-currency">
+          <span class="field-prefix">$</span>
+          <input
+            type="number"
+            class="field-control"
+            [ngModel]="fieldValue(section.groupName, pmiAmountField())"
+            (ngModelChange)="updateField(section.groupName, pmiAmountField(), $event)"
+          />
+        </div>
+      </div>
+    </div>
+  } @else if (section.groupName === 'Brokerage Fees' && isBrokerageAmountField(fieldName)) {
+    <div class="field-row">
+      <span class="field-label">{{ displayLabelFor(section.groupName, fieldName) }}</span>
+      <div class="field-inputs field-inputs--split">
+        <div class="field-currency field-currency--short">
+          <span class="field-prefix">%</span>
+          <input type="number" class="field-control" [ngModel]="fieldValue(section.groupName, brokeragePercentField(fieldName)!)" (ngModelChange)="updateField(section.groupName, brokeragePercentField(fieldName)!, $event)" />
+        </div>
+        <div class="field-currency">
+          <span class="field-prefix">$</span>
+          <input type="number" class="field-control" [ngModel]="fieldValue(section.groupName, fieldName)" (ngModelChange)="updateField(section.groupName, fieldName, $event)" />
+        </div>
+      </div>
+    </div>
+  } @else if (isDateField(fieldName)) {
+    <div class="field-row">
+      <span class="field-label">{{ displayLabelFor(section.groupName, fieldName) }}</span>
+      <input type="date" class="field-control field-control--solo" [ngModel]="dateFieldValue(section.groupName, fieldName)" (ngModelChange)="updateDateField(section.groupName, fieldName, $event)" [disabled]="isReadOnlyField(section.groupName, fieldName)" />
+    </div>
+  } @else {
+    <div class="field-row">
+      <span class="field-label">{{ displayLabelFor(section.groupName, fieldName) }}</span>
+      @if (isCurrencyField(fieldName, section.groupName)) {
+        <div class="field-currency" [class.field-currency--green]="isGreenCurrencyField(section.groupName, fieldName)">
+          <span class="field-prefix" [class.field-prefix--green]="isGreenCurrencyField(section.groupName, fieldName)">$</span>
+          <input
+            type="number"
+            class="field-control"
+            [class.field-control--green]="isGreenCurrencyField(section.groupName, fieldName)"
+            [ngModel]="fieldValue(section.groupName, fieldName)"
+            (ngModelChange)="updateField(section.groupName, fieldName, $event)"
+            [disabled]="isReadOnlyField(section.groupName, fieldName) || isPrepaidReadOnlyField(fieldName)"
+            [readonly]="isReadOnlyField(section.groupName, fieldName) || isPrepaidReadOnlyField(fieldName)"
+          />
+        </div>
+      } @else {
+        <input [type]="'text'" class="field-control field-control--solo" [ngModel]="fieldValue(section.groupName, fieldName)" (ngModelChange)="updateField(section.groupName, fieldName, $event)" [disabled]="isReadOnlyField(section.groupName, fieldName)" />
+      }
+    </div>
+  }
+</ng-template>

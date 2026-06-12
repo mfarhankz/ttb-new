@@ -117,7 +117,10 @@ export const routes: Routes = [
       },
       {
         path: 'buyer-cost-estimate',
-        loadComponent: () => import('./pages/authenticated/placeholder/placeholder.component').then(m => m.PlaceholderComponent),
+        loadComponent: () =>
+          import('./pages/authenticated/buyer-cost-estimate/buyer-cost-estimate.component').then(
+            (m) => m.BuyerCostEstimateComponent
+          ),
         title: 'Buyer Cost Estimate'
       },
       {
