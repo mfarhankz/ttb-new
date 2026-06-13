@@ -1,0 +1,378 @@
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Observable, map } from 'rxjs';
+import { resolveSavedFarmRowActions } from '@app/authenticated/farming/config/saved-farms-actions.config';
+import {
+  SAVED_FARMS_COLUMNS,
+  SAVED_FARM_TABS,
+  SELL_REFI_SCORE_ACTIVE_TOOLTIP,
+  SavedFarmTabId
+} from '@app/authenticated/farming/config/saved-farms.config';
+import { API_CONFIG } from '@app/core/config/api.config';
+import {
+  RemoveFarmPayload,
+  SavedFarmRecord,
+  TtbFarmMetainfoResponse,
+  TtbRemoveFarmResponse
+} from '@app/core/interfaces/saved-farm.interface';
+import { ApiService } from '@app/core/services/api.service';
+import { VerticalService } from '@app/core/services/vertical.service';
+
+const SEARCH_DEBOUNCE_MS = 320;
+
+const EMPTY_TAB_BUCKETS = (): Record<SavedFarmTabId, Record<string, unknown>[]> => ({
+  main: [],
+  phoneEmail: [],
+  dla: [],
+  riskScore: []
+});
+
+@Injectable({ providedIn: 'root' })
+export class SavedFarmsService {
+  private readonly apiService = inject(ApiService);
+  private readonly verticalService = inject(VerticalService);
+
+  private readonly _farmsByTab = signal<Record<SavedFarmTabId, Record<string, unknown>[]>>(EMPTY_TAB_BUCKETS());
+  private readonly _rows = signal<Record<string, unknown>[]>([]);
+  private readonly _loading = signal(false);
+  private readonly _error = signal<string | null>(null);
+  private readonly _activeTab = signal<SavedFarmTabId>('main');
+  private readonly _searchText = signal('');
+  private readonly _searchField = signal('$');
+
+  readonly rows = this._rows.asReadonly();
+  readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
+  readonly activeTab = this._activeTab.asReadonly();
+  readonly searchText = this._searchText.asReadonly();
+  readonly searchField = this._searchField.asReadonly();
+  readonly tabs = SAVED_FARM_TABS;
+  readonly columns = SAVED_FARMS_COLUMNS;
+
+  readonly tabCounts = computed(() => {
+    const buckets = this._farmsByTab();
+    return {
+      main: buckets.main.length,
+      phoneEmail: buckets.phoneEmail.length,
+      dla: buckets.dla.length,
+      riskScore: buckets.riskScore.length
+    };
+  });
+
+  readonly totalCount = computed(() => {
+    const counts = this.tabCounts();
+    return counts.main + counts.phoneEmail + counts.dla + counts.riskScore;
+  });
+
+  readonly hasActiveFilters = (): boolean =>
+    !!this._searchText().trim() || this._searchField() !== '$';
+
+  private loadSucceeded = false;
+  private searchDebounce?: ReturnType<typeof setTimeout>;
+  private readonly _rawFarms = signal<SavedFarmRecord[]>([]);
+
+  /** Re-apply tab buckets (e.g. after vertical config loads PH/EM prefix). */
+  rebucketFarms(): void {
+    this._farmsByTab.set(this.bucketFarms(this._rawFarms()));
+    this.refreshFilteredRows();
+  }
+
+  fetchFarmsList(force = false): void {
+    if (!force && this.loadSucceeded) {
+      this.refreshFilteredRows();
+      return;
+    }
+
+    this._loading.set(true);
+    this._error.set(null);
+
+    const cacheBust = `?t=${Date.now()}`;
+    this.apiService.get<TtbFarmMetainfoResponse>(`${API_CONFIG.endpoints.getFarmMetainfo}${cacheBust}`).subscribe({
+      next: (response) => {
+        const payload = response.response;
+
+        if (payload.status !== 'OK') {
+          this.loadSucceeded = false;
+          this._error.set(payload.message ?? 'Failed to load saved farms.');
+          this._rawFarms.set([]);
+          this._farmsByTab.set(EMPTY_TAB_BUCKETS());
+          this._rows.set([]);
+          this._loading.set(false);
+          return;
+        }
+
+        const records = this.normalizeFarmRecords(payload.data);
+        this._rawFarms.set(records);
+        this.loadSucceeded = true;
+        this.rebucketFarms();
+        this._loading.set(false);
+      },
+      error: (err) => {
+        this.loadSucceeded = false;
+        this._error.set(err.message ?? 'Failed to load saved farms.');
+        this._farmsByTab.set(EMPTY_TAB_BUCKETS());
+        this._rawFarms.set([]);
+        this._rows.set([]);
+        this._loading.set(false);
+      }
+    });
+  }
+
+  refresh(): void {
+    this.loadSucceeded = false;
+    this.fetchFarmsList(true);
+  }
+
+  removeFarms(farmIds: Array<number | string>): Observable<string> {
+    const payload: RemoveFarmPayload = {
+      farm_ids: farmIds.map((id) => Number(id)).filter((id) => Number.isFinite(id))
+    };
+
+    return this.apiService.post<TtbRemoveFarmResponse>(API_CONFIG.endpoints.removeFarm, payload).pipe(
+      map((response) => {
+        const envelope = response.response;
+
+        if (envelope.status !== 'OK') {
+          const message = this.coalesceRemoveFarmMessage(envelope.data?.msg);
+          throw new Error(message || 'Failed to delete farm(s).');
+        }
+
+        return this.coalesceRemoveFarmMessage(envelope.data?.msg) || 'Successfully deleted the farm(s).';
+      })
+    );
+  }
+
+  setActiveTab(tab: SavedFarmTabId): void {
+    if (this._activeTab() === tab) {
+      return;
+    }
+
+    clearTimeout(this.searchDebounce);
+    this._activeTab.set(tab);
+    this.resetFilters(false);
+    this.refreshFilteredRows();
+  }
+
+  setSearchText(value: string): void {
+    this._searchText.set(value);
+    this.scheduleFilterRefresh();
+  }
+
+  clearSearch(): void {
+    this.setSearchText('');
+  }
+
+  setSearchField(value: string): void {
+    this._searchField.set(value);
+    this.refreshFilteredRows();
+  }
+
+  resetFilters(reapply = true): void {
+    this._searchText.set('');
+    this._searchField.set('$');
+
+    if (reapply) {
+      this.refreshFilteredRows();
+    }
+  }
+
+  private scheduleFilterRefresh(): void {
+    clearTimeout(this.searchDebounce);
+    this.searchDebounce = setTimeout(() => this.refreshFilteredRows(), SEARCH_DEBOUNCE_MS);
+  }
+
+  private refreshFilteredRows(): void {
+    const tabRows = this._farmsByTab()[this._activeTab()] ?? [];
+    this._rows.set(this.filterRowsClient(tabRows));
+  }
+
+  private bucketFarms(records: SavedFarmRecord[]): Record<SavedFarmTabId, Record<string, unknown>[]> {
+    const buckets = EMPTY_TAB_BUCKETS();
+
+    records.forEach((farm) => {
+      const tab = this.getFarmTab(farm);
+      buckets[tab].push(this.mapRecord(farm, buckets[tab].length));
+    });
+
+    return buckets;
+  }
+
+  private getFarmTab(farm: SavedFarmRecord): SavedFarmTabId {
+    if (this.isPhoneEmailFarm(farm)) {
+      return 'phoneEmail';
+    }
+
+    if (this.isRiskScoreFarm(farm)) {
+      return 'riskScore';
+    }
+
+    if (this.isDlaFarm(farm)) {
+      return 'dla';
+    }
+
+    return 'main';
+  }
+
+  private normalizeFarmRecords(
+    data: SavedFarmRecord[] | Record<string, unknown> | undefined
+  ): SavedFarmRecord[] {
+    if (!data) {
+      return [];
+    }
+
+    const list = Array.isArray(data) ? data : Object.values(data);
+
+    return list.filter((item): item is SavedFarmRecord => {
+      if (!item || typeof item !== 'object') {
+        return false;
+      }
+
+      const farmId = (item as SavedFarmRecord).farm_id;
+      return farmId != null && farmId !== '';
+    });
+  }
+
+  private resolveFarmDisplayName(farm: SavedFarmRecord): string {
+    for (const candidate of [farm.name, farm.alias, farm.farm_name]) {
+      if (typeof candidate === 'string' && candidate.trim()) {
+        return candidate.trim();
+      }
+    }
+
+    return '';
+  }
+
+  private isPhoneEmailFarm(farm: SavedFarmRecord): boolean {
+    const reserved = this.verticalService.content()?.app_config?.['reserved_farm_name_for_single_phone_email_lookups'];
+    if (typeof reserved !== 'string' || !reserved) {
+      return false;
+    }
+
+    const name = typeof farm.name === 'string' ? farm.name : '';
+    return name.indexOf(reserved) === 0;
+  }
+
+  /** Property Lead Alert farms — production uses live_farm_status, not generic notification_config. */
+  private isDlaFarm(farm: SavedFarmRecord): boolean {
+    return this.hasLiveFarmStatus(farm);
+  }
+
+  /** Risk score farms — API sets risk_score_billing_id to a billing id when subscribed. */
+  private isRiskScoreFarm(farm: SavedFarmRecord): boolean {
+    return this.hasRiskScoreBillingId(farm);
+  }
+
+  private hasRiskScoreBillingId(farm: SavedFarmRecord): boolean {
+    const billingId = farm.risk_score_billing_id;
+    if (billingId == null) {
+      return false;
+    }
+
+    const normalized = String(billingId).trim().toLowerCase();
+    if (!normalized || normalized === 'null' || normalized === 'undefined') {
+      return false;
+    }
+
+    const asNumber = Number(billingId);
+    return Number.isFinite(asNumber) && asNumber > 0;
+  }
+
+  private hasLiveFarmStatus(farm: SavedFarmRecord): boolean {
+    const status = farm.live_farm_status;
+    if (status == null || status === '' || status === false || status === 0 || status === '0') {
+      return false;
+    }
+
+    if (status === true || status === 1 || status === '1') {
+      return true;
+    }
+
+    const normalized = String(status).trim().toLowerCase();
+    return normalized === 'true' || normalized === 'live' || normalized === 'active' || normalized === 'y';
+  }
+
+  private filterRowsClient(rows: Record<string, unknown>[]): Record<string, unknown>[] {
+    return rows.filter((row) => this.matchesClientFilters(row));
+  }
+
+  private matchesClientFilters(row: Record<string, unknown>): boolean {
+    const query = this._searchText().trim().toLowerCase();
+    if (!query) {
+      return true;
+    }
+
+    const field = this._searchField();
+    const searchableByField = row['searchableByField'] as Record<string, string> | undefined;
+    if (!searchableByField) {
+      return false;
+    }
+
+    if (field === '$') {
+      return Object.values(searchableByField).some((value) => value.includes(query));
+    }
+
+    return (searchableByField[field] ?? '').includes(query);
+  }
+
+  private mapRecord(farm: SavedFarmRecord, index: number): Record<string, unknown> {
+    const name = this.resolveFarmDisplayName(farm) || '—';
+    const propertyCount = farm.farm_record_count != null ? Number(farm.farm_record_count) : '—';
+    const createdOn = this.formatDate(farm.created);
+
+    return {
+      id: farm.farm_id,
+      farmId: farm.farm_id,
+      serialNumber: index + 1,
+      name,
+      propertyCount,
+      createdOn,
+      geometry: farm.geometry,
+      recType: farm.rec_type,
+      statusIndicator: this.hasSellRefiScoreRecType(farm.rec_type)
+        ? { tooltip: SELL_REFI_SCORE_ACTIVE_TOOLTIP }
+        : null,
+      actions: resolveSavedFarmRowActions(),
+      searchableByField: {
+        name: name.toLowerCase(),
+        propertyCount: String(propertyCount).toLowerCase(),
+        createdOn: createdOn.toLowerCase()
+      }
+    };
+  }
+
+  private hasSellRefiScoreRecType(recType: unknown): boolean {
+    if (recType == null || recType === '') {
+      return false;
+    }
+
+    return String(recType).includes('sell_refi_score');
+  }
+
+  private coalesceRemoveFarmMessage(msg?: string | string[]): string {
+    if (Array.isArray(msg)) {
+      return msg.filter(Boolean).join(', ').toLowerCase();
+    }
+
+    if (typeof msg === 'string' && msg.trim()) {
+      return msg.trim();
+    }
+
+    return '';
+  }
+
+  private formatDate(value?: string): string {
+    if (!value) {
+      return '—';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return date.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: '2-digit'
+    });
+  }
+}

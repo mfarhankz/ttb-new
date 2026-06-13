@@ -31,12 +31,12 @@ export { DataTableComponent } from '../ui/data-table/data-table.component';
 export { type DataTableColumn } from '../ui/data-table/data-table.types';
 export { TabNavComponent } from '../ui/tab-nav/tab-nav.component';
 export { type TabNavItem } from '../ui/tab-nav/tab-nav.types';
-export { MapTablePipelineComponent } from '../../features/map/components/map-table-pipeline/map-table-pipeline.component';
-export { MapPipelineViewToggleComponent } from '../../features/map/components/map-table-pipeline/map-pipeline-view-toggle.component';
+export { MapTablePipelineComponent } from '../../authenticated/map/components/map-table-pipeline/map-table-pipeline.component';
+export { MapPipelineViewToggleComponent } from '../../authenticated/map/components/map-table-pipeline/map-pipeline-view-toggle.component';
 export {
   type MapPipelineViewMode,
   type MapTablePipelineConfig
-} from '../../features/map/components/map-table-pipeline/map-table-pipeline.types';
+} from '../../authenticated/map/components/map-table-pipeline/map-table-pipeline.types';
 export { UsageReportTableComponent } from '../ui/usage-report-table/usage-report-table.component';
 export { GeographicAreaFieldsComponent } from '../widgets/geographic-area-fields/geographic-area-fields.component';
 export {
@@ -46,4 +46,4 @@ export {
   type GeographicAreaGroupType,
   type GeographicAreaLayout
 } from '../widgets/geographic-area-fields/geographic-area-fields.types';
-export { PropertySearchModalComponent } from '../../features/property-search/components/property-search-modal/property-search-modal.component';
+export { PropertySearchModalComponent } from '../../authenticated/property-search/components/property-search-modal/property-search-modal.component';

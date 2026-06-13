@@ -187,29 +187,17 @@ titletoolbox-new/
 │   │   ├── layouts/                 # Layout components
 │   │   │   ├── authenticated-layout/
 │   │   │   └── public-layout/
-│   │   ├── pages/                   # Page components
-│   │   │   ├── authenticated/      # Protected pages
-│   │   │   │   ├── dashboard/
-│   │   │   │   └── profile/
-│   │   │   └── public/             # Public pages
-│   │   │       ├── home/
-│   │   │       ├── login/
-│   │   │       └── mfa/            # MFA components
-│   │   │           ├── mfa-otp-verify/
-│   │   │           └── mfa-phone-register/
-│   │   ├── shared/                 # Shared components
-│   │   │   └── components/        # Reusable UI components
-│   │   │       ├── alert/
-│   │   │       ├── button/
-│   │   │       ├── card/
-│   │   │       ├── checkbox/
-│   │   │       ├── form-field/
-│   │   │       ├── input/
-│   │   │       ├── label/
-│   │   │       ├── modal/
-│   │   │       ├── radio/
-│   │   │       ├── select/
-│   │   │       └── textarea/
+│   │   ├── routes/                  # Route fragments (public + authenticated)
+│   │   ├── public/                  # Before login (home, login, MFA)
+│   │   ├── authenticated/           # After login — sidebar domains
+│   │   │   ├── dashboard/
+│   │   │   ├── farming/
+│   │   │   ├── statistics/
+│   │   │   ├── property-lead-alerts/
+│   │   │   ├── buyer-cost-estimate/
+│   │   │   ├── admin/
+│   │   │   └── ...                  # See authenticated/README.md
+│   │   ├── shared/                 # Shared UI (ui/, widgets/, theme/)
 │   │   ├── app.config.ts           # App configuration
 │   │   ├── app.routes.ts           # Route definitions
 │   │   └── app.ts                  # Root component

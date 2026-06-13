@@ -6,14 +6,14 @@ import {
   AreaSearchFormData,
   AreaSearchPayload
 } from '../interfaces/area-search-field.interface';
-import { mapFieldChoices } from '@app/features/farming/components/area-search-fields/area-search-field.utils';
+import { mapFieldChoices } from '@app/authenticated/farming/components/area-search-fields/area-search-field.utils';
 import {
   AREA_SEARCH_CONTACT_FIELD_NAME,
   AREA_SEARCH_CRITERIA_ALWAYS_VISIBLE_FIELDS,
   AREA_SEARCH_CRITERIA_GEOGRAPHIC_ORDER,
   AREA_SEARCH_DATE_MATCH_OPTIONS,
   AREA_SEARCH_RANGE_MATCH_OPTIONS
-} from '@app/features/farming/config/area-search-fields.config';
+} from '@app/authenticated/farming/config/area-search-fields.config';
 import { expandContactInfoValues } from './area-search-contact-note.util';
 import { createEmptyFieldValue, flatCustomFilters, parseFormData } from './area-search-form.util';
 

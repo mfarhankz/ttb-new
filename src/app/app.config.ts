@@ -6,7 +6,7 @@ import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
 import { TTBPreset } from '@app/shared/theme/ttb-preset';
-import { MapScriptsLoaderService } from '@app/features/map/services/map-scripts-loader.service';
+import { MapScriptsLoaderService } from '@app/authenticated/map/services/map-scripts-loader.service';
 import { ThemeService } from '@app/core/services/theme.service';
 import { VerticalService } from '@app/core/services/vertical.service';
 import { partnerKeyInterceptor } from './core/interceptors/partner-key.interceptor';

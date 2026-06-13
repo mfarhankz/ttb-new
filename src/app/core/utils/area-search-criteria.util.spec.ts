@@ -1,5 +1,5 @@
 import { buildSelectedCriteria } from './area-search-criteria.util';
-import { AREA_SEARCH_CONTACT_FIELD_NAME } from '@app/features/farming/config/area-search-fields.config';
+import { AREA_SEARCH_CONTACT_FIELD_NAME } from '@app/authenticated/farming/config/area-search-fields.config';
 import { AreaSearchFieldGroup, AreaSearchFieldsInfo, AreaSearchFormData } from '../interfaces/area-search-field.interface';
 
 describe('area-search-criteria.util', () => {

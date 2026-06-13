@@ -13,11 +13,11 @@ import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { MultiSelect } from 'primeng/multiselect';
 import { Select } from 'primeng/select';
-import { AREA_SEARCH_CHOICE_LOADING_PLACEHOLDER } from '@app/features/farming/config/area-search-fields.config';
+import { AREA_SEARCH_CHOICE_LOADING_PLACEHOLDER } from '@app/authenticated/farming/config/area-search-fields.config';
 import { US_STATE_AREA_SEARCH_OPTIONS, resolveStateAbbrevFromFips } from '@app/core/config/us-states.config';
 import { CountyChoice } from '@app/core/interfaces/property-search.interface';
-import { AreaChoicesService } from '@app/features/farming/services/area-choices.service';
-import { AreaSearchControlStyles } from '@app/features/farming/components/area-search-fields/area-search-control.styles';
+import { AreaChoicesService } from '@app/authenticated/farming/services/area-choices.service';
+import { AreaSearchControlStyles } from '@app/authenticated/farming/components/area-search-fields/area-search-control.styles';
 import {
   GeographicAreaCityZipControl,
   GeographicAreaCityZipMode,

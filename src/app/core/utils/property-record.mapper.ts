@@ -1,4 +1,4 @@
-import { resolveDetailPropertyRowActions } from '@app/features/detail/config/detail-property-actions.config';
+import { resolveDetailPropertyRowActions } from '@app/authenticated/detail/config/detail-property-actions.config';
 import { PropertyRecordRaw } from '../interfaces/property-record.interface';
 
 export interface LeadDetailItem {

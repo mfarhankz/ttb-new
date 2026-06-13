@@ -9,9 +9,9 @@ import {
   ElementRef,
   inject
 } from '@angular/core';
-import { MapScriptsLoaderService } from '@app/features/map/services/map-scripts-loader.service';
-import { OlMapService, type MapObjectRefs } from '@app/features/map/services/ol-map.service';
-import { MAP_DEFAULTS } from '@app/features/map/config/map.config';
+import { MapScriptsLoaderService } from '@app/authenticated/map/services/map-scripts-loader.service';
+import { OlMapService, type MapObjectRefs } from '@app/authenticated/map/services/ol-map.service';
+import { MAP_DEFAULTS } from '@app/authenticated/map/config/map.config';
 
 declare const ol: any;
 

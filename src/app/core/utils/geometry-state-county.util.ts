@@ -1,4 +1,4 @@
-import { MapDrawnGeometry } from '@app/features/map/services/ol-map.service';
+import { MapDrawnGeometry } from '@app/authenticated/map/services/ol-map.service';
 
 interface GeometryLocationFips {
   mm_fips_state_code?: string;

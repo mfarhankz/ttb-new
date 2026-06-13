@@ -1,6 +1,6 @@
 import { Component, inject, viewChild } from '@angular/core';
 import { Menu } from 'primeng/menu';
-import { DashboardTabToolbarService } from '@app/features/dashboard/services/dashboard-tab-toolbar.service';
+import { DashboardTabToolbarService } from '@app/authenticated/dashboard/services/dashboard-tab-toolbar.service';
 
 @Component({
   selector: 'app-tab-toolbar',

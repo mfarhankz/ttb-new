@@ -3,14 +3,14 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/ro
 import { filter, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/core/services/auth.service';
-import { PropertySearchModalService } from '@app/features/property-search/services/property-search-modal.service';
+import { PropertySearchModalService } from '@app/authenticated/property-search/services/property-search-modal.service';
 import { ThemeModalService } from '@app/core/services/theme-modal.service';
 import { LayoutService } from '@app/core/services/layout.service';
 import { VerticalService } from '@app/core/services/vertical.service';
-import { ClearSearchService } from '@app/features/farming/services/clear-search.service';
-import { ClearSearchStateService } from '@app/features/farming/services/clear-search-state.service';
-import { PropertyLeadAlertsService } from '@app/features/property-lead-alerts/services/property-lead-alerts.service';
-import { SubscriptionService } from '@app/features/dashboard/services/subscription.service';
+import { ClearSearchService } from '@app/authenticated/farming/services/clear-search.service';
+import { ClearSearchStateService } from '@app/authenticated/farming/services/clear-search-state.service';
+import { PropertyLeadAlertsService } from '@app/authenticated/property-lead-alerts/services/property-lead-alerts.service';
+import { SubscriptionService } from '@app/authenticated/dashboard/services/subscription.service';
 import {
   MAIN_NAV,
   SETTINGS_NAV,

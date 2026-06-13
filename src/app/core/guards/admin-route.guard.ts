@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AdminPermissionsService } from '@app/features/admin/services/admin-permissions.service';
+import { AdminPermissionsService } from '@app/authenticated/admin/services/admin-permissions.service';
 
 /** Legacy: offices route redirects to agencies when agency_support is enabled. */
 export const adminOfficesGuard: CanActivateFn = () => {

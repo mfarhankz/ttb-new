@@ -1,12 +1,12 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@app/core/guards/auth.guard';
-import { adminRoutes } from '@app/features/admin/admin.routes';
-import { buyerCostEstimateRoutes } from '@app/features/buyer-cost-estimate/buyer-cost-estimate.routes';
-import { dashboardRoutes } from '@app/features/dashboard/dashboard.routes';
-import { detailRoutes } from '@app/features/detail/detail.routes';
-import { farmingRoutes } from '@app/features/farming/farming.routes';
-import { propertyLeadAlertsRoutes } from '@app/features/property-lead-alerts/property-lead-alerts.routes';
-import { statisticsRoutes } from '@app/features/statistics/statistics.routes';
+import { adminRoutes } from '@app/authenticated/admin/admin.routes';
+import { buyerCostEstimateRoutes } from '@app/authenticated/buyer-cost-estimate/buyer-cost-estimate.routes';
+import { dashboardRoutes } from '@app/authenticated/dashboard/dashboard.routes';
+import { detailRoutes } from '@app/authenticated/detail/detail.routes';
+import { farmingRoutes } from '@app/authenticated/farming/farming.routes';
+import { propertyLeadAlertsRoutes } from '@app/authenticated/property-lead-alerts/property-lead-alerts.routes';
+import { statisticsRoutes } from '@app/authenticated/statistics/statistics.routes';
 
 export const authenticatedRoutes: Routes = [
   {
