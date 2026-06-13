@@ -108,6 +108,10 @@ export class AreaSearchChoiceFieldComponent implements OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['value'] && this.selectedValue && this.dynamicChoices.shouldLazyLoadField(this.field.field_name)) {
+      this.refreshDynamicOptions();
+    }
+
     if (changes['field']) {
       if (!this.usesDynamicChoices()) {
         this.staticOptions.set(mapFieldChoices(this.field));
@@ -129,6 +133,10 @@ export class AreaSearchChoiceFieldComponent implements OnChanges, OnDestroy {
     if (changes['field'] || changes['dependencyKey']) {
       if (this.dynamicChoices.shouldLazyLoadField(this.field.field_name)) {
         this.lazyPanelOpened.set(false);
+        if (this.selectedValue) {
+          this.refreshDynamicOptions();
+          return;
+        }
         this.dynamicOptions.set([]);
         this.syncOptions();
         return;

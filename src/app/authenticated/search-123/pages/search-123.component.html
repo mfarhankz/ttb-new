@@ -1,0 +1,27 @@
+<div class="flex min-h-screen flex-col bg-background p-4 md:p-6 lg:p-8">
+  <app-card title="123 search" [padding]="'lg'" class="mx-auto w-full max-w-360">
+    @if (initializingLocation()) {
+      <p class="text-body-sm text-muted">Loading state/city…</p>
+    } @else {
+      <app-search-123-wizard
+        [form]="form()"
+        [queries]="queries()"
+        [queriesLoading]="queriesLoading()"
+        [selectedQuery]="selectedQuery()"
+        [searching]="searching()"
+        [paying]="paying()"
+        [errorMessage]="errorMessage()"
+        [successMessage]="successMessage()"
+        [showPayNowButton]="showPayNowButton()"
+        [payNowPrice]="payNowPrice()"
+        [premierDataEnabled]="premierDataEnabled()"
+        [allowedMaxLimit]="search123Service.allowedMaxLimit"
+        (formChange)="onFormChange($event)"
+        (querySelect)="onQuerySelect($event)"
+        (search)="onSearch()"
+        (payNow)="onPayNow()"
+        (openPremierData)="onOpenPremierData()"
+      />
+    }
+  </app-card>
+</div>

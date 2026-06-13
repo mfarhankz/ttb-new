@@ -34,7 +34,7 @@ export const MAIN_NAV: NavItem[] = [
   { label: 'Buyer Cost Estimate', icon: 'pi pi-calculator', route: '/buyer-cost-estimate' },
   { label: 'Property Lead Alerts', icon: 'pi pi-bell', route: '/property-lead-alerts', badge: 'NEW' },
   { label: 'High Volume Search', icon: 'pi pi-compass' },
-  { label: '123 search', icon: 'pi pi-sort-numeric-down' }
+  { label: '123 search', icon: 'pi pi-sort-numeric-down', route: '/123-search' }
 ];
 
 export const MANAGE_ACCOUNT_NAV: NavItem[] = [

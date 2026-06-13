@@ -14,6 +14,7 @@ export class AreaSearchStateService {
   private readonly _queryId = signal<string | null>(null);
   private readonly _queryName = signal<string | null>(null);
   private readonly _runGetCountOnEntry = signal(false);
+  private readonly _premierDataFromSearch123 = signal(false);
 
   readonly pendingGeometry = this._pendingGeometry.asReadonly();
   readonly editCriteria = this._editCriteria.asReadonly();
@@ -43,6 +44,16 @@ export class AreaSearchStateService {
     this._editCriteria.set(criteria);
   }
 
+  setPremierDataFromSearch123(enabled: boolean): void {
+    this._premierDataFromSearch123.set(enabled);
+  }
+
+  consumePremierDataFromSearch123(): boolean {
+    const enabled = this._premierDataFromSearch123();
+    this._premierDataFromSearch123.set(false);
+    return enabled;
+  }
+
   consumeEditCriteria(): AreaSearchPayload | null {
     const criteria = this._editCriteria();
     this._editCriteria.set(null);
@@ -68,5 +79,6 @@ export class AreaSearchStateService {
     this._runGetCountOnEntry.set(false);
     this._queryId.set(null);
     this._queryName.set(null);
+    this._premierDataFromSearch123.set(false);
   }
 }

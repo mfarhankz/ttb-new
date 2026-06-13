@@ -10,6 +10,7 @@ import { VerticalService } from '@app/core/services/vertical.service';
 import { ClearSearchService } from '@app/authenticated/farming/services/clear-search.service';
 import { ClearSearchStateService } from '@app/authenticated/farming/services/clear-search-state.service';
 import { PropertyLeadAlertsService } from '@app/authenticated/property-lead-alerts/services/property-lead-alerts.service';
+import { CommonQueriesService } from '@app/authenticated/farming/services/common-queries.service';
 import { SubscriptionService } from '@app/authenticated/dashboard/services/subscription.service';
 import {
   MAIN_NAV,
@@ -37,6 +38,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   readonly clearSearchState = inject(ClearSearchStateService);
   private clearSearchService = inject(ClearSearchService);
   private plaService = inject(PropertyLeadAlertsService);
+  private commonQueriesService = inject(CommonQueriesService);
   private subscriptionService = inject(SubscriptionService);
   private routerSub?: Subscription;
   private flyoutHideTimer?: ReturnType<typeof setTimeout>;
@@ -82,6 +84,16 @@ export class SidebarComponent implements OnInit, OnDestroy {
               route: '/property-lead-alerts/history'
             }
           ];
+        }
+
+        return [item];
+      }
+
+      if (item.label === '123 search') {
+        const suppressed = this.verticalService.content()?.app_config?.['suppress_123_search'] === true;
+        const hasQueries = this.commonQueriesService.queries().length > 0;
+        if (suppressed || !hasQueries) {
+          return [];
         }
 
         return [item];
@@ -136,6 +148,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.applySidebarWidth();
     }
     this.plaService.loadSubscription();
+    this.commonQueriesService.fetchList();
     this.layoutCollapseSub = this.layoutService.onSidebarCollapseRequest.subscribe((collapsed) => {
       if (this.isCollapsed !== collapsed) {
         this.setCollapsed(collapsed);

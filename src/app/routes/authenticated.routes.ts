@@ -6,6 +6,7 @@ import { dashboardRoutes } from '@app/authenticated/dashboard/dashboard.routes';
 import { detailRoutes } from '@app/authenticated/detail/detail.routes';
 import { farmingRoutes } from '@app/authenticated/farming/farming.routes';
 import { propertyLeadAlertsRoutes } from '@app/authenticated/property-lead-alerts/property-lead-alerts.routes';
+import { search123Routes } from '@app/authenticated/search-123/search-123.routes';
 import { statisticsRoutes } from '@app/authenticated/statistics/statistics.routes';
 
 export const authenticatedRoutes: Routes = [
@@ -23,6 +24,7 @@ export const authenticatedRoutes: Routes = [
       ...statisticsRoutes,
       ...buyerCostEstimateRoutes,
       ...propertyLeadAlertsRoutes,
+      ...search123Routes,
       ...adminRoutes
     ]
   }

@@ -120,19 +120,27 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly mobileTabOpen = signal(false);
   readonly fieldsReady = signal(false);
   readonly renderedFieldCount = signal(0);
+  readonly premierDataFromSearch123 = signal(false);
 
   readonly pageTitle = computed(() => {
+    if (this.premierDataFromSearch123()) {
+      return 'Premier Data';
+    }
     if (this.hasGeometry()) {
       return 'Available Filters';
     }
     return 'Area Search';
   });
 
-  readonly pageSubtitle = computed(() =>
-    this.hasGeometry()
-      ? 'Refine your map-based search with additional filters.'
-      : 'Search for properties using Advanced Search.'
-  );
+  readonly pageSubtitle = computed(() => {
+    if (this.premierDataFromSearch123()) {
+      return 'Buy Premier data for properties in selected Farm.';
+    }
+    if (this.hasGeometry()) {
+      return 'Refine your map-based search with additional filters.';
+    }
+    return 'Search for properties using Advanced Search.';
+  });
 
   readonly hasCountResult = computed(() => !!this.countResult());
   readonly countFound = computed(
@@ -685,6 +693,8 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private applyEntrySources(): void {
+    this.premierDataFromSearch123.set(this.stateService.consumePremierDataFromSearch123());
+
     const geometry = this.stateService.consumePendingGeometry();
     const runGetCount = this.stateService.consumeRunGetCountOnEntry();
     if (geometry) {
@@ -697,6 +707,9 @@ export class AreaSearchComponent implements OnInit, AfterViewInit, OnDestroy {
     const editCriteria = this.stateService.consumeEditCriteria();
     if (editCriteria) {
       this.formService.loadFromPayload(editCriteria);
+      if (this.premierDataFromSearch123()) {
+        this.dynamicChoicesService.invalidateDependents('mm_fips_state_code');
+      }
     }
 
     const queryId = this.route.snapshot.queryParamMap.get('queryId');

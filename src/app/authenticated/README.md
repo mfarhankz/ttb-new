@@ -12,6 +12,7 @@ Each folder here maps to a **sidebar section** or shared domain module for logge
 | Statistics | [`statistics/`](statistics/) | `/statistics/*` |
 | Buyer Cost Estimate | [`buyer-cost-estimate/`](buyer-cost-estimate/) | `/buyer-cost-estimate` |
 | Property Lead Alerts | [`property-lead-alerts/`](property-lead-alerts/) | `/property-lead-alerts` |
+| 123 search | [`search-123/`](search-123/) | `/123-search` |
 | Admin (dashboard section) | [`admin/`](admin/) | `/admin/*`, `/manage-reports/*` |
 | Login / MFA (modal) | [`auth/`](auth/) | `/login` lives in [`public/`](../public/) |
 
