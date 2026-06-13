@@ -363,3 +363,11 @@ export function buildSelectedCriteria(
   const payload = flatCustomFilters(parseFormData({ ...formData }, fieldGroups, fieldsInfo));
   return collectPayloadCriteria(payload, fieldsInfo, fieldGroups, formData, resolveDynamicLabel);
 }
+
+export function buildCriteriaChipsFromPayload(
+  payload: AreaSearchPayload,
+  fieldsInfo: AreaSearchFieldsInfo,
+  fieldGroups: AreaSearchFieldGroup[] | null = null
+): AreaSearchCriteriaChip[] {
+  return collectPayloadCriteria(payload, fieldsInfo, fieldGroups, {} as AreaSearchFormData);
+}

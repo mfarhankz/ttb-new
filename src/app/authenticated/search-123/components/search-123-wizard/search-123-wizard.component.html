@@ -1,60 +1,65 @@
 <div class="space-y-6">
-  <div class="grid grid-cols-1 gap-4 border-b border-border pb-4 md:grid-cols-12">
-    <div class="md:col-span-3">
-      <div class="flex items-start gap-3">
-        <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">1</span>
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-muted">Step 1</p>
-          <p class="text-sm font-medium text-foreground">Select an area</p>
-        </div>
-      </div>
-    </div>
-    <div class="md:col-span-5">
-      <div class="flex items-start gap-3">
-        <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">2</span>
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-muted">Step 2</p>
-          <p class="text-sm font-medium text-foreground">Select a frequently used query</p>
-        </div>
-      </div>
-    </div>
-    <div class="md:col-span-4" [class.opacity-50]="stepThreeDisabled()">
-      <div class="flex items-start gap-3">
-        <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">3</span>
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-muted">Step 3</p>
-          <p class="text-sm font-medium text-foreground">Launch search</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
-    <section class="space-y-4 lg:col-span-3">
-      <p class="text-body-sm text-muted">
-        Draw a radius or boundary on the map using Farming search, or enter a location below.
-      </p>
-
-      <div class="flex flex-wrap gap-2">
-        <a
-          routerLink="/farming/radius-search"
-          class="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-body-sm font-medium text-foreground transition-colors hover:border-primary hover:bg-primary/5"
+  <div class="grid grid-cols-1 items-start gap-8 md:grid-cols-12">
+    <section class="space-y-4 md:col-span-3">
+      <div class="grid w-full grid-cols-2 gap-3">
+        <button
+          type="button"
+          title="Radius search"
+          class="group flex min-w-0 flex-col overflow-hidden rounded-xl border-2 bg-surface shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md"
+          [class.border-warning]="selectedShape() === 'circle'"
+          [class.border-border]="selectedShape() !== 'circle'"
+          (click)="goToMapSearch('radius')"
         >
-          <i class="pi pi-circle text-primary" aria-hidden="true"></i>
-          Radius search
-        </a>
-        <a
-          routerLink="/farming/boundary-search"
-          class="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-body-sm font-medium text-foreground transition-colors hover:border-primary hover:bg-primary/5"
+          <div class="aspect-square overflow-hidden bg-surface-elevated">
+            <img
+              src="assets/images/radius_logo.png"
+              alt="Radius search"
+              class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
+          <span
+            class="flex items-center justify-center gap-2 border-t border-border px-2 py-2.5 text-center text-sm font-bold uppercase tracking-wide text-foreground transition-colors group-hover:text-primary"
+          >
+            <i class="pi pi-circle text-base text-primary" aria-hidden="true"></i>
+            Radius
+          </span>
+        </button>
+        <button
+          type="button"
+          title="Boundary search"
+          class="group flex min-w-0 flex-col overflow-hidden rounded-xl border-2 bg-surface shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md"
+          [class.border-warning]="selectedShape() === 'polygon'"
+          [class.border-border]="selectedShape() !== 'polygon'"
+          (click)="goToMapSearch('boundary')"
         >
-          <i class="pi pi-stop text-primary" aria-hidden="true"></i>
-          Boundary search
-        </a>
+          <div class="aspect-square overflow-hidden bg-surface-elevated">
+            <img
+              src="assets/images/boundary_logo.png"
+              alt="Boundary search"
+              class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
+          <span
+            class="flex items-center justify-center gap-2 border-t border-border px-2 py-2.5 text-center text-sm font-bold uppercase tracking-wide text-foreground transition-colors group-hover:text-primary"
+          >
+            <i class="pi pi-stop text-base text-primary" aria-hidden="true"></i>
+            Boundary
+          </span>
+        </button>
       </div>
 
-      <div class="text-center text-sm font-medium text-muted">Or</div>
+      @if (geometryChip().length) {
+        <app-area-search-criteria-chips
+          [chips]="geometryChip()"
+          [removable]="true"
+          (remove)="clearDrawnArea.emit()"
+          (view)="viewGeometry()"
+        />
+      }
 
-      <div class="flex items-center gap-2">
+      <div class="text-center text-sm font-medium text-muted my-8">Or</div>
+
+      <div class="flex items-center gap-2 mb-8">
         <p-checkbox
           inputId="search123-county-state-check"
           [binary]="true"
@@ -66,7 +71,7 @@
         </label>
       </div>
 
-      @if (showCheckMsg()) {
+      @if (showAreaMsg()) {
         <app-alert type="error">Please select an area</app-alert>
       }
 
@@ -81,55 +86,55 @@
       />
     </section>
 
-    <section class="lg:col-span-5">
+    <section class="flex min-h-0 flex-col md:col-span-5">
       @if (queriesLoading()) {
         <p class="text-body-sm text-muted">Loading common queries…</p>
-      } @else if (!queries().length) {
+      } @else if (!queries().length && !premierDataEnabled()) {
         <p class="text-body-sm text-muted">No common queries available.</p>
       } @else {
-        <div class="flex max-h-96 flex-col gap-2 overflow-y-auto pr-1">
-          @if (premierDataEnabled()) {
-            <label class="flex cursor-pointer items-center gap-2 rounded-md border border-border px-3 py-2 hover:bg-muted/30">
-              <input type="radio" name="search123-query" (click)="openPremierData.emit()" />
-              <span class="text-sm font-medium text-foreground">Premier Data Queries…</span>
-            </label>
-          }
+        <div class="flex min-h-0 flex-1 flex-col gap-2">
+          <div class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto pr-1">
+            @if (premierDataEnabled()) {
+              <button
+                type="button"
+                class="flex h-10 min-h-10 w-full shrink-0 cursor-pointer items-center gap-2 rounded-md border-2 border-warning bg-warning/10 px-3 text-left transition-colors hover:bg-warning/15"
+                (click)="openPremierData.emit()"
+              >
+                <i class="pi pi-star-fill shrink-0 text-warning" aria-hidden="true"></i>
+                <span class="text-sm font-semibold text-warning">Premier Data Queries…</span>
+              </button>
+            }
 
-          @for (query of queries(); track query.query_id) {
-            <label
-              class="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 transition-colors"
-              [class.border-primary]="selectedQuery()?.query_id === query.query_id"
-              [class.bg-primary/5]="selectedQuery()?.query_id === query.query_id"
-              [class.border-border]="selectedQuery()?.query_id !== query.query_id"
-            >
-              <input
-                type="radio"
-                name="search123-query"
-                [checked]="selectedQuery()?.query_id === query.query_id"
-                (click)="selectQuery(query)"
-              />
-              <span class="text-sm text-foreground">{{ query.name || 'Untitled query' }}</span>
-            </label>
+            @for (query of queries(); track query.query_id) {
+              <label
+                class="flex shrink-0 cursor-pointer items-center gap-1 rounded-md border px-3 py-1.5 transition-colors hover:border-primary/50 hover:bg-primary/5"
+                [class.border-primary]="selectedQuery()?.query_id === query.query_id"
+                [class.bg-primary/5]="selectedQuery()?.query_id === query.query_id"
+                [class.border-border]="selectedQuery()?.query_id !== query.query_id"
+              >
+                <input
+                  type="radio"
+                  name="search123-query"
+                  [checked]="selectedQuery()?.query_id === query.query_id"
+                  (click)="selectQuery(query)"
+                />
+                <span class="text-sm font-semibold text-foreground">{{ query.name || 'Untitled query' }}</span>
+              </label>
+            }
+          </div>
+
+          @if (showQueryMsg()) {
+            <app-alert type="error" class="shrink-0">Query Must Be Selected</app-alert>
           }
         </div>
       }
-
-      @if (showQueryMsg()) {
-        <app-alert type="error" class="mt-3">Query Must Be Selected</app-alert>
-      }
     </section>
 
-    <section class="space-y-4 lg:col-span-4" [class.pointer-events-none]="stepThreeDisabled()" [class.opacity-50]="stepThreeDisabled()">
-      <app-button
-        variant="success"
-        class="w-full"
-        [loading]="searching()"
-        [disabled]="stepThreeDisabled() || searching()"
-        (onClick)="onSearchClick()"
-      >
-        Search
-      </app-button>
-
+    <section
+      class="flex flex-col space-y-4 md:col-span-4"
+      [class.pointer-events-none]="stepThreeDisabled()"
+      [class.opacity-50]="stepThreeDisabled()"
+    >
       <div class="grid grid-cols-12 items-center gap-3">
         <div class="col-span-7 flex items-center gap-2">
           <p-checkbox
@@ -144,7 +149,7 @@
           <input
             pInputText
             type="number"
-            class="w-full"
+            class="box-border h-10 min-h-10 w-full text-body-sm leading-5"
             placeholder="1000"
             [disabled]="!form().maxLimitCheck"
             [ngModel]="form().maxLimitValue"
@@ -164,6 +169,16 @@
           Suppress/Omit records already saved
         </label>
       </div>
+
+      <app-button
+        variant="success"
+        class="w-full"
+        [loading]="searching()"
+        [disabled]="launchDisabled() || searching()"
+        (onClick)="onSearchClick()"
+      >
+        Search
+      </app-button>
 
       @if (form().maxLimitCheck && form().maxLimitValue > allowedMaxLimit()) {
         <app-alert type="error">
@@ -194,3 +209,5 @@
     </div>
   }
 </div>
+
+<app-area-search-geometry-preview #geometryPreview />

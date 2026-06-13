@@ -1,5 +1,35 @@
 <div class="flex min-h-screen flex-col bg-background p-4 md:p-6 lg:p-8">
-  <app-card title="123 search" [padding]="'lg'" class="mx-auto w-full max-w-360">
+  <app-card [padding]="'lg'" class="mx-auto w-full max-w-360">
+    <div cardHeader class="grid grid-cols-1 gap-4 border-b border-border px-6 py-4 md:grid-cols-12 lg:px-8">
+      <div class="md:col-span-3">
+        <div class="flex items-start gap-3">
+          <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">1</span>
+          <div class="min-w-0">
+            <p class="text-xs font-semibold tracking-wide text-muted">Step 1</p>
+            <p class="whitespace-nowrap text-xs font-medium text-foreground sm:text-sm">Select an area via radius or a polygon</p>
+          </div>
+        </div>
+      </div>
+      <div class="md:col-span-5">
+        <div class="flex items-start gap-3">
+          <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">2</span>
+          <div class="min-w-0">
+            <p class="text-xs font-semibold tracking-wide text-muted">Step 2</p>
+            <p class="whitespace-nowrap text-xs font-medium text-foreground sm:text-sm">Select a frequently used query</p>
+          </div>
+        </div>
+      </div>
+      <div class="md:col-span-4" [class.opacity-50]="stepThreeDisabled()">
+        <div class="flex items-start gap-3">
+          <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">3</span>
+          <div class="min-w-0">
+            <p class="text-xs font-semibold tracking-wide text-muted">Step 3</p>
+            <p class="whitespace-nowrap text-xs font-medium text-foreground sm:text-sm">Launch search</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     @if (initializingLocation()) {
       <p class="text-body-sm text-muted">Loading state/city…</p>
     } @else {
@@ -15,8 +45,12 @@
         [showPayNowButton]="showPayNowButton()"
         [payNowPrice]="payNowPrice()"
         [premierDataEnabled]="premierDataEnabled()"
-        [allowedMaxLimit]="search123Service.allowedMaxLimit"
+        [allowedMaxLimit]="allowedMaxLimit"
+        [stepThreeDisabled]="stepThreeDisabled()"
+        [selectedShape]="selectedShape()"
+        [geometry]="geometry()"
         (formChange)="onFormChange($event)"
+        (clearDrawnArea)="onClearDrawnArea()"
         (querySelect)="onQuerySelect($event)"
         (search)="onSearch()"
         (payNow)="onPayNow()"

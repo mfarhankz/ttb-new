@@ -1,4 +1,13 @@
-import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnDestroy,
+  OnInit,
+  computed,
+  inject,
+  signal
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { Search123WizardComponent } from '@app/authenticated/search-123/components/search-123-wizard/search-123-wizard.component';
@@ -11,9 +20,11 @@ import {
   Search123FormState,
   Search123Service
 } from '@app/authenticated/search-123/services/search-123.service';
+import { Search123StateService } from '@app/authenticated/search-123/services/search-123-state.service';
 import { AreaSearchService } from '@app/authenticated/farming/services/area-search.service';
 import { AreaSearchSessionService } from '@app/authenticated/farming/services/area-search-session.service';
 import { AreaSearchStateService } from '@app/authenticated/farming/services/area-search-state.service';
+import { AreaSearchFieldsService } from '@app/authenticated/farming/services/area-search-fields.service';
 import { CommonQueriesService } from '@app/authenticated/farming/services/common-queries.service';
 import { SavedFarmsService } from '@app/authenticated/farming/services/saved-farms.service';
 import { PayNowModalService } from '@app/authenticated/payment/services/pay-now-modal.service';
@@ -28,19 +39,25 @@ import { AuthService } from '@app/core/services/auth.service';
 import { VerticalService } from '@app/core/services/vertical.service';
 import { extractLeadsMeta, mapPropertyRecords } from '@app/core/utils/property-record.mapper';
 import { US_STATE_FIPS_BY_ABBREV } from '@app/core/config/us-states.config';
+import { fetchStateCountyFromGeometry } from '@app/core/utils/geometry-state-county.util';
+import { buildCriteriaChipsFromPayload } from '@app/core/utils/area-search-criteria.util';
 import { CardComponent } from '@app/shared/components';
 import { GeographicAreaFieldsValue } from '@app/shared/widgets/geographic-area-fields/geographic-area-fields.types';
+import { MapDrawnGeometry } from '@app/authenticated/map/services/ol-map.service';
 
 @Component({
   selector: 'app-search-123',
   standalone: true,
   imports: [CardComponent, Search123WizardComponent],
-  templateUrl: './search-123.component.html'
+  templateUrl: './search-123.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Search123Component implements OnInit, OnDestroy {
   private readonly router = inject(Router);
-  protected readonly search123Service = inject(Search123Service);
+  private readonly search123Service = inject(Search123Service);
+  private readonly search123StateService = inject(Search123StateService);
   private readonly areaSearchService = inject(AreaSearchService);
+  private readonly fieldsService = inject(AreaSearchFieldsService);
   private readonly sessionService = inject(AreaSearchSessionService);
   private readonly areaSearchStateService = inject(AreaSearchStateService);
   private readonly commonQueriesService = inject(CommonQueriesService);
@@ -52,6 +69,12 @@ export class Search123Component implements OnInit, OnDestroy {
 
   private lastSearchPayload: AreaSearchPayload | null = null;
 
+  readonly allowedMaxLimit = this.search123Service.allowedMaxLimit;
+  readonly selectedShape = this.search123StateService.selectedShape;
+  readonly geometry = this.search123StateService.geometry;
+  readonly queries = this.commonQueriesService.queries;
+  readonly queriesLoading = this.commonQueriesService.loading;
+
   readonly form = signal<Search123FormState>(this.createDefaultForm());
   readonly selectedQuery = signal<CommonAreaSearchQuery | null>(null);
   readonly searching = signal(false);
@@ -61,9 +84,6 @@ export class Search123Component implements OnInit, OnDestroy {
   readonly successMessage = signal<string | null>(null);
   readonly showPayNowButton = signal(false);
   readonly countResult = signal<GlobalSearchCountData | null>(null);
-
-  readonly queries = this.commonQueriesService.queries;
-  readonly queriesLoading = this.commonQueriesService.loading;
   readonly premierDataEnabled = signal(false);
 
   readonly payNowPrice = computed(() => {
@@ -71,10 +91,16 @@ export class Search123Component implements OnInit, OnDestroy {
     return price != null ? Number(price) : null;
   });
 
+  readonly stepThreeDisabled = computed(
+    () =>
+      (!this.form().countyStateCheck && !this.selectedShape()) || !this.selectedQuery()
+  );
+
   ngOnInit(): void {
     this.premierDataEnabled.set(this.search123Service.isPremierDataLinkEnabled());
     this.commonQueriesService.fetchList();
-    this.initializeLocationDefaults();
+    this.fieldsService.loadFields().subscribe({ error: () => undefined });
+    void this.initializeLocationDefaults();
   }
 
   ngOnDestroy(): void {
@@ -172,6 +198,13 @@ export class Search123Component implements OnInit, OnDestroy {
     void this.router.navigate(['/farming/area-search']);
   }
 
+  onClearDrawnArea(): void {
+    this.search123StateService.clearDrawnArea();
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+    this.showPayNowButton.set(false);
+  }
+
   private createDefaultForm(): Search123FormState {
     return {
       countyStateCheck: false,
@@ -185,7 +218,14 @@ export class Search123Component implements OnInit, OnDestroy {
     };
   }
 
-  private initializeLocationDefaults(): void {
+  private async initializeLocationDefaults(): Promise<void> {
+    const drawnGeometry = this.geometry();
+    if (drawnGeometry) {
+      await this.hydrateGeographicFromGeometry(drawnGeometry);
+      this.initializingLocation.set(false);
+      return;
+    }
+
     const stateFips = this.resolveDefaultStateFips();
     const geographic: GeographicAreaFieldsValue = {
       stateFips,
@@ -194,6 +234,20 @@ export class Search123Component implements OnInit, OnDestroy {
 
     this.form.update((current) => ({ ...current, geographic }));
     this.initializingLocation.set(false);
+  }
+
+  private async hydrateGeographicFromGeometry(geometry: MapDrawnGeometry): Promise<void> {
+    const location = await fetchStateCountyFromGeometry(geometry);
+    const stateFips = location.mm_fips_state_code ?? this.resolveDefaultStateFips();
+
+    this.form.update((current) => ({
+      ...current,
+      geographic: {
+        ...current.geographic,
+        stateFips,
+        countyFips: current.geographic.countyFips
+      }
+    }));
   }
 
   private resolveDefaultStateFips(): string {
@@ -214,7 +268,7 @@ export class Search123Component implements OnInit, OnDestroy {
     return this.search123Service.buildPayload({
       form: this.form(),
       selectedQuery: this.selectedQuery(),
-      selectedShape: null
+      geometry: this.geometry() ?? undefined
     });
   }
 
@@ -234,11 +288,16 @@ export class Search123Component implements OnInit, OnDestroy {
     rawRecords: PropertyRecordRaw[],
     pagingInfo?: { page?: number; limit?: number; total?: number; total_found?: number; [key: string]: unknown }
   ): void {
+    const fieldsInfo = this.fieldsService.fieldsInfo();
+    const criteriaChips = fieldsInfo
+      ? buildCriteriaChipsFromPayload(criteria, fieldsInfo, this.fieldsService.fieldGroups())
+      : [];
     const leadsMeta = extractLeadsMeta(rawRecords);
     const rows = mapPropertyRecords(rawRecords, leadsMeta.leadsAttr, leadsMeta.leadsTypes);
     const sessionId = this.sessionService.createSession({
       title: this.selectedQuery()?.name ?? '123 Search Results',
       criteria,
+      criteriaChips,
       rows,
       rawRecords,
       countResult: this.countResult() ?? undefined,

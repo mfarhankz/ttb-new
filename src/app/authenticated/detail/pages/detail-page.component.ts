@@ -41,6 +41,7 @@ import { MapTablePipelineComponent } from '@app/authenticated/map/components/map
 import { MapPipelineViewMode } from '@app/authenticated/map/components/map-table-pipeline/map-table-pipeline.types';
 import { OlMapComponent } from '@app/shared/widgets/ol-map/ol-map.component';
 import { AreaSearchCriteriaChipsComponent } from '@app/authenticated/farming/components/area-search-fields/area-search-criteria-chips.component';
+import { AreaSearchGeometryPreviewComponent } from '@app/authenticated/farming/components/area-search-fields/area-search-geometry-preview.component';
 import {
   DETAIL_PAGE_DEFAULT_PAGE_SIZE,
   DETAIL_PAGE_EMPTY_COPY,
@@ -94,7 +95,8 @@ const DETAIL_ACTIONS_COLUMN: DataTableColumn = {
     IconField,
     InputIcon,
     InputText,
-    AreaSearchCriteriaChipsComponent
+    AreaSearchCriteriaChipsComponent,
+    AreaSearchGeometryPreviewComponent
   ],
   templateUrl: './detail-page.component.html',
   styles: [
@@ -128,6 +130,7 @@ export class DetailPageComponent implements OnInit, OnDestroy {
   @ViewChild('saveSearchModal') private saveSearchModal?: ModalComponent;
   @ViewChild('shareSearchModal') private shareSearchModal?: ModalComponent;
   @ViewChild('sendDataModal') private sendDataModal?: ModalComponent;
+  @ViewChild('geometryPreview') private geometryPreview?: AreaSearchGeometryPreviewComponent;
   readonly exportMenu = viewChild<Menu>('exportMenu');
   readonly saveShareMenu = viewChild<Menu>('saveShareMenu');
   readonly overflowMenu = viewChild<Menu>('overflowMenu');
@@ -805,6 +808,23 @@ export class DetailPageComponent implements OnInit, OnDestroy {
 
     this.areaSearchStateService.setEditCriteria(session.criteria);
     void this.router.navigate(['/farming/area-search'], { queryParams: { edit: 'true' } });
+  }
+
+  viewCriteriaChip(fieldName: string): void {
+    if (fieldName !== 'geometry') {
+      return;
+    }
+
+    const geometry = this.detailPageService.geometry();
+    const resolved = Array.isArray(geometry) ? geometry[0] : geometry;
+    if (!resolved?.match || resolved.value == null) {
+      return;
+    }
+
+    this.geometryPreview?.open({
+      match: resolved.match,
+      value: resolved.value
+    });
   }
 
   goBack(): void {

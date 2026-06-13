@@ -175,7 +175,7 @@
     <div mapTablePipelineTable class="flex h-full min-h-0 flex-1 flex-col gap-2">
       <div class="shrink-0">
         @if (isQueryDetail() && criteriaChips().length) {
-          <app-area-search-criteria-chips [chips]="criteriaChips()" />
+          <app-area-search-criteria-chips [chips]="criteriaChips()" (view)="viewCriteriaChip($event)" />
         } @else {
           <p class="text-body-sm text-muted">
             {{ titleLabel() }}:
@@ -447,3 +447,5 @@
     </div>
   </div>
 </app-modal>
+
+<app-area-search-geometry-preview #geometryPreview />

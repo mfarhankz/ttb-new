@@ -108,8 +108,14 @@
 
             <div class="ml-auto flex flex-wrap items-center gap-2">
               <app-button variant="primary" size="sm" (onClick)="onClearPin()">Clear Pin</app-button>
-              <app-button variant="success" size="sm" (onClick)="onGetCount()">Get Count</app-button>
-              <app-button variant="success" size="sm" (onClick)="onAddFilters()">Add Filters</app-button>
+              @if (search123Handoff()) {
+                <app-button variant="success" size="sm" (onClick)="onContinueToSearch123()">
+                  Continue
+                </app-button>
+              } @else {
+                <app-button variant="success" size="sm" (onClick)="onGetCount()">Get Count</app-button>
+                <app-button variant="success" size="sm" (onClick)="onAddFilters()">Add Filters</app-button>
+              }
             </div>
           </div>
         }

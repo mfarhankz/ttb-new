@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, finalize } from 'rxjs';
@@ -7,7 +7,7 @@ import { Select } from 'primeng/select';
 import { ButtonComponent } from '@app/shared/components';
 import { AddressAutocompleteComponent } from '@app/shared/widgets/address-autocomplete/address-autocomplete.component';
 import { OlMapComponent } from '@app/shared/widgets/ol-map/ol-map.component';
-import { OlMapService, type MapObjectRefs } from '@app/authenticated/map/services/ol-map.service';
+import { OlMapService, type MapDrawnGeometry, type MapObjectRefs } from '@app/authenticated/map/services/ol-map.service';
 import { MAP_DEFAULTS } from '@app/authenticated/map/config/map.config';
 import { LayoutService } from '@app/core/services/layout.service';
 import { AreaSearchStateService } from '@app/authenticated/farming/services/area-search-state.service';
@@ -16,6 +16,8 @@ import { PropertySearchService } from '@app/authenticated/property-search/servic
 import { VerticalService } from '@app/core/services/vertical.service';
 import { ClearSearchService } from '@app/authenticated/farming/services/clear-search.service';
 import { ClearSearchStateService } from '@app/authenticated/farming/services/clear-search-state.service';
+import { SEARCH_123_ROUTE } from '@app/authenticated/search-123/config/search-123.config';
+import { Search123StateService } from '@app/authenticated/search-123/services/search-123-state.service';
 import { SmartyAddressDetails } from '@app/core/interfaces/smarty.interface';
 import { CountyFipsOption, ParcelSearchPayload } from '@app/core/interfaces/property-search.interface';
 
@@ -40,6 +42,7 @@ export class MapSearchComponent implements OnInit, OnDestroy {
   private readonly verticalService = inject(VerticalService);
   private readonly clearSearchService = inject(ClearSearchService);
   private readonly clearSearchState = inject(ClearSearchStateService);
+  private readonly search123StateService = inject(Search123StateService);
   private sidebarResizeSub?: Subscription;
   private mapReadyAttempts = 0;
   private parcelCountyDebounce?: ReturnType<typeof setTimeout>;
@@ -63,6 +66,9 @@ export class MapSearchComponent implements OnInit, OnDestroy {
   readonly parcelCountyOptions = signal<CountyFipsOption[]>([]);
   readonly parcelSearching = signal(false);
   readonly searchError = signal<string | null>(null);
+  readonly returnUrl = signal<string | null>(null);
+
+  readonly search123Handoff = computed(() => this.returnUrl() === SEARCH_123_ROUTE);
 
   readonly smartyVerificationEnabled = this.verticalService.smartyVerificationEnabled;
 
@@ -76,6 +82,7 @@ export class MapSearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.returnUrl.set(this.route.snapshot.queryParamMap.get('returnUrl'));
     this.clearSearchService.registerMapHandler(() => this.onCancelSearch());
     this.sidebarResizeSub = this.layoutService.onSidebarResize.subscribe(() => {
       setTimeout(() => this.mapObject.map?.updateSize?.(), 220);
@@ -90,6 +97,10 @@ export class MapSearchComponent implements OnInit, OnDestroy {
         this.mapMode.set(mode);
         this.scheduleMapMode(mode);
       }
+    });
+
+    this.route.queryParamMap.subscribe((params) => {
+      this.returnUrl.set(params.get('returnUrl'));
     });
   }
 
@@ -203,11 +214,33 @@ export class MapSearchComponent implements OnInit, OnDestroy {
   }
 
   onGetCount(): void {
+    if (this.search123Handoff()) {
+      this.onContinueToSearch123();
+      return;
+    }
+
     this.openAreaSearch(true);
   }
 
   onAddFilters(): void {
+    if (this.search123Handoff()) {
+      this.onContinueToSearch123();
+      return;
+    }
+
     this.openAreaSearch(false);
+  }
+
+  onContinueToSearch123(geometryOverride?: MapDrawnGeometry): void {
+    const geometry = geometryOverride ?? this.mapObject.geometry;
+    const mode = this.mapMode();
+    if (!geometry?.match || !geometry.value || !mode) {
+      return;
+    }
+
+    const shape = mode === 'radius' ? 'circle' : 'polygon';
+    this.search123StateService.setDrawnArea(geometry, shape);
+    void this.router.navigateByUrl(SEARCH_123_ROUTE);
   }
 
   onClearPin(): void {
@@ -247,9 +280,16 @@ export class MapSearchComponent implements OnInit, OnDestroy {
     this.searchError.set(null);
     this.addressResetToken.update((token) => token + 1);
     this.olMapService.removeDrawInteraction(this.mapObject);
-    const cancelRoute =
-      this.searchContext() === 'statistics' ? '/statistics/radius-search' : '/dashboard';
+    const cancelRoute = this.resolveCancelRoute();
     void this.router.navigate([cancelRoute]);
+  }
+
+  private resolveCancelRoute(): string {
+    if (this.returnUrl()) {
+      return this.returnUrl()!;
+    }
+
+    return this.searchContext() === 'statistics' ? '/statistics/radius-search' : '/dashboard';
   }
 
   private openAreaSearch(runGetCount: boolean): void {
@@ -318,10 +358,16 @@ export class MapSearchComponent implements OnInit, OnDestroy {
 
     const shape = mode === 'radius' ? 'circle' : 'polygon';
     const shapeCallbacks = {
-      onDrawComplete: (_geometry: unknown, label: string) => {
+      onDrawComplete: (geometry: MapDrawnGeometry, label: string) => {
+        this.shapeSummary.set(label);
+
+        if (this.search123Handoff()) {
+          setTimeout(() => this.onContinueToSearch123(geometry), 100);
+          return;
+        }
+
         this.showSearchPanel.set(false);
         this.showShapeActions.set(true);
-        this.shapeSummary.set(label);
       },
       onGeometryChange: (_geometry: unknown, label: string) => {
         this.shapeSummary.set(label);

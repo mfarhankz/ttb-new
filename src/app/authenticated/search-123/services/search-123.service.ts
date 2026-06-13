@@ -22,7 +22,6 @@ export interface Search123BuildInput {
   form: Search123FormState;
   selectedQuery: CommonAreaSearchQuery | null;
   geometry?: MapDrawnGeometry;
-  selectedShape?: 'circle' | 'polygon' | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -70,7 +69,7 @@ export class Search123Service {
 
     this.applyGeographicToPayload(payload, input.form);
 
-    if (input.selectedShape && input.geometry) {
+    if (input.geometry?.match && input.geometry.value != null) {
       payload.geometry = {
         match: input.geometry.match,
         value: input.geometry.value

@@ -1,4 +1,5 @@
 <div [class]="getCardClasses()">
+  <ng-content select="[cardHeader]"></ng-content>
   @if (title || subtitle || headerActions) {
     <div class="px-6 py-4 border-b border-border">
       <div class="flex items-center justify-between gap-4">
